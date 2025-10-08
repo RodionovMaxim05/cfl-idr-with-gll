@@ -1,0 +1,30 @@
+name: Test
+
+on: [ push, pull_request, workflow_dispatch ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 11
+
+      - name: Execute Gradle `test` task
+        uses: gradle/gradle-build-action@v3
+        with:
+          arguments: test jacocoTestReport --no-daemon
+
+      - name: Upload `test` report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestReport-${{ matrix.os }}
+          path: build/reports/tests/
+          retention-days: 14
