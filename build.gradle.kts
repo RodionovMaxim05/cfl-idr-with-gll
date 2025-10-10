@@ -1,5 +1,6 @@
 plugins {
 	kotlin("jvm") version "1.9.20"
+	application
 	jacoco
 }
 
@@ -10,6 +11,8 @@ repositories {
 }
 
 dependencies {
+	implementation(files("libs/solver.jar"))
+	implementation("org.antlr:antlr4:4.13.1") // for solver
 	testImplementation(kotlin("test"))
 }
 
@@ -18,6 +21,10 @@ tasks.test {
 }
 kotlin {
 	jvmToolchain(11)
+}
+
+application {
+	mainClass.set("org.cfl_idr_with_gll.Main")
 }
 
 jacoco {
