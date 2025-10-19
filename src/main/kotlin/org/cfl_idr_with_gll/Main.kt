@@ -5,8 +5,7 @@ import java.io.File
 
 object Main {
 
-	private const val DIRECTORY_INPUT = "taint"
-	private const val DIRECTORY_OUTPUT = "taint-out"
+	private const val DIRECTORY_OUTPUT = "src/main/resources/taint"
 
 	private var currentGrammar = "classic"
 	private var currParityK = 2
@@ -18,30 +17,40 @@ object Main {
 	@JvmStatic
 	fun main(args: Array<String>) {
 		if (args.size < 2) {
-			error("Usage: <dot-file-name-in-resources> <grammar>")
+			error("Usage: <dot-file-paths> <grammar>")
 		}
 
-		val dotFileName = args[0]
+		val dotFilePath = args[0]
 		currentGrammar = args[1]
 
 		if (currentGrammar !in supportedGrammars) {
 			error("Invalid grammar: $currentGrammar. Supported: $supportedGrammars")
 		}
 
-		val resourcePath = "/$DIRECTORY_INPUT/$dotFileName"
-		val inputText = Main::class.java.getResourceAsStream(resourcePath)
-			?.bufferedReader()?.use { it.readText() }
-			?: error("Resource not found: $resourcePath")
+		val inputFile = File(dotFilePath)
+		if (!inputFile.exists()) {
+			error("Input file not found: ${inputFile.absolutePath}")
+		}
 
-//		val finalGraphText = if (isGraphvizFormat(resourcePath)) inputText
-//		else convertEdgesToGraphvizText(inputText)
-		val finalGraphText = convertEdgesToGraphvizText(inputText)
+		val inputText = inputFile.readText()
+
+		val finalGraphText = if (isGraphvizFormat(inputFile)) {
+			inputText
+		} else {
+			convertEdgesToGraphvizText(inputText)
+		}
 
 		val inputGraph = DotParser().parseDot(finalGraphText)
 
-		val benchmarkName = dotFileName.substringBeforeLast(".")
+		val benchmarkName = inputFile.name.substringBeforeLast(".")
 		val outputDir = File(DIRECTORY_OUTPUT)
-//		outputDir.mkdirs()
+		outputDir.mkdirs()
 		val outputFile = File(outputDir, "$benchmarkName.out")
+
+		val paths = getUnderApprox(inputGraph)
+
+		for (path in paths) {
+			outputFile.writeText("$path\n")
+		}
 	}
 }
