@@ -46,8 +46,8 @@ fun <VertexType> extractEdgesFromSppfResults(
 	return edges
 }
 
-fun isGraphvizFormat(file: String): Boolean {
-	val firstLine = File(file).useLines { lines ->
+fun isGraphvizFormat(file: File): Boolean {
+	val firstLine = file.useLines { lines ->
 		lines.firstOrNull { it.isNotBlank() }
 	}
 	return firstLine?.trim()?.startsWith("digraph") == true
