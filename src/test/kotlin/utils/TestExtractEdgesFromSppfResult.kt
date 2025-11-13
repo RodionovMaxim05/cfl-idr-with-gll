@@ -2,7 +2,7 @@ import org.junit.jupiter.api.Test
 import org.ucfs.rsm.symbol.ITerminal
 import kotlin.test.assertEquals
 import org.cfl_idr_with_gll.extractEdgesFromSppfResults
-import org.cfl_idr_with_gll.Edge
+import org.cfl_idr_with_gll.SppfEdge
 import utils.sppfForExtractEdges.buildSimpleSppf
 import utils.sppfForExtractEdges.buildSimplifiedDyckGrammarSppf
 import utils.sppfForExtractEdges.buildOneVertexLoopDyckGrammarSppf
@@ -23,7 +23,7 @@ class TestExtractEdgesFromSppfResult {
 		val result = extractEdgesFromSppfResults(sppf)
 
 		assertEquals(
-			setOf(Edge(0, MockTerminal("a"), 1)),
+			setOf(SppfEdge(0, MockTerminal("a"), 1)),
 			result
 		)
 	}
@@ -34,7 +34,7 @@ class TestExtractEdgesFromSppfResult {
 
 		val result = extractEdgesFromSppfResults(sppf)
 
-		val expected = setOf(Edge(0, MockTerminal("("), 1), Edge(1, MockTerminal(")"), 2))
+		val expected = setOf(SppfEdge(0, MockTerminal("("), 1), SppfEdge(1, MockTerminal(")"), 2))
 		assertEquals(expected, result)
 	}
 
@@ -44,7 +44,7 @@ class TestExtractEdgesFromSppfResult {
 
 		val result = extractEdgesFromSppfResults(sppf)
 
-		val expected = setOf(Edge(0, MockTerminal("("), 0), Edge(0, MockTerminal(")"), 0))
+		val expected = setOf(SppfEdge(0, MockTerminal("("), 0), SppfEdge(0, MockTerminal(")"), 0))
 		assertEquals(expected, result)
 	}
 
@@ -54,7 +54,7 @@ class TestExtractEdgesFromSppfResult {
 
 		val result = extractEdgesFromSppfResults(sppf)
 
-		val expected = setOf(Edge(0, MockTerminal("a"), 1))
+		val expected = setOf(SppfEdge(0, MockTerminal("a"), 1))
 		assertEquals(expected, result)
 	}
 }

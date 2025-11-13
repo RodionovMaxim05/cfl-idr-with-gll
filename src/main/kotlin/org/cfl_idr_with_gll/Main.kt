@@ -47,10 +47,18 @@ object Main {
 		outputDir.mkdirs()
 		val outputFile = File(outputDir, "$benchmarkName.out")
 
-		val paths = getUnderApprox(inputGraph)
+		val underPaths = getUnderApprox(inputGraph)
 
-		for (path in paths) {
-			outputFile.writeText("$path\n")
+		val overPaths = getMROverApprox(inputGraph, "parity2", 2)
+
+		outputFile.writeText("Under approximation paths:\n")
+		for (path in underPaths) {
+			outputFile.appendText("\t$path\n")
+		}
+
+		outputFile.appendText("\nOver approximation paths:\n")
+		for (path in overPaths) {
+			outputFile.appendText("\t$path\n")
 		}
 	}
 }
