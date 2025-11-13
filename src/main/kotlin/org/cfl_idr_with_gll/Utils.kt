@@ -9,12 +9,12 @@ import kotlin.text.split
 import kotlin.text.substringBefore
 import kotlin.text.trim
 
-data class Edge<VertexType>(val from: VertexType, val label: ITerminal, val to: VertexType)
+data class SppfEdge<VertexType>(val from: VertexType, val label: ITerminal, val to: VertexType)
 
 fun <VertexType> extractEdgesFromSppfResults(
 	sppf: Set<RangeSppfNode<VertexType>>
-): Set<Edge<VertexType>> {
-	val edges = mutableSetOf<Edge<VertexType>>()
+): Set<SppfEdge<VertexType>> {
+	val edges = mutableSetOf<SppfEdge<VertexType>>()
 	val visited = mutableSetOf<RangeSppfNode<VertexType>>()
 
 	fun dfs(node: RangeSppfNode<VertexType>) {
@@ -22,7 +22,7 @@ fun <VertexType> extractEdgesFromSppfResults(
 
 		when (val t = node.type) {
 			is TerminalType<*> -> {
-				edges.add(Edge(node.inputRange!!.from, t.terminal, node.inputRange!!.to))
+				edges.add(SppfEdge(node.inputRange!!.from, t.terminal, node.inputRange!!.to))
 			}
 
 			is IntermediateType<*> -> {
