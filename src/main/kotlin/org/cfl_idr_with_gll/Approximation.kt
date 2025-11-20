@@ -49,7 +49,7 @@ fun <V, L : ILabel> getUnderApprox(
 
 		reachablePaths.addAll(componentPaths)
 	}
-
+	
 	return reachablePaths
 }
 
@@ -131,7 +131,7 @@ fun <V, L : ILabel> mutualRefinement(
 		val alphaEdges = extractEdgesFromSppfResults(alphaSppf)
 		val updatedAlphaGraph = createGraphFromEdges(alphaEdges)
 
-		val (_, _, alphaParsedComp) = parseDyckComponent(updatedAlphaGraph, terminalFormat)
+		val (parList, braList, alphaParsedComp) = parseDyckComponent(updatedAlphaGraph, terminalFormat)
 
 		val alphaPaths = alphaSppf.mapNotNull { node ->
 			node.inputRange?.let { range ->
@@ -141,7 +141,7 @@ fun <V, L : ILabel> mutualRefinement(
 
 		// Get betaPaths
 		val betaSppf =
-			getBetaPaths(alphaParsedComp, parenthesesList, bracketsList, curGrammar, curParityK, terminalFormat)
+			getBetaPaths(alphaParsedComp, parList, braList, curGrammar, curParityK, terminalFormat)
 
 		val betaEdges = extractEdgesFromSppfResults(betaSppf)
 		val newBetaParsedComp = createGraphFromEdges(betaEdges)
