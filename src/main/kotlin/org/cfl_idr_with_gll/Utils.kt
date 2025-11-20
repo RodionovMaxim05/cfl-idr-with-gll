@@ -73,10 +73,6 @@ fun convertEdgesToGraphvizText(inputText: String): String {
 	return buildString {
 		appendLine("digraph G {")
 
-		for (v in vertices) {
-			appendLine("    start->$v;")
-		}
-
 		for (line in edges) {
 			val trimmedLine = line.trim()
 			val lineWithSemicolon = if (trimmedLine.endsWith(";")) trimmedLine else "$trimmedLine;"
