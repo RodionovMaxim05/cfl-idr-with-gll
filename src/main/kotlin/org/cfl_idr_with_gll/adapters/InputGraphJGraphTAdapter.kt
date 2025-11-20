@@ -16,7 +16,6 @@ object InputGraphJGraphTAdapter {
 
 		inputGraph.edges.forEach { (from, edges) ->
 			edges.forEach { edge ->
-				jGraph.addVertex(edge.targetVertex)
 				jGraph.addEdge(from, edge.targetVertex)
 			}
 		}

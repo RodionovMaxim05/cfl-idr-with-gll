@@ -1,7 +1,7 @@
 Under approximation paths:
-	Path(source=1, target=9)
 	Path(source=6, target=8)
+	Path(source=1, target=9)
 
 Over approximation paths:
-	Path(source=1, target=9)
 	Path(source=6, target=8)
+	Path(source=1, target=9)
