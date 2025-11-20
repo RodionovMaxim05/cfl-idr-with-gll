@@ -1,5 +1,3 @@
 digraph G {
-    start->10;
-    start->20;
     10->20[label="op--0"];
 }
