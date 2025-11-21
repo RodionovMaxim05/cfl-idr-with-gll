@@ -37,6 +37,17 @@ class TestOverApprox {
 	}
 
 	@Test
+	fun `se on figure5 graph`() {
+		val graph = loadGraph("src/test/resources/correctness/figure5/graph.dot")
+
+		val actual = getMROverApprox(graph, "se", 2).sortedPaths()
+
+		val expected = listOf(Path(source = 1, target = 9), Path(source = 6, target = 8))
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
 	fun `parity2 on figure9 graph`() {
 		val graph = loadGraph("src/test/resources/correctness/figure9/graph.dot")
 
@@ -69,6 +80,54 @@ class TestOverApprox {
 			Path(source = 6, target = 8),
 			Path(source = 7, target = 8)
 		)
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `parity on figure10 graph`() {
+		val graph = loadGraph("src/test/resources/correctness/figure10/graph.dot")
+
+		val actual = getMROverApprox(graph, "parity2", 2).sortedPaths()
+
+		val expected = listOf(
+			Path(source = 1, target = 3),
+			Path(source = 1, target = 5),
+			Path(source = 1, target = 7),
+			Path(source = 2, target = 4),
+			Path(source = 2, target = 6),
+			Path(source = 3, target = 5),
+			Path(source = 3, target = 7),
+			Path(source = 4, target = 6),
+			Path(source = 5, target = 7)
+		)
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `se on figure10 graph`() {
+		val graph = loadGraph("src/test/resources/correctness/figure10/graph.dot")
+
+		val actual = getMROverApprox(graph, "se", 2).sortedPaths()
+
+		val expected = listOf(
+			Path(source = 1, target = 7),
+			Path(source = 2, target = 6),
+			Path(source = 3, target = 7),
+			Path(source = 4, target = 6)
+		)
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `project on figure9 graph`() {
+		val graph = loadGraph("src/test/resources/correctness/figure10/graph.dot")
+
+		val actual = getMROverApprox(graph, "project", 2).sortedPaths()
+
+		val expected = listOf(Path(source = 3, target = 7), Path(source = 4, target = 6))
 
 		assertEquals(expected, actual)
 	}
