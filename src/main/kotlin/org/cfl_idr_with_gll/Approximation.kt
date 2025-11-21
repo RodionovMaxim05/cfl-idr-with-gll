@@ -2,6 +2,7 @@ package org.cfl_idr_with_gll
 
 import org.cfl_idr_with_gll.GrammarAnalysisCache.getAlphaPaths
 import org.cfl_idr_with_gll.GrammarAnalysisCache.getBetaPaths
+import org.cfl_idr_with_gll.GrammarAnalysisCache.getProjectPaths
 import org.cfl_idr_with_gll.graph.parseDyckComponent
 import org.cfl_idr_with_gll.graph.parseDyckComponentNaive
 import org.cfl_idr_with_gll.graph.splitIntoConnectedComponents
@@ -145,13 +146,33 @@ fun <V, L : ILabel> mutualRefinement(
 
 		val betaEdges = extractEdgesFromSppfResults(betaSppf)
 		val newBetaParsedComp = createGraphFromEdges(betaEdges)
-		val (_, _, betaParsedComp) = parseDyckComponent(newBetaParsedComp, terminalFormat)
+		var (_, _, betaParsedComp) = parseDyckComponent(newBetaParsedComp, terminalFormat)
 
 		val betaPaths = betaSppf.mapNotNull { node ->
 			node.inputRange?.let { range ->
 				Path(range.from, range.to)
 			}
 		}.filter { it.source != it.target }
+
+		val projectPaths: List<Path<V>>
+		if (curGrammar == "project" || curGrammar == "all") {
+			val projectSppf = getProjectPaths(parsedComp, parList, braList, terminalFormat)
+
+			val projectEdges = extractEdgesFromSppfResults(projectSppf)
+			val newProjectParsedComp = createGraphFromEdges(projectEdges)
+			val (newParList, newBraList, newParsedComp) = parseDyckComponent(newProjectParsedComp, terminalFormat)
+//			parList = newParList
+//			braList = newBraList
+			betaParsedComp = newParsedComp
+
+			projectPaths = projectSppf.mapNotNull { node ->
+				node.inputRange?.let { range ->
+					Path(range.from, range.to)
+				}
+			}.filter { it.source != it.target }
+		} else {
+			projectPaths = betaPaths
+		}
 
 //		if (curGrammar == "exclude" || curGrammar == "all") {
 //			for (braId in braList) {
@@ -173,9 +194,10 @@ fun <V, L : ILabel> mutualRefinement(
 			// stability has been achieved
 
 			val betaPathSet = betaPaths.toSet()
+			val projectPathSet = projectPaths.toSet()
 
 			for (path in alphaPaths) {
-				if (path.source != path.target && betaPathSet.contains(path)) {
+				if (path.source != path.target && betaPathSet.contains(path) && projectPathSet.contains(path)) {
 					paths += path
 				}
 			}

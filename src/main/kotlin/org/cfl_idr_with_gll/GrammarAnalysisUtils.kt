@@ -56,6 +56,14 @@ fun getBetaGrammar(
 	}
 }
 
+fun getProjectGrammar(
+	parenthesesIds: List<String>,
+	bracketsIds: List<String>,
+	terminalFormat: ITerminalFormat
+): Grammar {
+	return dyckProjectGrammar(terminalFormat, parenthesesIds, bracketsIds)
+}
+
 //fun getExcludeGrammar(
 //	parenthesesIds: List<String>,
 //	bracketsIds: List<String>,
@@ -95,6 +103,24 @@ object GrammarAnalysisCache {
 		terminalFormat: ITerminalFormat
 	): Set<RangeSppfNode<V>> {
 		val grammar = getBetaGrammar(parenthesesLabels, bracketsLabels, curGrammar, curParityK, terminalFormat)
+
+		for (v in graph.vertices) {
+			graph.addStartVertex(v)
+		}
+
+		val gll = Gll.gll(grammar.rsm, graph)
+		val sppf = gll.parse()
+
+		return sppf
+	}
+
+	fun <V, L : ILabel> getProjectPaths(
+		graph: InputGraph<V, L>,
+		parenthesesLabels: List<String>,
+		bracketsLabels: List<String>,
+		terminalFormat: ITerminalFormat
+	): Set<RangeSppfNode<V>> {
+		val grammar = getProjectGrammar(parenthesesLabels, bracketsLabels, terminalFormat)
 
 		for (v in graph.vertices) {
 			graph.addStartVertex(v)
