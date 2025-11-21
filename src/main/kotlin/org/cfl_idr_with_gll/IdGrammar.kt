@@ -211,20 +211,18 @@ fun dyckAlphaGrammarKParity(
 			// Rules for PARENTHESES - Alpha (Eq 11 + 14)
 			// Parentheses are transparent (do not add their parity) and contain a substring.
 			// Rule: Target -> ( Inner ) * Next, where Target = Inner ^ Next
-			if (parenthesesIds.isNotEmpty()) {
-				for (parId in parenthesesIds) {
-					val open = Term(terminalFormat.generateLabel(BracketType.Parentheses, parId, true))
-					val close = Term(terminalFormat.generateLabel(BracketType.Parentheses, parId, false))
+			for (parId in parenthesesIds) {
+				val open = Term(terminalFormat.generateLabel(BracketType.Parentheses, parId, true))
+				val close = Term(terminalFormat.generateLabel(BracketType.Parentheses, parId, false))
 
-					// We iterate over all possible masks for the content INSIDE the parentheses (innerMask)
-					for (innerMask in 0 until numStates) {
-						val S_inner = Smap.getValue(innerMask)
+				// We iterate over all possible masks for the content INSIDE the parentheses (innerMask)
+				for (innerMask in 0 until numStates) {
+					val S_inner = Smap.getValue(innerMask)
 
-						val nextMask = currentMask xor innerMask
-						val S_next = Smap.getValue(nextMask)
+					val nextMask = currentMask xor innerMask
+					val S_next = Smap.getValue(nextMask)
 
-						alternatives.add((open * S_inner * close) * S_next)
-					}
+					alternatives.add((open * S_inner * close) * S_next)
 				}
 			}
 
@@ -242,6 +240,102 @@ fun dyckAlphaGrammarKParity(
 
 		// The starting rule S must lead to a fully balanced state (mask 0)
 		S /= Smap.getValue(0)
+	}
+}
+
+enum class RState {
+	QE, // Equivalent (q0): start
+	QO, // Open (q1): seen open brackets
+	QC  // Close (qf): seen close brackets, valid endpoint
+}
+
+fun dyckAlphaGrammarKParitySe(
+	terminalFormat: ITerminalFormat,
+	parenthesesIds: List<String>,
+	bracketsIds: List<String>,
+	k: Int
+): Grammar {
+
+	return (object : Grammar() {
+		val S by Nt().asStart()
+	}).apply {
+		val grammar = this
+		val numParityStates = 1 shl k // 2^k - Total number of parity states
+
+		val SmapProduct = mutableMapOf<Pair<Int, RState>, Nt>()
+
+		// Create all 2^k * 3 non-terminals
+		for (mask in 0 until numParityStates) {
+			val parityStr = maskToParity(mask, k)
+			for (qState in RState.entries) {
+				val nt = Nt()
+				initNtReflectively(grammar, nt, "S${parityStr}${qState}")
+				SmapProduct[Pair(mask, qState)] = nt
+			}
+		}
+
+		val sortedB = bracketsIds.sorted()
+		val labelGroup = mutableMapOf<String, Int>()
+		for ((i, label) in sortedB.withIndex()) {
+			labelGroup[label] = i % k
+		}
+
+		for (currentMask in 0 until numParityStates) {
+			for (currentQ in RState.entries) {
+				val currentNt = SmapProduct.getValue(Pair(currentMask, currentQ))
+				val alternatives = mutableListOf<Regexp>()
+
+				// Exit Rule
+				if (currentMask == 0 && (currentQ == RState.QE || currentQ == RState.QC)) {
+					alternatives.add(Epsilon)
+				}
+
+				for (brId in sortedB) {
+					val group = labelGroup.getValue(brId)
+					val bit = 1 shl group
+
+					val openTerm = Term(terminalFormat.generateLabel(BracketType.Brackets, brId, true))
+					val nextParityMask = currentMask xor bit
+					val nextQOpen = RState.QO
+
+					alternatives.add(openTerm * SmapProduct.getValue(Pair(nextParityMask, nextQOpen)))
+
+					if (currentQ != RState.QE) {
+						val closeTerm = Term(terminalFormat.generateLabel(BracketType.Brackets, brId, false))
+						val nextQClose = RState.QC
+
+						alternatives.add(closeTerm * SmapProduct.getValue(Pair(nextParityMask, nextQClose)))
+					}
+				}
+
+
+				for (id in parenthesesIds) {
+					val openTerm = Term(terminalFormat.generateLabel(BracketType.Parentheses, id, true))
+					val closeTerm = Term(terminalFormat.generateLabel(BracketType.Parentheses, id, false))
+
+					for (innerMask in 0 until numParityStates) {
+						val S_inner = SmapProduct.getValue(Pair(innerMask, RState.QE))
+
+						val nextParityMask = currentMask xor innerMask
+						val S_next = SmapProduct.getValue(Pair(nextParityMask, currentQ))
+
+						alternatives.add((openTerm * S_inner * closeTerm) * S_next)
+					}
+				}
+
+				alternatives.add(Term("normal") * currentNt)
+
+				if (alternatives.isNotEmpty()) {
+					var combined = alternatives[0]
+					for (i in 1 until alternatives.size) {
+						combined = combined or alternatives[i]
+					}
+					currentNt /= combined
+				}
+			}
+		}
+
+		S /= SmapProduct.getValue(Pair(0, RState.QE))
 	}
 }
 
@@ -333,20 +427,18 @@ fun dyckBetaGrammarKParity(
 			// Rules for BRACKETS - analogically Alpha (Eq 11 + 14)
 			// Brackets are transparent (do not add their parity) and contain a substring.
 			// Rule: Target -> ( Inner ) * Next, where Target = Inner ^ Next
-			if (bracketsIds.isNotEmpty()) {
-				for (brId in bracketsIds) {
-					val open = Term(terminalFormat.generateLabel(BracketType.Brackets, brId, true))
-					val close = Term(terminalFormat.generateLabel(BracketType.Brackets, brId, false))
+			for (brId in bracketsIds) {
+				val open = Term(terminalFormat.generateLabel(BracketType.Brackets, brId, true))
+				val close = Term(terminalFormat.generateLabel(BracketType.Brackets, brId, false))
 
-					// We iterate over all possible masks for the content INSIDE the brackets (innerMask)
-					for (innerMask in 0 until numStates) {
-						val S_inner = Smap.getValue(innerMask)
+				// We iterate over all possible masks for the content INSIDE the brackets (innerMask)
+				for (innerMask in 0 until numStates) {
+					val S_inner = Smap.getValue(innerMask)
 
-						val nextMask = currentMask xor innerMask
-						val S_next = Smap.getValue(nextMask)
+					val nextMask = currentMask xor innerMask
+					val S_next = Smap.getValue(nextMask)
 
-						alternatives.add((open * S_inner * close) * S_next)
-					}
+					alternatives.add((open * S_inner * close) * S_next)
 				}
 			}
 
@@ -364,5 +456,95 @@ fun dyckBetaGrammarKParity(
 
 		// The starting rule S must lead to a fully balanced state (mask 0)
 		S /= Smap.getValue(0)
+	}
+}
+
+fun dyckBetaGrammarKParitySe(
+	terminalFormat: ITerminalFormat,
+	parenthesesIds: List<String>,
+	bracketsIds: List<String>,
+	k: Int
+): Grammar {
+
+	return (object : Grammar() {
+		val S by Nt().asStart()
+	}).apply {
+		val grammar = this
+		val numParityStates = 1 shl k // 2^k - Total number of parity states
+
+		val SmapProduct = mutableMapOf<Pair<Int, RState>, Nt>()
+
+		// Create all 2^k * 3 non-terminals
+		for (mask in 0 until numParityStates) {
+			val parityStr = maskToParity(mask, k)
+			for (qState in RState.entries) {
+				val nt = Nt()
+				initNtReflectively(grammar, nt, "S${parityStr}${qState}")
+				SmapProduct[Pair(mask, qState)] = nt
+			}
+		}
+
+		val sortedP = parenthesesIds.sorted()
+		val labelGroup = mutableMapOf<String, Int>()
+		for ((i, label) in sortedP.withIndex()) {
+			labelGroup[label] = i % k
+		}
+
+		for (currentMask in 0 until numParityStates) {
+			for (currentQ in RState.entries) {
+				val currentNt = SmapProduct.getValue(Pair(currentMask, currentQ))
+				val alternatives = mutableListOf<Regexp>()
+
+				// Exit Rule
+				if (currentMask == 0 && (currentQ == RState.QE || currentQ == RState.QC)) {
+					alternatives.add(Epsilon)
+				}
+
+				for (parId in sortedP) {
+					val group = labelGroup.getValue(parId)
+					val bit = 1 shl group
+
+					val openTerm = Term(terminalFormat.generateLabel(BracketType.Parentheses, parId, true))
+					val nextParityMask = currentMask xor bit
+					val nextQOpen = RState.QO
+
+					alternatives.add(openTerm * SmapProduct.getValue(Pair(nextParityMask, nextQOpen)))
+
+					if (currentQ != RState.QE) {
+						val closeTerm = Term(terminalFormat.generateLabel(BracketType.Parentheses, parId, false))
+						val nextQClose = RState.QC
+
+						alternatives.add(closeTerm * SmapProduct.getValue(Pair(nextParityMask, nextQClose)))
+					}
+				}
+
+
+				for (brId in bracketsIds) {
+					val openTerm = Term(terminalFormat.generateLabel(BracketType.Brackets, brId, true))
+					val closeTerm = Term(terminalFormat.generateLabel(BracketType.Brackets, brId, false))
+
+					for (innerMask in 0 until numParityStates) {
+						val S_inner = SmapProduct.getValue(Pair(innerMask, RState.QE))
+
+						val nextParityMask = currentMask xor innerMask
+						val S_next = SmapProduct.getValue(Pair(nextParityMask, currentQ))
+
+						alternatives.add((openTerm * S_inner * closeTerm) * S_next)
+					}
+				}
+
+				alternatives.add(Term("normal") * currentNt)
+
+				if (alternatives.isNotEmpty()) {
+					var combined = alternatives[0]
+					for (i in 1 until alternatives.size) {
+						combined = combined or alternatives[i]
+					}
+					currentNt /= combined
+				}
+			}
+		}
+
+		S /= SmapProduct.getValue(Pair(0, RState.QE))
 	}
 }
