@@ -49,7 +49,7 @@ fun <V, L : ILabel> getUnderApprox(
 
 		reachablePaths.addAll(componentPaths)
 	}
-	
+
 	return reachablePaths
 }
 
@@ -152,6 +152,19 @@ fun <V, L : ILabel> mutualRefinement(
 				Path(range.from, range.to)
 			}
 		}.filter { it.source != it.target }
+
+//		if (curGrammar == "exclude" || curGrammar == "all") {
+//			for (braId in braList) {
+//				val currBraSppf = getExcludePaths(betaParsedComp, parList, braList, braId, terminalFormat)
+//
+//				val currBraEdges = extractEdgesFromSppfResults(currBraSppf)
+//				val newExcludeParsedComp = createGraphFromEdges(currBraEdges)
+//				val (newParList, newBraList, newParsedComp) = parseDyckComponent(newExcludeParsedComp, terminalFormat)
+//				parList = newParList
+//				braList = newBraList
+//				betaParsedComp = newParsedComp
+//			}
+//		}
 
 		val finalEdgeCount = betaParsedComp.edges.size
 

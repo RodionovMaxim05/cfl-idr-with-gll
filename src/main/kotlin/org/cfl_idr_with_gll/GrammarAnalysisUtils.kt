@@ -32,6 +32,7 @@ fun getAlphaGrammar(
 	return when (curGrammar) {
 		"parityK" -> dyckAlphaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, curParityK)
 		"parity2" -> dyckAlphaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, 2)
+		"se" -> dyckAlphaGrammarKParitySe(terminalFormat, parenthesesIds, bracketsIds, 2)
 		"project" -> dyckAlphaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, 1)
 		"exclude" -> dyckAlphaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, 1)
 		else -> dyckAlphaGrammar(terminalFormat, parenthesesIds, bracketsIds)
@@ -48,11 +49,21 @@ fun getBetaGrammar(
 	return when (curGrammar) {
 		"parityK" -> dyckBetaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, curParityK)
 		"parity2" -> dyckBetaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, 2)
+		"se" -> dyckBetaGrammarKParitySe(terminalFormat, parenthesesIds, bracketsIds, 2)
 		"project" -> dyckBetaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, 1)
 		"exclude" -> dyckBetaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, 1)
 		else -> dyckBetaGrammar(terminalFormat, parenthesesIds, bracketsIds)
 	}
 }
+
+//fun getExcludeGrammar(
+//	parenthesesIds: List<String>,
+//	bracketsIds: List<String>,
+//	labelId: String,
+//	terminalFormat: ITerminalFormat
+//): Grammar {
+//	return dyckAlphaGrammarKParityExclude(terminalFormat, parenthesesIds, bracketsIds, 2, labelId)
+//}
 
 object GrammarAnalysisCache {
 	fun <V, L : ILabel> getAlphaPaths(
@@ -94,4 +105,23 @@ object GrammarAnalysisCache {
 
 		return sppf
 	}
+
+//	fun <V, L : ILabel> getExcludePaths(
+//		graph: InputGraph<V, L>,
+//		parenthesesLabels: List<String>,
+//		bracketsLabels: List<String>,
+//		braId: String,
+//		terminalFormat: ITerminalFormat
+//	): Set<RangeSppfNode<V>> {
+//		val grammar = getExcludeGrammar(parenthesesLabels, bracketsLabels, braId, terminalFormat)
+//
+//		for (v in graph.vertices) {
+//			graph.addStartVertex(v)
+//		}
+//
+//		val gll = Gll.gll(grammar.rsm, graph)
+//		val sppf = gll.parse()
+//
+//		return sppf
+//	}
 }
