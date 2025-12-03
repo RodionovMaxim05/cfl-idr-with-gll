@@ -1,9 +1,5 @@
 package org.cfl_idr_with_gll
 
-import org.cfl_idr_with_gll.GrammarAnalysisCache.getAlphaPaths
-import org.cfl_idr_with_gll.GrammarAnalysisCache.getBetaPaths
-import org.cfl_idr_with_gll.GrammarAnalysisCache.getExcludePaths
-import org.cfl_idr_with_gll.GrammarAnalysisCache.getProjectPaths
 import org.cfl_idr_with_gll.graph.parseDyckComponent
 import org.cfl_idr_with_gll.graph.parseDyckComponentNaive
 import org.cfl_idr_with_gll.graph.splitIntoConnectedComponents
@@ -73,7 +69,8 @@ fun <V, L : ILabel> getMROverApprox(
 		graph to representativeMap
 	}
 
-	val refinedCondensedPaths = mutualRefinement(condensedGraph, currGrammar, currParityK, terminalFormat)
+	val sppfCache = GrammarAnalysisCache<V>()
+	val refinedCondensedPaths = mutualRefinement(condensedGraph, currGrammar, currParityK, sppfCache, terminalFormat)
 
 	// Create an inverse mapping: component -> vertices
 	val representativeToVerticesMap = mutableMapOf<V, MutableList<V>>()
@@ -116,6 +113,7 @@ fun <V, L : ILabel> mutualRefinement(
 	graph: InputGraph<V, L>,
 	curGrammar: String,
 	curParityK: Int,
+	sppfCache: GrammarAnalysisCache<V>,
 	terminalFormat: ITerminalFormat,
 ): List<Path<V>> {
 	val paths = mutableListOf<Path<V>>()
@@ -127,7 +125,8 @@ fun <V, L : ILabel> mutualRefinement(
 		val initialEdgeCount = parsedComp.edges.size
 
 		// Get alphaPaths
-		val alphaSppf = getAlphaPaths(parsedComp, parenthesesList, bracketsList, curGrammar, curParityK, terminalFormat)
+		val alphaSppf =
+			sppfCache.getAlphaPaths(parsedComp, parenthesesList, bracketsList, curGrammar, curParityK, terminalFormat)
 
 		// Updating the graph
 		val alphaEdges = extractEdgesFromSppfResults(alphaSppf)
@@ -143,7 +142,7 @@ fun <V, L : ILabel> mutualRefinement(
 
 		// Get betaPaths
 		val betaSppf =
-			getBetaPaths(alphaParsedComp, alphaParList, alphaBraList, curGrammar, curParityK, terminalFormat)
+			sppfCache.getBetaPaths(alphaParsedComp, alphaParList, alphaBraList, curGrammar, curParityK, terminalFormat)
 
 		val betaEdges = extractEdgesFromSppfResults(betaSppf)
 		val newBetaParsedComp = createGraphFromEdges(betaEdges)
@@ -157,7 +156,7 @@ fun <V, L : ILabel> mutualRefinement(
 
 		val projectPaths: List<Path<V>>
 		if (curGrammar == "project" || curGrammar == "all") {
-			val projectSppf = getProjectPaths(alphaParsedComp, betaParList, betaBraList, terminalFormat)
+			val projectSppf = sppfCache.getProjectPaths(alphaParsedComp, betaParList, betaBraList, terminalFormat)
 
 			val projectEdges = extractEdgesFromSppfResults(projectSppf)
 			val newProjectParsedComp = createGraphFromEdges(projectEdges)
@@ -177,7 +176,8 @@ fun <V, L : ILabel> mutualRefinement(
 
 		if (curGrammar == "exclude" || curGrammar == "all") {
 			for (braId in betaBraList) {
-				val currBraSppf = getExcludePaths(betaParsedComp, betaParList, betaBraList, braId, terminalFormat)
+				val currBraSppf =
+					sppfCache.getExcludePaths(betaParsedComp, betaParList, betaBraList, braId, terminalFormat)
 
 				val currBraEdges = extractEdgesFromSppfResults(currBraSppf)
 				val newExcludeParsedComp = createGraphFromEdges(currBraEdges)
@@ -208,6 +208,7 @@ fun <V, L : ILabel> mutualRefinement(
 				betaParsedComp,
 				curGrammar,
 				curParityK,
+				sppfCache,
 				terminalFormat
 			)
 			for (path in refinedPaths) {

@@ -31,40 +31,50 @@ fun <V, L : ILabel> InputGraph<V, L>.splitIntoConnectedComponents(): List<InputG
 	return result
 }
 
-fun <V, L : ILabel> InputGraph<V, L>.hash(): Int {
+fun fnv1aHash(data: ByteArray): ULong {
+	var hash = 0xCBF29CE484222325UL // FNV offset basis (64-bit)
+	val fnvPrime = 0x100000001B3UL // FNV prime (64-bit)
+
+	for (byte in data) {
+		hash = hash xor byte.toULong()
+		hash *= fnvPrime
+	}
+
+	return hash
+}
+
+fun <V, L : ILabel> InputGraph<V, L>.hash(): ULong {
 	val edgeStrings = mutableListOf<String>()
 
 	for (sourceV in vertices) {
 		for (edge in getEdges(sourceV)) {
 			val labelStr = edge.label.toString()
 
-			if (labelStr.isEmpty()) continue
-			edgeStrings.add("$sourceV->${edge.targetVertex}[$labelStr]")
+			edgeStrings += "$sourceV->${edge.targetVertex}[$labelStr]"
 		}
 	}
 
 	edgeStrings.sort()
 	val key = edgeStrings.joinToString(",")
 
-	return key.hashCode()
+	return fnv1aHash(key.toByteArray())
 }
 
-fun <V, L : ILabel> InputGraph<V, L>.hashGWithInt(intParameter: Int): Int {
+fun <V, L : ILabel> InputGraph<V, L>.hashGWithId(id: String): ULong {
 	val edgeStrings = mutableListOf<String>()
 
 	for (sourceV in vertices) {
 		for (edge in getEdges(sourceV)) {
 			val labelStr = edge.label.toString()
 
-			if (labelStr.isEmpty()) continue
-			edgeStrings.add("$sourceV->${edge.targetVertex}[$labelStr]")
+			edgeStrings += "$sourceV->${edge.targetVertex}[$labelStr]"
 		}
 	}
 
-	edgeStrings.add("($intParameter)")
+	edgeStrings += "($id)"
 	edgeStrings.sort()
+
 	val key = edgeStrings.joinToString(",")
 
-	return key.hashCode()
+	return fnv1aHash(key.toByteArray())
 }
-
