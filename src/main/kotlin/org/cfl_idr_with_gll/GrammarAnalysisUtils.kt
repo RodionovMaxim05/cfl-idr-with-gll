@@ -1,5 +1,7 @@
 package org.cfl_idr_with_gll
 
+import org.cfl_idr_with_gll.graph.hash
+import org.cfl_idr_with_gll.graph.hashGWithId
 import org.cfl_idr_with_gll.terminal.ITerminalFormat
 import org.ucfs.grammar.combinator.Grammar
 import org.ucfs.input.ILabel
@@ -73,8 +75,21 @@ fun getExcludeGrammar(
 	return dyckAlphaGrammarKParityExclude(terminalFormat, parenthesesIds, bracketsIds, 2, labelId)
 }
 
-object GrammarAnalysisCache {
-	fun <V, L : ILabel> getAlphaPaths(
+class GrammarAnalysisCache<V> {
+
+	private val alphaCache = mutableMapOf<ULong, Set<RangeSppfNode<V>>>()
+	private val betaCache = mutableMapOf<ULong, Set<RangeSppfNode<V>>>()
+	private val projectCache = mutableMapOf<ULong, Set<RangeSppfNode<V>>>()
+	private val excludeCache = mutableMapOf<ULong, Set<RangeSppfNode<V>>>()
+
+	fun clear() {
+		alphaCache.clear()
+		betaCache.clear()
+		projectCache.clear()
+		excludeCache.clear()
+	}
+
+	fun <L : ILabel> getAlphaPaths(
 		graph: InputGraph<V, L>,
 		parenthesesLabels: List<String>,
 		bracketsLabels: List<String>,
@@ -82,19 +97,20 @@ object GrammarAnalysisCache {
 		curParityK: Int,
 		terminalFormat: ITerminalFormat
 	): Set<RangeSppfNode<V>> {
-		val grammar = getAlphaGrammar(parenthesesLabels, bracketsLabels, curGrammar, curParityK, terminalFormat)
+		val h: ULong = graph.hash()
 
-		for (v in graph.vertices) {
-			graph.addStartVertex(v)
+		return alphaCache.getOrPut(h) {
+			val grammar = getAlphaGrammar(parenthesesLabels, bracketsLabels, curGrammar, curParityK, terminalFormat)
+
+			graph.vertices.forEach { graph.addStartVertex(it) }
+
+			val gll = Gll.gll(grammar.rsm, graph)
+
+			gll.parse()
 		}
-
-		val gll = Gll.gll(grammar.rsm, graph)
-		val sppf = gll.parse()
-
-		return sppf
 	}
 
-	fun <V, L : ILabel> getBetaPaths(
+	fun <L : ILabel> getBetaPaths(
 		graph: InputGraph<V, L>,
 		parenthesesLabels: List<String>,
 		bracketsLabels: List<String>,
@@ -102,52 +118,55 @@ object GrammarAnalysisCache {
 		curParityK: Int,
 		terminalFormat: ITerminalFormat
 	): Set<RangeSppfNode<V>> {
-		val grammar = getBetaGrammar(parenthesesLabels, bracketsLabels, curGrammar, curParityK, terminalFormat)
+		val h: ULong = graph.hash()
 
-		for (v in graph.vertices) {
-			graph.addStartVertex(v)
+		return betaCache.getOrPut(h) {
+			val grammar = getBetaGrammar(parenthesesLabels, bracketsLabels, curGrammar, curParityK, terminalFormat)
+
+			graph.vertices.forEach { graph.addStartVertex(it) }
+
+			val gll = Gll.gll(grammar.rsm, graph)
+
+			gll.parse()
 		}
-
-		val gll = Gll.gll(grammar.rsm, graph)
-		val sppf = gll.parse()
-
-		return sppf
 	}
 
-	fun <V, L : ILabel> getProjectPaths(
+	fun <L : ILabel> getProjectPaths(
 		graph: InputGraph<V, L>,
 		parenthesesLabels: List<String>,
 		bracketsLabels: List<String>,
 		terminalFormat: ITerminalFormat
 	): Set<RangeSppfNode<V>> {
-		val grammar = getProjectGrammar(parenthesesLabels, bracketsLabels, terminalFormat)
+		val h: ULong = graph.hash()
 
-		for (v in graph.vertices) {
-			graph.addStartVertex(v)
+		return projectCache.getOrPut(h) {
+			val grammar = getProjectGrammar(parenthesesLabels, bracketsLabels, terminalFormat)
+
+			graph.vertices.forEach { graph.addStartVertex(it) }
+
+			val gll = Gll.gll(grammar.rsm, graph)
+
+			gll.parse()
 		}
-
-		val gll = Gll.gll(grammar.rsm, graph)
-		val sppf = gll.parse()
-
-		return sppf
 	}
 
-	fun <V, L : ILabel> getExcludePaths(
+	fun <L : ILabel> getExcludePaths(
 		graph: InputGraph<V, L>,
 		parenthesesLabels: List<String>,
 		bracketsLabels: List<String>,
 		braId: String,
 		terminalFormat: ITerminalFormat
 	): Set<RangeSppfNode<V>> {
-		val grammar = getExcludeGrammar(parenthesesLabels, bracketsLabels, braId, terminalFormat)
+		val h: ULong = graph.hashGWithId(braId)
 
-		for (v in graph.vertices) {
-			graph.addStartVertex(v)
+		return excludeCache.getOrPut(h) {
+			val grammar = getExcludeGrammar(parenthesesLabels, bracketsLabels, braId, terminalFormat)
+
+			graph.vertices.forEach { graph.addStartVertex(it) }
+
+			val gll = Gll.gll(grammar.rsm, graph)
+
+			gll.parse()
 		}
-
-		val gll = Gll.gll(grammar.rsm, graph)
-		val sppf = gll.parse()
-
-		return sppf
 	}
 }

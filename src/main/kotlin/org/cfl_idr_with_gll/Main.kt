@@ -6,34 +6,72 @@ import java.io.File
 object Main {
 
 	private const val DIRECTORY_OUTPUT = "src/main/resources/taint"
-
-	private var currentGrammar = "classic"
-	private var currParityK = 2
-
-	private val supportedGrammars = setOf(
-		"parity", "parity2", "se", "project", "exclude", "all", "on-demand"
+	private val SUPPORTED_GRAMMARS = setOf(
+		"parityK", "parity2", "se", "project", "exclude", "all", "on-demand"
 	)
 
 	@JvmStatic
 	fun main(args: Array<String>) {
-		if (args.size < 2) {
-			error("Usage: <dot-file-paths> <grammar>")
+		var dotFilePath: String? = null
+		var grammar: String? = null
+		var parityK = 0
+		var outputPath: String? = null
+
+		var i = 0
+		while (i < args.size) {
+			when (args[i]) {
+				"-o" -> {
+					if (i + 1 >= args.size) error("Missing value for -o")
+					outputPath = args[++i]
+				}
+
+				else -> {
+					if (dotFilePath == null) {
+						dotFilePath = args[i]
+					} else if (grammar == null) {
+						grammar = args[i]
+					} else if (parityK == 0 && grammar == "parityK") {
+						parityK = args[i].toIntOrNull() ?: error("Parity K must be an integer")
+					} else {
+						error("Unexpected extra argument: ${args[i]}")
+					}
+				}
+			}
+			i++
 		}
 
-		val dotFilePath = args[0]
-		currentGrammar = args[1]
+		require(dotFilePath != null) { "Missing dot file path" }
+		require(grammar != null) { "Missing grammar" }
 
-		if (currentGrammar !in supportedGrammars) {
-			error("Invalid grammar: $currentGrammar. Supported: $supportedGrammars")
+		require(grammar in SUPPORTED_GRAMMARS) {
+			"Invalid grammar: '$grammar'. Supported: $SUPPORTED_GRAMMARS"
+		}
+		require(parityK > 0) { "Parity K must be a positive integer (got: $parityK)" }
+		if (grammar == "parityK") {
+			require(parityK != 0) { "Parity K is required for grammar '$grammar'" }
+			require(parityK > 0) { "Parity K must be a positive integer (got: $parityK)" }
 		}
 
-		val inputFile = File(dotFilePath)
-		if (!inputFile.exists()) {
-			error("Input file not found: ${inputFile.absolutePath}")
+		val inputFile = File(dotFilePath).apply {
+			require(exists()) { "Input file not found: ${absolutePath}" }
+		}
+
+		val benchmarkName = inputFile.name.substringBeforeLast(".")
+		val outputFile = if (outputPath != null) {
+			val output = File(outputPath)
+			if (output.name.contains('.')) {
+				output.parentFile?.mkdirs()
+				output
+			} else {
+				output.mkdirs()
+				File(output, "$benchmarkName.out")
+			}
+		} else {
+			val outputDir = File(DIRECTORY_OUTPUT).apply { mkdirs() }
+			File(outputDir, "$benchmarkName.out")
 		}
 
 		val inputText = inputFile.readText()
-
 		val finalGraphText = if (isGraphvizFormat(inputFile)) {
 			inputText
 		} else {
@@ -42,23 +80,16 @@ object Main {
 
 		val inputGraph = DotParser().parseDot(finalGraphText)
 
-		val benchmarkName = inputFile.name.substringBeforeLast(".")
-		val outputDir = File(DIRECTORY_OUTPUT)
-		outputDir.mkdirs()
-		val outputFile = File(outputDir, "$benchmarkName.out")
-
 		val underPaths = getUnderApprox(inputGraph)
 
-		val overPaths = getMROverApprox(inputGraph, "parity2", 2)
+		val overPaths = getMROverApprox(inputGraph, grammar, parityK)
 
-		outputFile.writeText("Under approximation paths:\n")
-		for (path in underPaths) {
-			outputFile.appendText("\t$path\n")
-		}
+		outputFile.writeText(buildString {
+			append("Under approximation paths:\n")
+			underPaths.forEach { append("\t$it\n") }
 
-		outputFile.appendText("\nOver approximation paths:\n")
-		for (path in overPaths) {
-			outputFile.appendText("\t$path\n")
-		}
+			append("\nOver approximation paths:\n")
+			overPaths.forEach { append("\t$it\n") }
+		})
 	}
 }
