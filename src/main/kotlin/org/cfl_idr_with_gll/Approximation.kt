@@ -2,6 +2,7 @@ package org.cfl_idr_with_gll
 
 import org.cfl_idr_with_gll.GrammarAnalysisCache.getAlphaPaths
 import org.cfl_idr_with_gll.GrammarAnalysisCache.getBetaPaths
+import org.cfl_idr_with_gll.GrammarAnalysisCache.getExcludePaths
 import org.cfl_idr_with_gll.GrammarAnalysisCache.getProjectPaths
 import org.cfl_idr_with_gll.graph.parseDyckComponent
 import org.cfl_idr_with_gll.graph.parseDyckComponentNaive
@@ -132,7 +133,7 @@ fun <V, L : ILabel> mutualRefinement(
 		val alphaEdges = extractEdgesFromSppfResults(alphaSppf)
 		val updatedAlphaGraph = createGraphFromEdges(alphaEdges)
 
-		val (parList, braList, alphaParsedComp) = parseDyckComponent(updatedAlphaGraph, terminalFormat)
+		val (alphaParList, alphaBraList, alphaParsedComp) = parseDyckComponent(updatedAlphaGraph, terminalFormat)
 
 		val alphaPaths = alphaSppf.mapNotNull { node ->
 			node.inputRange?.let { range ->
@@ -142,11 +143,11 @@ fun <V, L : ILabel> mutualRefinement(
 
 		// Get betaPaths
 		val betaSppf =
-			getBetaPaths(alphaParsedComp, parList, braList, curGrammar, curParityK, terminalFormat)
+			getBetaPaths(alphaParsedComp, alphaParList, alphaBraList, curGrammar, curParityK, terminalFormat)
 
 		val betaEdges = extractEdgesFromSppfResults(betaSppf)
 		val newBetaParsedComp = createGraphFromEdges(betaEdges)
-		var (_, _, betaParsedComp) = parseDyckComponent(newBetaParsedComp, terminalFormat)
+		var (betaParList, betaBraList, betaParsedComp) = parseDyckComponent(newBetaParsedComp, terminalFormat)
 
 		val betaPaths = betaSppf.mapNotNull { node ->
 			node.inputRange?.let { range ->
@@ -156,13 +157,13 @@ fun <V, L : ILabel> mutualRefinement(
 
 		val projectPaths: List<Path<V>>
 		if (curGrammar == "project" || curGrammar == "all") {
-			val projectSppf = getProjectPaths(parsedComp, parList, braList, terminalFormat)
+			val projectSppf = getProjectPaths(alphaParsedComp, betaParList, betaBraList, terminalFormat)
 
 			val projectEdges = extractEdgesFromSppfResults(projectSppf)
 			val newProjectParsedComp = createGraphFromEdges(projectEdges)
 			val (newParList, newBraList, newParsedComp) = parseDyckComponent(newProjectParsedComp, terminalFormat)
-//			parList = newParList
-//			braList = newBraList
+			betaParList = newParList
+			betaBraList = newBraList
 			betaParsedComp = newParsedComp
 
 			projectPaths = projectSppf.mapNotNull { node ->
@@ -174,18 +175,18 @@ fun <V, L : ILabel> mutualRefinement(
 			projectPaths = betaPaths
 		}
 
-//		if (curGrammar == "exclude" || curGrammar == "all") {
-//			for (braId in braList) {
-//				val currBraSppf = getExcludePaths(betaParsedComp, parList, braList, braId, terminalFormat)
-//
-//				val currBraEdges = extractEdgesFromSppfResults(currBraSppf)
-//				val newExcludeParsedComp = createGraphFromEdges(currBraEdges)
-//				val (newParList, newBraList, newParsedComp) = parseDyckComponent(newExcludeParsedComp, terminalFormat)
-//				parList = newParList
-//				braList = newBraList
-//				betaParsedComp = newParsedComp
-//			}
-//		}
+		if (curGrammar == "exclude" || curGrammar == "all") {
+			for (braId in betaBraList) {
+				val currBraSppf = getExcludePaths(betaParsedComp, betaParList, betaBraList, braId, terminalFormat)
+
+				val currBraEdges = extractEdgesFromSppfResults(currBraSppf)
+				val newExcludeParsedComp = createGraphFromEdges(currBraEdges)
+				val (newParList, newBraList, newParsedComp) = parseDyckComponent(newExcludeParsedComp, terminalFormat)
+				betaParList = newParList
+				betaBraList = newBraList
+				betaParsedComp = newParsedComp
+			}
+		}
 
 		val finalEdgeCount = betaParsedComp.edges.size
 
