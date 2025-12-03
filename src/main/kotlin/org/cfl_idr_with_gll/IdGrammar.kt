@@ -301,6 +301,92 @@ fun dyckAlphaGrammarKParity(
 	}
 }
 
+fun dyckAlphaGrammarKParityExclude(
+	terminalFormat: ITerminalFormat,
+	parenthesesIds: List<String>,
+	bracketsIds: List<String>,
+	k: Int,
+	exLabel: String
+): Grammar {
+	println(exLabel)
+	return object : Grammar() {
+		val S by Nt().asStart()
+
+		init {
+			val grammar = this
+			val numStates = 1 shl k
+
+			val Smap = buildMap<Int, Nt> {
+				for (mask in 0 until numStates) {
+					val p = maskToParity(mask, k)
+					val nt = Nt()
+					initNtReflectively(grammar, nt, "S$p")
+					put(mask, nt)
+				}
+			}
+
+			val sortedB = bracketsIds.sorted()
+			val labelGroup = mutableMapOf<String, Int>()
+			for ((i, label) in sortedB.withIndex()) {
+				labelGroup[label] = i % k
+			}
+
+			for (currentMask in 0 until numStates) {
+				val currentNt = Smap.getValue(currentMask)
+				val alternatives = mutableListOf<Regexp>()
+
+				if (currentMask == 0) {
+					alternatives.add(Epsilon)
+				}
+
+				for (brId in sortedB) {
+					val nextMask = if (brId == exLabel) {
+						currentMask
+					} else {
+						val group = labelGroup.getValue(brId)
+						val bit = 1 shl group
+						currentMask xor bit
+					}
+
+					val nextNt = Smap.getValue(nextMask)
+
+					val open = Term(terminalFormat.generateLabel(BracketType.Brackets, brId, true))
+					val close = Term(terminalFormat.generateLabel(BracketType.Brackets, brId, false))
+
+					alternatives.add(open * nextNt)
+					alternatives.add(close * nextNt)
+				}
+
+				for (parId in parenthesesIds) {
+					val open = Term(terminalFormat.generateLabel(BracketType.Parentheses, parId, true))
+					val close = Term(terminalFormat.generateLabel(BracketType.Parentheses, parId, false))
+
+					for (innerMask in 0 until numStates) {
+						val S_inner = Smap.getValue(innerMask)
+
+						val nextMask = currentMask xor innerMask
+						val S_next = Smap.getValue(nextMask)
+
+						alternatives.add((open * S_inner * close) * S_next)
+					}
+				}
+
+				alternatives.add(Term("normal") * currentNt)
+
+				if (alternatives.isNotEmpty()) {
+					var combined = alternatives[0]
+					for (i in 1 until alternatives.size) {
+						combined = combined or alternatives[i]
+					}
+					currentNt /= combined
+				}
+			}
+
+			S /= Smap.getValue(0)
+		}
+	}
+}
+
 fun dyckAlphaGrammarKParitySe(
 	terminalFormat: ITerminalFormat,
 	parenthesesIds: List<String>,

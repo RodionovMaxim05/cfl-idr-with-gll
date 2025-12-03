@@ -64,14 +64,14 @@ fun getProjectGrammar(
 	return dyckProjectGrammar(terminalFormat, parenthesesIds, bracketsIds)
 }
 
-//fun getExcludeGrammar(
-//	parenthesesIds: List<String>,
-//	bracketsIds: List<String>,
-//	labelId: String,
-//	terminalFormat: ITerminalFormat
-//): Grammar {
-//	return dyckAlphaGrammarKParityExclude(terminalFormat, parenthesesIds, bracketsIds, 2, labelId)
-//}
+fun getExcludeGrammar(
+	parenthesesIds: List<String>,
+	bracketsIds: List<String>,
+	labelId: String,
+	terminalFormat: ITerminalFormat
+): Grammar {
+	return dyckAlphaGrammarKParityExclude(terminalFormat, parenthesesIds, bracketsIds, 2, labelId)
+}
 
 object GrammarAnalysisCache {
 	fun <V, L : ILabel> getAlphaPaths(
@@ -132,22 +132,22 @@ object GrammarAnalysisCache {
 		return sppf
 	}
 
-//	fun <V, L : ILabel> getExcludePaths(
-//		graph: InputGraph<V, L>,
-//		parenthesesLabels: List<String>,
-//		bracketsLabels: List<String>,
-//		braId: String,
-//		terminalFormat: ITerminalFormat
-//	): Set<RangeSppfNode<V>> {
-//		val grammar = getExcludeGrammar(parenthesesLabels, bracketsLabels, braId, terminalFormat)
-//
-//		for (v in graph.vertices) {
-//			graph.addStartVertex(v)
-//		}
-//
-//		val gll = Gll.gll(grammar.rsm, graph)
-//		val sppf = gll.parse()
-//
-//		return sppf
-//	}
+	fun <V, L : ILabel> getExcludePaths(
+		graph: InputGraph<V, L>,
+		parenthesesLabels: List<String>,
+		bracketsLabels: List<String>,
+		braId: String,
+		terminalFormat: ITerminalFormat
+	): Set<RangeSppfNode<V>> {
+		val grammar = getExcludeGrammar(parenthesesLabels, bracketsLabels, braId, terminalFormat)
+
+		for (v in graph.vertices) {
+			graph.addStartVertex(v)
+		}
+
+		val gll = Gll.gll(grammar.rsm, graph)
+		val sppf = gll.parse()
+
+		return sppf
+	}
 }
