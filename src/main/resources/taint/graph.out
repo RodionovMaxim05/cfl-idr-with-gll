@@ -1,7 +1,11 @@
-Under approximation paths:
+Under approximation paths: 2
 	Path(source=6, target=8)
 	Path(source=1, target=9)
 
-Over approximation paths:
+Over approximation paths: 2
+	Path(source=6, target=8)
+	Path(source=1, target=9)
+
+On-Demand paths: 2
 	Path(source=6, target=8)
 	Path(source=1, target=9)

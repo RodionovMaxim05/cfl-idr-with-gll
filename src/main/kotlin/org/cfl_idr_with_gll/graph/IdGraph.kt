@@ -1,5 +1,6 @@
 package org.cfl_idr_with_gll.graph
 
+import org.cfl_idr_with_gll.terminal.DefaultTerminalFormat
 import org.cfl_idr_with_gll.terminal.ITerminalFormat
 import org.ucfs.input.ILabel
 import org.cfl_idr_with_gll.terminal.ITerminalFormat.BracketType
@@ -12,7 +13,7 @@ data class FullEdge<V, L>(val from: V, val to: V, val label: L)
 
 fun <V, L : ILabel> parseDyckComponent(
 	graph: InputGraph<V, L>,
-	terminalFormat: ITerminalFormat
+	terminalFormat: ITerminalFormat = DefaultTerminalFormat
 ): Triple<List<String>, List<String>, InputGraph<V, L>> {
 	val processedLabels = mutableSetOf<String>()
 	val parIds = mutableListOf<String>()
@@ -56,8 +57,8 @@ fun <V, L : ILabel> parseDyckComponent(
 }
 
 fun <V, L : ILabel> parseDyckComponentNaive(
-	terminalFormat: ITerminalFormat,
-	graph: InputGraph<V, L>
+	graph: InputGraph<V, L>,
+	terminalFormat: ITerminalFormat
 ): Triple<List<String>, List<String>, InputGraph<V, L>> {
 	val processedLabels = mutableSetOf<String>()
 	val parIds = mutableListOf<String>()

@@ -16,6 +16,7 @@ object Main {
 		var grammar: String? = null
 		var parityK = 0
 		var outputPath: String? = null
+		var onDemand = false
 
 		var i = 0
 		while (i < args.size) {
@@ -42,14 +43,16 @@ object Main {
 
 		require(dotFilePath != null) { "Missing dot file path" }
 		require(grammar != null) { "Missing grammar" }
-
 		require(grammar in SUPPORTED_GRAMMARS) {
 			"Invalid grammar: '$grammar'. Supported: $SUPPORTED_GRAMMARS"
 		}
-		require(parityK > 0) { "Parity K must be a positive integer (got: $parityK)" }
+
 		if (grammar == "parityK") {
 			require(parityK != 0) { "Parity K is required for grammar '$grammar'" }
 			require(parityK > 0) { "Parity K must be a positive integer (got: $parityK)" }
+		} else if (grammar == "on-demand") {
+			grammar = "all"
+			onDemand = true
 		}
 
 		val inputFile = File(dotFilePath).apply {
@@ -85,11 +88,22 @@ object Main {
 		val overPaths = getMROverApprox(inputGraph, grammar, parityK)
 
 		outputFile.writeText(buildString {
-			append("Under approximation paths:\n")
+			append("Under approximation paths: ${underPaths.size}\n")
 			underPaths.forEach { append("\t$it\n") }
 
-			append("\nOver approximation paths:\n")
+			append("\nOver approximation paths: ${overPaths.size}\n")
 			overPaths.forEach { append("\t$it\n") }
 		})
+
+		if (!onDemand) {
+			return
+		}
+
+		val onDemandPaths = getOnDemandMR(inputGraph, underPaths, overPaths)
+
+		outputFile.appendText("\nOn-Demand paths: ${onDemandPaths.size}\n")
+		onDemandPaths.forEach { outputFile.appendText("\t$it\n") }
+
+		println("Finished. Results written to ${outputFile.absolutePath}")
 	}
 }
