@@ -65,7 +65,6 @@ class TestIdGrammar {
 		// S S
 		assertTrue(alts.any { alt ->
 			val p = alt.concatParts()
-			println("${p[0]}, ${p.size}")
 			p.size == 2 && isNt(p[0], "S") && isNt(p[1], "S")
 		}, "Missing S S")
 

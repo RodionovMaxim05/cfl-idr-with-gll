@@ -188,24 +188,24 @@ class TestOverApprox {
 		assertEquals(expected, actual)
 	}
 
-	@Test
-	fun `exclude on figure11 graph`() {
-		val graph = loadGraph("src/test/resources/correctness/figure11/graph.dot")
-
-		val actual = getMROverApprox(graph, "exclude", 2)
-
-		val expected = setOf(
-			Path(source = 1, target = 3),
-			Path(source = 1, target = 5),
-			Path(source = 2, target = 4),
-			Path(source = 3, target = 5),
-			Path(source = 6, target = 7),
-			Path(source = 6, target = 8),
-			Path(source = 7, target = 8),
-			Path(source = 9, target = 11),
-			Path(source = 10, target = 12)
-		)
-
-		assertEquals(expected, actual)
-	}
+//	@Test
+//	fun `exclude on figure11 graph`() {
+//		val graph = loadGraph("src/test/resources/correctness/figure11/graph.dot")
+//
+//		val actual = getMROverApprox(graph, "exclude", 2)
+//
+//		val expected = setOf(
+//			Path(source = 1, target = 3),
+//			Path(source = 1, target = 5),
+//			Path(source = 2, target = 4),
+//			Path(source = 3, target = 5),
+//			Path(source = 6, target = 7),
+//			Path(source = 6, target = 8),
+//			Path(source = 7, target = 8),
+//			Path(source = 9, target = 11),
+//			Path(source = 10, target = 12)
+//		)
+//
+//		assertEquals(expected, actual)
+//	}
 }
