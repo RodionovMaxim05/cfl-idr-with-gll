@@ -2,8 +2,11 @@ package org.cfl_idr_with_gll.graph
 
 import org.cfl_idr_with_gll.Path
 import org.cfl_idr_with_gll.adapters.InputGraphJGraphTAdapter
+import org.jgrapht.alg.TransitiveClosure
 import org.jgrapht.alg.connectivity.ConnectivityInspector
 import org.jgrapht.alg.connectivity.KosarajuStrongConnectivityInspector
+import org.jgrapht.graph.DefaultEdge
+import org.jgrapht.graph.SimpleDirectedGraph
 import org.ucfs.input.ILabel
 import org.ucfs.input.InputGraph
 
@@ -33,7 +36,7 @@ fun <V, L : ILabel> InputGraph<V, L>.splitIntoConnectedComponents(): List<InputG
 	return resultComp
 }
 
-fun fnv1aHash(data: ByteArray): ULong {
+private fun fnv1aHash(data: ByteArray): ULong {
 	var hash = 0xCBF29CE484222325UL // FNV offset basis (64-bit)
 	val fnvPrime = 0x100000001B3UL // FNV prime (64-bit)
 
@@ -72,45 +75,55 @@ fun <V, L : ILabel> InputGraph<V, L>.removeNotPath(overApprox: Set<Path<V>>): In
 	return removeNotPathMatrix(pairMatrix)
 }
 
-fun <V, L : ILabel> computeSccs(graph: InputGraph<V, L>): Pair<Map<V, Int>, Set<Pair<Int, Int>>> {
+private fun <V, L : ILabel> computeSccs(graph: InputGraph<V, L>): Pair<Map<V, Int>, Set<Pair<Int, Int>>> {
 	val jGraph = InputGraphJGraphTAdapter.toJGraphT(graph)
 	val inspector = KosarajuStrongConnectivityInspector(jGraph)
 
 	val sccList: List<Set<V>> = inspector.stronglyConnectedSets()
 
-	val vertexToScc = mutableMapOf<V, Int>()
+	val vertexToSccMap = mutableMapOf<V, Int>()
 	sccList.forEachIndexed { idx, comp ->
-		comp.forEach { vertexToScc[it] = idx }
+		comp.forEach { vertexToSccMap[it] = idx }
 	}
 
 	// Build condensation DAG
-	val sccReach = mutableSetOf<Pair<Int, Int>>()
-	val sccEdges = mutableMapOf<Int, MutableSet<Int>>()
-	for (i in sccList.indices) sccEdges[i] = mutableSetOf()
 
-	for ((from, edgesFrom) in graph.edges) {
-		val fromScc = vertexToScc[from]!!
-		for (edge in edgesFrom) {
-			val toScc = vertexToScc[edge.targetVertex]!!
-			sccEdges[fromScc]!!.add(toScc)
-			sccReach.add(Pair(fromScc, toScc))
-		}
+	val componentCount = sccList.size
+	if (componentCount == 0) return vertexToSccMap to setOf()
+
+	val condensation = SimpleDirectedGraph<Int, DefaultEdge>(DefaultEdge::class.java)
+	for (i in 0 until componentCount) {
+		condensation.addVertex(i)
 	}
 
-	for (i in sccList.indices) sccReach.add(Pair(i, i))
-
-	// Compute transitive closure
-	for (k in sccList.indices) {
-		for (i in sccList.indices) {
-			for (j in sccList.indices) {
-				if (Pair(i, k) in sccReach && Pair(k, j) in sccReach) {
-					sccReach.add(Pair(i, j))
-				}
+	for ((sourceV, edges) in graph.edges) {
+		val fromScc = vertexToSccMap[sourceV] ?: continue
+		for (edge in edges) {
+			val toScc = vertexToSccMap[edge.targetVertex] ?: continue
+			if (fromScc != toScc) {
+				condensation.addEdge(fromScc, toScc)
 			}
 		}
 	}
 
-	return vertexToScc to sccReach
+	// Compute transitive closure
+	TransitiveClosure.INSTANCE.closeSimpleDirectedGraph(condensation)
+
+	val sccReach = mutableSetOf<Pair<Int, Int>>()
+
+	// Reflexivity
+	for (idx in 0 until componentCount) {
+		sccReach.add(idx to idx)
+	}
+
+	// All edges after closure - reachability
+	for (edge in condensation.edgeSet()) {
+		val src = condensation.getEdgeSource(edge)
+		val tgt = condensation.getEdgeTarget(edge)
+		sccReach.add(src to tgt)
+	}
+
+	return vertexToSccMap to sccReach
 }
 
 fun <V, L : ILabel> InputGraph<V, L>.removeNotPathMatrix(overApprox: List<Pair<V, V>>): InputGraph<V, L> {

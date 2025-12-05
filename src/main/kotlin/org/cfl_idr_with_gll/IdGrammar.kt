@@ -308,7 +308,7 @@ fun dyckAlphaGrammarKParityExclude(
 	k: Int,
 	exLabel: String
 ): Grammar {
-	println(exLabel)
+
 	return object : Grammar() {
 		val S by Nt().asStart()
 
