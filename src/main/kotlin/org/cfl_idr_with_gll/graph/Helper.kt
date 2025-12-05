@@ -3,6 +3,18 @@ package org.cfl_idr_with_gll.graph
 import org.cfl_idr_with_gll.Path
 import org.ucfs.input.InputGraph
 import org.ucfs.input.ILabel
+import kotlin.collections.mutableMapOf
+import kotlin.collections.set
+
+// PMR - Path-Minimized Representatives
+
+fun <V> findPMR(vertex: V, parentMap: MutableMap<V, V>): V {
+	val parentV = parentMap[vertex]
+	if (parentV != vertex && parentV != null) {
+		parentMap[vertex] = findPMR(parentV, parentMap)
+	}
+	return parentMap[vertex] ?: vertex
+}
 
 /**
  * Condenses a graph by a subset of paths (underApprox),
@@ -14,60 +26,50 @@ import org.ucfs.input.ILabel
  */
 fun <V, L : ILabel> condensateFromUnderApprox(
 	graph: InputGraph<V, L>,
-	underApprox: List<Path<V>>
-): Pair<InputGraph<V, L>, Map<V, V>> {
+	underApprox: Set<Path<V>>
+): Pair<InputGraph<V, L>, MutableMap<V, V>> {
 
 	// Initializing Union-Find
-	val parent = mutableMapOf<V, V>()
-	val weight = mutableMapOf<V, Int>()
+	val parentMap = mutableMapOf<V, V>()
+	val weightMap = mutableMapOf<V, Int>()
 
 	for (v in graph.vertices) {
-		parent[v] = v
-		weight[v] = 1
-	}
-
-	// PMR - Path-Minimized Representatives
-
-	fun findPMR(vertex: V): V {
-		val parentV = parent[vertex]
-		if (parentV != vertex && parentV != null) {
-			parent[vertex] = findPMR(parentV)
-		}
-		return parent[vertex] ?: vertex
+		parentMap[v] = v
+		weightMap[v] = 1
 	}
 
 	fun joinPMR(vertex1: V, vertex2: V) {
-		var v = findPMR(vertex1)
-		var u = findPMR(vertex2)
+		var v = findPMR(vertex1, parentMap)
+		var u = findPMR(vertex2, parentMap)
 		if (v == u) return
 
-		if (weight[v]!! < weight[u]!!) {
+		if (weightMap[v]!! < weightMap[u]!!) {
 			val tmp = v; v = u; u = tmp
 		}
 
-		weight[v] = weight[v]!! + weight[u]!!
-		parent[u] = v
+		weightMap[v] = weightMap[v]!! + weightMap[u]!!
+		parentMap[u] = v
 	}
 
 	// UnderApprox traversal: merge mutually reachable vertices
 	val accessibilityMap = mutableMapOf<V, MutableSet<V>>()
 
 	for (path in underApprox) {
-		if (path.source !in parent || path.target !in parent) continue
+		if (path.source !in parentMap || path.target !in parentMap) continue
 
-		val sourceRep = findPMR(path.source)
-		val targetRep = findPMR(path.target)
-		if (sourceRep == targetRep) continue
+		val sourceRoot = findPMR(path.source, parentMap)
+		val targetRoot = findPMR(path.target, parentMap)
+		if (sourceRoot == targetRoot) continue
 
-		accessibilityMap.getOrPut(sourceRep) { mutableSetOf() }.add(targetRep)
-		accessibilityMap.getOrPut(targetRep) { mutableSetOf() } // ensure lv key exists
+		accessibilityMap.getOrPut(sourceRoot) { mutableSetOf() }.add(targetRoot)
+		accessibilityMap.getOrPut(targetRoot) { mutableSetOf() } // ensure lv key exists
 
 		// If mutual accessibility is found, combine the components
-		if (accessibilityMap[sourceRep]?.contains(targetRep) == true && accessibilityMap[targetRep]?.contains(
-				sourceRep
+		if (accessibilityMap[sourceRoot]?.contains(targetRoot) == true && accessibilityMap[targetRoot]?.contains(
+				sourceRoot
 			) == true
 		) {
-			joinPMR(sourceRep, targetRep)
+			joinPMR(sourceRoot, targetRoot)
 		}
 	}
 
@@ -75,21 +77,21 @@ fun <V, L : ILabel> condensateFromUnderApprox(
 	val condensedGraph = InputGraph<V, L>()
 	val existingEdges = mutableSetOf<Triple<V, V, L>>()
 
-	for ((source, edgeList) in graph.edges) {
+	for ((sourceV, edgeList) in graph.edges) {
 		for (edge in edgeList) {
-			val sourceRep = findPMR(source)
-			val targetRep = findPMR(edge.targetVertex)
-			if (sourceRep == targetRep) continue
+			val sourceRoot = findPMR(sourceV, parentMap)
+			val targetRoot = findPMR(edge.targetVertex, parentMap)
+			if (sourceRoot == targetRoot) continue
 
-			val key = Triple(sourceRep, targetRep, edge.label)
+			val key = Triple(sourceRoot, targetRoot, edge.label)
 			if (existingEdges.contains(key)) continue
 			existingEdges.add(key)
 
-			condensedGraph.addVertex(sourceRep)
-			condensedGraph.addVertex(targetRep)
-			condensedGraph.addEdge(sourceRep, edge.label, targetRep)
+			condensedGraph.addVertex(sourceRoot)
+			condensedGraph.addVertex(targetRoot)
+			condensedGraph.addEdge(sourceRoot, edge.label, targetRoot)
 		}
 	}
 
-	return condensedGraph to parent
+	return condensedGraph to parentMap
 }
