@@ -38,8 +38,7 @@ fun <V, L : ILabel> getUnderApprox(
 	graph: InputGraph<V, L>,
 	terminalFormat: ITerminalFormat = DefaultTerminalFormat
 ): Set<Path<V>> {
-	val (_, _, processedGraph) = parseDyckComponentNaive(graph, terminalFormat)
-	val graphComponents = processedGraph.splitIntoConnectedComponents()
+	val graphComponents = graph.splitIntoConnectedComponents()
 	val reachablePaths = mutableSetOf<Path<V>>()
 
 	for (gComp in graphComponents) {
