@@ -75,13 +75,20 @@ fun <V, L : ILabel> condensateFromUnderApprox(
 
 	// Constructing a condensed graph
 	val condensedGraph = InputGraph<V, L>()
+	
+	val representatives = graph.vertices.map { findPMR(it, parentMap) }.toSet()
+	for (rep in representatives) {
+		condensedGraph.addVertex(rep)
+	}
+
 	val existingEdges = mutableSetOf<Triple<V, V, L>>()
 
 	for ((sourceV, edgeList) in graph.edges) {
 		for (edge in edgeList) {
+			if (edge.label.toString().isEmpty()) continue
+
 			val sourceRoot = findPMR(sourceV, parentMap)
 			val targetRoot = findPMR(edge.targetVertex, parentMap)
-			if (sourceRoot == targetRoot) continue
 
 			val key = Triple(sourceRoot, targetRoot, edge.label)
 			if (existingEdges.contains(key)) continue

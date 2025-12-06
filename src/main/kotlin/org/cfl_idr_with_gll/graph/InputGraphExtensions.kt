@@ -75,7 +75,7 @@ fun <V, L : ILabel> InputGraph<V, L>.removeNotPath(overApprox: Set<Path<V>>): In
 	return removeNotPathMatrix(pairMatrix)
 }
 
-private fun <V, L : ILabel> computeSccs(graph: InputGraph<V, L>): Pair<Map<V, Int>, Set<Pair<Int, Int>>> {
+fun <V, L : ILabel> computeSccs(graph: InputGraph<V, L>): Pair<Map<V, Int>, Set<Pair<Int, Int>>> {
 	val jGraph = InputGraphJGraphTAdapter.toJGraphT(graph)
 	val inspector = KosarajuStrongConnectivityInspector(jGraph)
 
@@ -126,7 +126,7 @@ private fun <V, L : ILabel> computeSccs(graph: InputGraph<V, L>): Pair<Map<V, In
 	return vertexToSccMap to sccReach
 }
 
-fun <V, L : ILabel> InputGraph<V, L>.removeNotPathMatrix(overApprox: List<Pair<V, V>>): InputGraph<V, L> {
+private fun <V, L : ILabel> InputGraph<V, L>.removeNotPathMatrix(overApprox: List<Pair<V, V>>): InputGraph<V, L> {
 	if (overApprox.size == vertices.size * vertices.size) {
 		return this
 	}
@@ -145,16 +145,16 @@ fun <V, L : ILabel> InputGraph<V, L>.removeNotPathMatrix(overApprox: List<Pair<V
 	// Precompute which edges to keep
 	val edgesToKeep = mutableSetOf<Pair<V, V>>()
 
-	for ((from, edgesFrom) in edges) {
+	for ((sourceV, edgesFrom) in edges) {
 		for (edge in edgesFrom) {
-			val to = edge.targetVertex
+			val targetV = edge.targetVertex
 
-			val compFrom = vertexToSccMap[from] ?: continue
-			val compTo = vertexToSccMap[to] ?: continue
+			val compFrom = vertexToSccMap[sourceV] ?: continue
+			val compTo = vertexToSccMap[targetV] ?: continue
 
 			// Direct match
 			if (Pair(compFrom, compTo) in allowedCompTransitions) {
-				edgesToKeep += Pair(from, to)
+				edgesToKeep += Pair(sourceV, targetV)
 				continue
 			}
 
@@ -163,7 +163,7 @@ fun <V, L : ILabel> InputGraph<V, L>.removeNotPathMatrix(overApprox: List<Pair<V
 				if (sccReach.contains(Pair(a, compFrom)) &&
 					sccReach.contains(Pair(compTo, b))
 				) {
-					edgesToKeep += from to to
+					edgesToKeep += sourceV to targetV
 					break
 				}
 			}
