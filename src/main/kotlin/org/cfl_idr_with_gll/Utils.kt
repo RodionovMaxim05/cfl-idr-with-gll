@@ -16,31 +16,32 @@ fun <VertexType> extractEdgesFromSppfResults(
 ): Set<SppfEdge<VertexType>> {
 	val edges = mutableSetOf<SppfEdge<VertexType>>()
 	val visited = mutableSetOf<RangeSppfNode<VertexType>>()
+	val stack = ArrayDeque<RangeSppfNode<VertexType>>()
 
-	fun dfs(node: RangeSppfNode<VertexType>) {
-		if (!visited.add(node)) return
+	for (root in sppf) {
+		stack.add(root)
+	}
 
-		when (val t = node.type) {
+	while (stack.isNotEmpty()) {
+		val node = stack.removeLast()
+
+		if (!visited.add(node)) continue
+
+		when (val nodeType = node.type) {
 			is TerminalType<*> -> {
-				edges.add(SppfEdge(node.inputRange!!.from, t.terminal, node.inputRange!!.to))
+				edges.add(SppfEdge(node.inputRange!!.from, nodeType.terminal, node.inputRange!!.to))
 			}
 
-			is IntermediateType<*> -> {
+			is IntermediateType<*>,
+			is Range,
+			is NonterminalType,
+			is EpsilonNonterminalType,
+			is EmptyType -> {
 				for (child in node.children) {
-					dfs(child)
-				}
-			}
-
-			is Range, is NonterminalType, is EpsilonNonterminalType, is EmptyType -> {
-				for (child in node.children) {
-					dfs(child)
+					stack.add(child)
 				}
 			}
 		}
-	}
-
-	for (root in sppf) {
-		dfs(root)
 	}
 
 	return edges
