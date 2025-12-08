@@ -80,4 +80,38 @@ class TestUnderApprox {
 
 		assertEquals(expected, actual)
 	}
+
+	@Test
+	fun `loozfon graph`() {
+		val graph = loadGraph("src/test/resources/correctness/loozfon/graph.dot")
+
+		val actual = getUnderApprox(graph)
+
+		assertEquals(76, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/loozfon/underApproxPaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `faketaobao graph`() {
+		val graph = loadGraph("src/test/resources/correctness/faketaobao/graph.dot")
+
+		val actual = getUnderApprox(graph)
+
+		assertEquals(57, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/faketaobao/underApproxPaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
 }
