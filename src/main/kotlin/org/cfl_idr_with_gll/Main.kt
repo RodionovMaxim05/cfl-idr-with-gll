@@ -85,7 +85,7 @@ object Main {
 
 		val underPaths = getUnderApprox(inputGraph)
 
-		val overPaths = getMROverApprox(inputGraph, grammar, parityK)
+		val overPaths = getMROverApprox(inputGraph, grammar, parityK, underPaths)
 
 		outputFile.writeText(buildString {
 			append("Under approximation paths: ${underPaths.size}\n")
