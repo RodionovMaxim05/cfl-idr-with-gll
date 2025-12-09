@@ -260,39 +260,39 @@ class TestOverApprox {
 		assertEquals(expected, actual)
 	}
 
-//	@Test
-//	fun `exclude on loozfon graph`() {
-//		val graph = loadGraph("src/test/resources/correctness/loozfon/graph.dot")
-//
-//		val actual = getMROverApprox(graph, "exclude", 2)
-//
-//		assertEquals(212, actual.size)
-//
-//		val expectedLines = File("src/test/resources/correctness/loozfon/exlcudePaths.txt").readLines()
-//		val expected = expectedLines
-//			.map { it.split(" ") }
-//			.map { Path(it[0].toInt(), it[1].toInt()) }
-//			.toSet()
-//
-//		assertEquals(expected, actual)
-//	}
+	@Test
+	fun `exclude on loozfon graph`() {
+		val graph = loadGraph("src/test/resources/correctness/loozfon/graph.dot")
 
-//	@Test
-//	fun `all on loozfon graph`() {
-//		val graph = loadGraph("src/test/resources/correctness/loozfon/graph.dot")
-//
-//		val actual = getMROverApprox(graph, "all", 2)
-//
-//		assertEquals(93, actual.size)
-//
-//		val expectedLines = File("src/test/resources/correctness/loozfon/allPaths.txt").readLines()
-//		val expected = expectedLines
-//			.map { it.split(" ") }
-//			.map { Path(it[0].toInt(), it[1].toInt()) }
-//			.toSet()
-//
-//		assertEquals(expected, actual)
-//	}
+		val actual = getMROverApprox(graph, "exclude", 2)
+
+		assertEquals(212, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/loozfon/excludePaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `all on loozfon graph`() {
+		val graph = loadGraph("src/test/resources/correctness/loozfon/graph.dot")
+
+		val actual = getMROverApprox(graph, "all", 2)
+
+		assertEquals(93, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/loozfon/allPaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
 
 	@Test
 	fun `parity2 on faketaobao graph`() {

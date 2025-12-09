@@ -1,7 +1,6 @@
 package org.cfl_idr_with_gll
 
 import org.cfl_idr_with_gll.graph.parseDyckComponent
-import org.cfl_idr_with_gll.graph.parseDyckComponentNaive
 import org.cfl_idr_with_gll.graph.splitIntoConnectedComponents
 import org.cfl_idr_with_gll.graph.condensateFromUnderApprox
 import org.cfl_idr_with_gll.graph.findPMR
@@ -67,15 +66,16 @@ fun <V, L : ILabel> getMROverApprox(
 	underApprox: Set<Path<V>> = emptySet(),
 	terminalFormat: ITerminalFormat = DefaultTerminalFormat
 ): Set<Path<V>> {
+	val (_, _, parsedGraph) = parseDyckComponent(graph)
 
 	// If underApprox is passed, collapse mutually reachable vertices;
 	// otherwise, simply copy the graph without merging.
 	val (condensedGraph, vertexToRepresentativeMap) = if (underApprox.isNotEmpty()) {
-		condensateFromUnderApprox(graph, underApprox)
+		condensateFromUnderApprox(parsedGraph, underApprox)
 	} else {
 		// Each vertex is its own representative
-		val representativeMap = graph.vertices.associateWith { it }
-		graph to representativeMap
+		val representativeMap = parsedGraph.vertices.associateWith { it }
+		parsedGraph to representativeMap
 	}
 
 	val sppfCache = GrammarAnalysisCache<V>()
@@ -250,7 +250,8 @@ fun <V, L : ILabel> mutualRefinement(
 
 		// Parsing the Dyck component
 		val (parenthesesList, bracketsList, parsedComp) = parseDyckComponent(gComp, terminalFormat)
-		val initialEdgeCount = parsedComp.edges.size
+		var initialEdgeCount = 0
+		parsedComp.edges.forEach { initialEdgeCount += it.value.size }
 
 		// Get alphaPaths
 
@@ -336,14 +337,21 @@ fun <V, L : ILabel> mutualRefinement(
 			}
 		}
 
-		val finalEdgeCount = betaParsedComp.edges.size
+		var finalEdgeCount = 0
+		betaParsedComp.edges.forEach { finalEdgeCount += it.value.size }
 
 		// Check convergence
 		if (finalEdgeCount == 0 || initialEdgeCount == finalEdgeCount) {
 			// Stability has been achieved
 
+//			if (checkOnePath && alphaPaths.isNotEmpty() &&
+//				betaPaths.isNotEmpty() && projectPaths.isNotEmpty()
+//			) {
+//				return alphaPaths
+//			}
+
 			resultPaths.addAll(
-				alphaPaths.intersect(betaPaths).intersect(projectPaths).intersect(excludePaths)
+				alphaPaths.intersect(betaPaths).intersect(projectPaths)
 			)
 
 		} else {

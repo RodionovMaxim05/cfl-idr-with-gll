@@ -37,6 +37,7 @@ fun getAlphaGrammar(
 		"se" -> dyckAlphaGrammarKParitySe(terminalFormat, parenthesesIds, bracketsIds, 2)
 		"project" -> dyckAlphaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, 1)
 		"exclude" -> dyckAlphaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, 1)
+		"all" -> dyckAlphaGrammarKParitySe(terminalFormat, parenthesesIds, bracketsIds, 2)
 		else -> dyckAlphaGrammar(terminalFormat, parenthesesIds, bracketsIds)
 	}
 }
@@ -54,6 +55,7 @@ fun getBetaGrammar(
 		"se" -> dyckBetaGrammarKParitySe(terminalFormat, parenthesesIds, bracketsIds, 2)
 		"project" -> dyckBetaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, 1)
 		"exclude" -> dyckBetaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, 1)
+		"all" -> dyckBetaGrammarKParitySe(terminalFormat, parenthesesIds, bracketsIds, 2)
 		else -> dyckBetaGrammar(terminalFormat, parenthesesIds, bracketsIds)
 	}
 }
