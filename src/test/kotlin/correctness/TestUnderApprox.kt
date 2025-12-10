@@ -114,4 +114,55 @@ class TestUnderApprox {
 
 		assertEquals(expected, actual)
 	}
+
+	@Test
+	fun `jollyserv graph`() {
+		val graph = loadGraph("src/test/resources/correctness/jollyserv/graph.dot")
+
+		val actual = getUnderApprox(graph)
+
+		assertEquals(155, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/jollyserv/underApproxPaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `zertsecurity graph`() {
+		val graph = loadGraph("src/test/resources/correctness/zertsecurity/graph.dot")
+
+		val actual = getUnderApprox(graph)
+
+		assertEquals(779, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/zertsecurity/underApproxPaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `fakebanker graph`() {
+		val graph = loadGraph("src/test/resources/correctness/fakebanker/graph.dot")
+
+		val actual = getUnderApprox(graph)
+
+		assertEquals(249, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/fakebanker/underApproxPaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
 }

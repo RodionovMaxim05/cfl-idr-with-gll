@@ -378,4 +378,259 @@ class TestOverApprox {
 
 		assertEquals(expected, actual)
 	}
+
+	@Test
+	fun `parity2 on jollyserv graph`() {
+		val graph = loadGraph("src/test/resources/correctness/jollyserv/graph.dot")
+
+		val actual = getMROverApprox(graph, "parityK", 2)
+
+		assertEquals(175, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/jollyserv/parity2Paths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `se on jollyserv graph`() {
+		val graph = loadGraph("src/test/resources/correctness/jollyserv/graph.dot")
+
+		val actual = getMROverApprox(graph, "se", 2)
+
+		assertEquals(164, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/jollyserv/sePaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `project on jollyserv graph`() {
+		val graph = loadGraph("src/test/resources/correctness/jollyserv/graph.dot")
+
+		val actual = getMROverApprox(graph, "project", 2)
+
+		assertEquals(174, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/jollyserv/projectPaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `exclude on jollyserv graph`() {
+		val graph = loadGraph("src/test/resources/correctness/jollyserv/graph.dot")
+
+		val actual = getMROverApprox(graph, "exclude", 2)
+
+		assertEquals(176, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/jollyserv/excludePaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `all on jollyserv graph`() {
+		val graph = loadGraph("src/test/resources/correctness/jollyserv/graph.dot")
+
+		val actual = getMROverApprox(graph, "all", 2)
+
+		assertEquals(164, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/jollyserv/allPaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `parity2 on zertsecurity graph`() {
+		val graph = loadGraph("src/test/resources/correctness/zertsecurity/graph.dot")
+
+		val actual = getMROverApprox(graph, "parityK", 2)
+
+		assertEquals(1045, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/zertsecurity/parity2Paths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `se on zertsecurity graph`() {
+		val graph = loadGraph("src/test/resources/correctness/zertsecurity/graph.dot")
+
+		val actual = getMROverApprox(graph, "se", 2)
+
+		assertEquals(883, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/zertsecurity/sePaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `project on zertsecurity graph`() {
+		val graph = loadGraph("src/test/resources/correctness/zertsecurity/graph.dot")
+
+		val actual = getMROverApprox(graph, "project", 2)
+
+		assertEquals(1081, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/zertsecurity/projectPaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `exclude on zertsecurity graph`() {
+		val graph = loadGraph("src/test/resources/correctness/zertsecurity/graph.dot")
+
+		val actual = getMROverApprox(graph, "exclude", 2)
+
+		assertEquals(1080, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/zertsecurity/excludePaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `all on zertsecurity graph`() {
+		val graph = loadGraph("src/test/resources/correctness/zertsecurity/graph.dot")
+
+		val actual = getMROverApprox(graph, "all", 2)
+
+		assertEquals(883, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/zertsecurity/allPaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `parity2 on fakebanker graph`() {
+		val graph = loadGraph("src/test/resources/correctness/fakebanker/graph.dot")
+
+		val actual = getMROverApprox(graph, "parityK", 2)
+
+		assertEquals(590, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/fakebanker/parity2Paths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `se on fakebanker graph`() {
+		val graph = loadGraph("src/test/resources/correctness/fakebanker/graph.dot")
+
+		val actual = getMROverApprox(graph, "se", 2)
+
+		assertEquals(279, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/fakebanker/sePaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `project on fakebanker graph`() {
+		val graph = loadGraph("src/test/resources/correctness/fakebanker/graph.dot")
+
+		val actual = getMROverApprox(graph, "project", 2)
+
+		assertEquals(354, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/fakebanker/projectPaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `exclude on fakebanker graph`() {
+		val graph = loadGraph("src/test/resources/correctness/fakebanker/graph.dot")
+
+		val actual = getMROverApprox(graph, "exclude", 2)
+
+		assertEquals(590, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/fakebanker/excludePaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `all on fakebanker graph`() {
+		val graph = loadGraph("src/test/resources/correctness/fakebanker/graph.dot")
+
+		val actual = getMROverApprox(graph, "all", 2)
+
+		assertEquals(272, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/fakebanker/allPaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
 }
