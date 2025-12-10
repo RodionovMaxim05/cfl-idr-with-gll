@@ -232,7 +232,13 @@ fun dyckAlphaGrammarKParity(
 				}
 			}
 
-			val sortedB = bracketsIds.sorted()
+			// First the numbers in numerical order, then the remaining strings in lexicographic order
+			val sortedB = bracketsIds.sortedWith(
+				compareBy(
+					{ it.toIntOrNull() == null },
+					{ it.toIntOrNull() },
+					{ it }
+				))
 			val labelGroup = mutableMapOf<String, Int>()
 			// Assign each group of brackets the corresponding bit (group)
 			for ((i, label) in sortedB.withIndex()) {
@@ -325,7 +331,13 @@ fun dyckAlphaGrammarKParityExclude(
 				}
 			}
 
-			val sortedB = bracketsIds.sorted()
+			// First the numbers in numerical order, then the remaining strings in lexicographic order
+			val sortedB = bracketsIds.sortedWith(
+				compareBy(
+					{ it.toIntOrNull() == null },
+					{ it.toIntOrNull() },
+					{ it }
+				))
 			val labelGroup = mutableMapOf<String, Int>()
 			for ((i, label) in sortedB.withIndex()) {
 				labelGroup[label] = i % k
@@ -416,7 +428,13 @@ fun dyckAlphaGrammarKParitySe(
 				}
 			}
 
-			val sortedB = bracketsIds.sorted()
+			// First the numbers in numerical order, then the remaining strings in lexicographic order
+			val sortedB = bracketsIds.sortedWith(
+				compareBy(
+					{ it.toIntOrNull() == null },
+					{ it.toIntOrNull() },
+					{ it }
+				))
 			val labelGroup = mutableMapOf<String, Int>()
 			for ((i, label) in sortedB.withIndex()) {
 				labelGroup[label] = i % k
@@ -541,7 +559,13 @@ fun dyckBetaGrammarKParity(
 				}
 			}
 
-			val sortedP = parenthesesIds.sorted()
+			// First the numbers in numerical order, then the remaining strings in lexicographic order
+			val sortedP = parenthesesIds.sortedWith(
+				compareBy(
+					{ it.toIntOrNull() == null },
+					{ it.toIntOrNull() },
+					{ it }
+				))
 			val labelGroup = mutableMapOf<String, Int>()
 			// Assign each group of parentheses the corresponding bit (group)
 			for ((i, label) in sortedP.withIndex()) {
@@ -639,7 +663,13 @@ fun dyckBetaGrammarKParitySe(
 				}
 			}
 
-			val sortedP = parenthesesIds.sorted()
+			// First the numbers in numerical order, then the remaining strings in lexicographic order
+			val sortedP = parenthesesIds.sortedWith(
+				compareBy(
+					{ it.toIntOrNull() == null },
+					{ it.toIntOrNull() },
+					{ it }
+				))
 			val labelGroup = mutableMapOf<String, Int>()
 			for ((i, label) in sortedP.withIndex()) {
 				labelGroup[label] = i % k
