@@ -19,6 +19,7 @@ fun <VertexType> extractEdgesFromSppfResults(
 	val stack = ArrayDeque<RangeSppfNode<VertexType>>()
 
 	for (root in sppf) {
+		if (root.inputRange?.from == root.inputRange?.to) continue
 		stack.add(root)
 	}
 

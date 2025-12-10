@@ -8,7 +8,6 @@ import utils.sppfForExtractEdges.buildSimplifiedDyckGrammarSppf
 import utils.sppfForExtractEdges.buildOneVertexLoopDyckGrammarSppf
 import utils.sppfForExtractEdges.buildCyclicSppf
 
-
 class TestExtractEdgesFromSppfResult {
 
 	data class MockTerminal(val name: String) : ITerminal {
@@ -44,8 +43,7 @@ class TestExtractEdgesFromSppfResult {
 
 		val result = extractEdgesFromSppfResults(sppf)
 
-		val expected = setOf(SppfEdge(0, MockTerminal("("), 0), SppfEdge(0, MockTerminal(")"), 0))
-		assertEquals(expected, result)
+		assertEquals(emptySet(), result)
 	}
 
 	@Test
