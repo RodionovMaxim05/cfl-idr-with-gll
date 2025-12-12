@@ -172,12 +172,13 @@ private fun <V, L : ILabel> InputGraph<V, L>.removeNotPathMatrix(overApprox: Lis
 
 	// Build result graph
 	val resultGraph = InputGraph<V, L>()
-	vertices.forEach { resultGraph.addVertex(it) }
 
 	for ((sourceV, outgoingEdges) in edges) {
 		for (edge in outgoingEdges) {
 			val targetV = edge.targetVertex
-			if (sourceV != targetV && Pair(sourceV, targetV) in edgesToKeep) {
+			if (Pair(sourceV, targetV) in edgesToKeep) {
+				resultGraph.addVertex(sourceV)
+				resultGraph.addVertex(targetV)
 				resultGraph.addEdge(sourceV, edge.label, targetV)
 			}
 		}
