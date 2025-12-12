@@ -124,9 +124,11 @@ fun <V, L : ILabel> getOnDemandMR(
 	overApprox: Set<Path<V>>,
 	terminalFormat: ITerminalFormat = DefaultTerminalFormat
 ): Set<Path<V>> {
+	val (_, _, parsedGraph) = parseDyckComponent(graph)
+
 	// Step 1: Apply "classic" grammar refinement
 
-	val reducedGraph1 = graph.removeNotPath(overApprox)
+	val reducedGraph1 = parsedGraph.removeNotPath(overApprox)
 	val (_, _, graph1) = parseDyckComponent(reducedGraph1)
 
 	val filteredClassicPaths = refineMRWithGrammar(graph1, underApprox, overApprox, "classic", terminalFormat)
@@ -268,7 +270,7 @@ fun <V, L : ILabel> mutualRefinement(
 		}
 
 		// Updating the graph
-		val alphaEdges = extractEdgesFromSppfResults(alphaSppf)
+		val alphaEdges = extractEdgesFromSppfResults(alphaSppf, targetPath)
 		val updatedAlphaGraph = createGraphFromEdges(alphaEdges)
 		val (alphaParList, alphaBraList, alphaParsedComp) = parseDyckComponent(updatedAlphaGraph, terminalFormat)
 
@@ -286,14 +288,14 @@ fun <V, L : ILabel> mutualRefinement(
 			betaPaths = setOf(targetPath!!)
 		}
 
-		val betaEdges = extractEdgesFromSppfResults(betaSppf)
+		val betaEdges = extractEdgesFromSppfResults(betaSppf, targetPath)
 		val newBetaParsedComp = createGraphFromEdges(betaEdges)
 		var (betaParList, betaBraList, betaParsedComp) = parseDyckComponent(newBetaParsedComp, terminalFormat)
 
 		// Optional: Project phase
 		var projectPaths = betaPaths
 		if (curGrammar == "project" || curGrammar == "all") {
-			val projectSppf = sppfCache.getProjectPaths(alphaParsedComp, betaParList, betaBraList, terminalFormat)
+			val projectSppf = sppfCache.getProjectPaths(betaParsedComp, betaParList, betaBraList, terminalFormat)
 
 			projectPaths = extractNonTrivialPaths(projectSppf)
 
@@ -304,7 +306,7 @@ fun <V, L : ILabel> mutualRefinement(
 				projectPaths = setOf(targetPath!!)
 			}
 
-			val projectEdges = extractEdgesFromSppfResults(projectSppf)
+			val projectEdges = extractEdgesFromSppfResults(projectSppf, targetPath)
 			val newProjectParsedComp = createGraphFromEdges(projectEdges)
 			val (newParList, newBraList, newParsedComp) = parseDyckComponent(newProjectParsedComp, terminalFormat)
 			betaParList = newParList
@@ -313,28 +315,36 @@ fun <V, L : ILabel> mutualRefinement(
 		}
 
 		// Optional: Exclude phase
-		var excludePaths = projectPaths
+		val excludePaths: MutableSet<Path<*>> = mutableSetOf()
 		if (curGrammar == "exclude" || curGrammar == "all") {
-			for (braId in betaBraList) {
+			for ((i, braId) in betaBraList.withIndex()) {
 				val excludeSppf =
 					sppfCache.getExcludePaths(betaParsedComp, betaParList, betaBraList, braId, terminalFormat)
 
-				excludePaths = extractNonTrivialPaths(excludeSppf)
+				var curBraPaths = extractNonTrivialPaths(excludeSppf)
 
 				if (checkOnePath) {
-					if (!excludePaths.contains(targetPath)) {
+					if (!curBraPaths.contains(targetPath)) {
 						return resultPaths
 					}
-					excludePaths = setOf(targetPath!!)
+					curBraPaths = setOf(targetPath!!)
 				}
 
-				val excludeEdges = extractEdgesFromSppfResults(excludeSppf)
+				val excludeEdges = extractEdgesFromSppfResults(excludeSppf, targetPath)
 				val newExcludeParsedComp = createGraphFromEdges(excludeEdges)
 				val (newParList, newBraList, newParsedComp) = parseDyckComponent(newExcludeParsedComp, terminalFormat)
 				betaParList = newParList
 				betaBraList = newBraList
 				betaParsedComp = newParsedComp
+
+				if (i == 0) {
+					excludePaths.addAll(curBraPaths)
+				} else {
+					excludePaths.retainAll { it in curBraPaths }
+				}
 			}
+		} else {
+			excludePaths.addAll(betaPaths)
 		}
 
 		var finalEdgeCount = 0
@@ -344,11 +354,11 @@ fun <V, L : ILabel> mutualRefinement(
 		if (finalEdgeCount == 0 || initialEdgeCount == finalEdgeCount) {
 			// Stability has been achieved
 
-//			if (checkOnePath && alphaPaths.isNotEmpty() &&
-//				betaPaths.isNotEmpty() && projectPaths.isNotEmpty()
-//			) {
-//				return alphaPaths
-//			}
+			if (checkOnePath && alphaPaths.isNotEmpty() &&
+				betaPaths.isNotEmpty() && projectPaths.isNotEmpty()
+			) {
+				return alphaPaths
+			}
 
 			resultPaths.addAll(
 				alphaPaths.intersect(betaPaths).intersect(projectPaths)
@@ -364,6 +374,15 @@ fun <V, L : ILabel> mutualRefinement(
 				sppfCache,
 				terminalFormat
 			)
+
+			if (checkOnePath) {
+				if (refinedPaths.isEmpty()) {
+					return emptySet()
+				} else if (!refinedPaths.contains(targetPath)) {
+					continue
+				}
+			}
+
 			resultPaths.addAll(refinedPaths)
 		}
 	}

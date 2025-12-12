@@ -152,7 +152,7 @@ class TestRemoveNotPath {
 
 		val result = graph.removeNotPath(overApprox)
 
-		assertEquals(setOf("A", "B", "C"), result.vertices)
+		assertEquals(setOf("A", "B"), result.vertices)
 		assertEquals(1, result.edges.values.sumOf { it.size })
 		assertTrue(result.getEdges("A").any { it.label.toString() == "x" })
 		assertTrue(result.getEdges("B").isEmpty())

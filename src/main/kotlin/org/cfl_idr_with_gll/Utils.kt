@@ -12,7 +12,8 @@ import kotlin.text.trim
 data class SppfEdge<VertexType>(val from: VertexType, val label: ITerminal, val to: VertexType)
 
 fun <VertexType> extractEdgesFromSppfResults(
-	sppf: Set<RangeSppfNode<VertexType>>
+	sppf: Set<RangeSppfNode<VertexType>>,
+	targetPath: Path<VertexType>? = null
 ): Set<SppfEdge<VertexType>> {
 	val edges = mutableSetOf<SppfEdge<VertexType>>()
 	val visited = mutableSetOf<RangeSppfNode<VertexType>>()
@@ -20,7 +21,12 @@ fun <VertexType> extractEdgesFromSppfResults(
 
 	for (root in sppf) {
 		if (root.inputRange?.from == root.inputRange?.to) continue
-		stack.add(root)
+		
+		if (targetPath == null ||
+			(root.inputRange?.from == targetPath.source && root.inputRange?.to == targetPath.target)
+		) {
+			stack.add(root)
+		}
 	}
 
 	while (stack.isNotEmpty()) {
