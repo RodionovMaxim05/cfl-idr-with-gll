@@ -165,4 +165,21 @@ class TestUnderApprox {
 
 		assertEquals(expected, actual)
 	}
+
+	@Test
+	fun `uranai graph`() {
+		val graph = loadGraph("src/test/resources/correctness/uranai/graph.dot")
+
+		val actual = getUnderApprox(graph)
+
+		assertEquals(143, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/uranai/underApproxPaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
 }

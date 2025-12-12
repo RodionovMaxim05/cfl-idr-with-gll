@@ -185,4 +185,23 @@ class TestOnDemand {
 
 		assertEquals(expected, actual)
 	}
+
+	@Test
+	fun `uranai graph`() {
+		val graph = loadGraph("src/test/resources/correctness/uranai/graph.dot")
+		val underPaths = getUnderApprox(graph)
+		val overPaths = getMROverApprox(graph, "all", 1)
+
+		val actual = getOnDemandMR(graph, underPaths, overPaths)
+
+		assertEquals(143, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/uranai/onDemandPaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
 }
