@@ -210,6 +210,23 @@ class TestOverApprox {
 	}
 
 	@Test
+	fun `parity1 on loozfon graph`() {
+		val graph = loadGraph("src/test/resources/correctness/loozfon/graph.dot")
+
+		val actual = getMROverApprox(graph, "parityK", 1)
+
+		assertEquals(212, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/loozfon/parity1Paths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
 	fun `parity2 on loozfon graph`() {
 		val graph = loadGraph("src/test/resources/correctness/loozfon/graph.dot")
 
@@ -286,6 +303,23 @@ class TestOverApprox {
 		assertEquals(93, actual.size)
 
 		val expectedLines = File("src/test/resources/correctness/loozfon/allPaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `parity1 on faketaobao graph`() {
+		val graph = loadGraph("src/test/resources/correctness/faketaobao/graph.dot")
+
+		val actual = getMROverApprox(graph, "parityK", 1)
+
+		assertEquals(151, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/faketaobao/parity1Paths.txt").readLines()
 		val expected = expectedLines
 			.map { it.split(" ") }
 			.map { Path(it[0].toInt(), it[1].toInt()) }
@@ -380,6 +414,23 @@ class TestOverApprox {
 	}
 
 	@Test
+	fun `parity1 on jollyserv graph`() {
+		val graph = loadGraph("src/test/resources/correctness/jollyserv/graph.dot")
+
+		val actual = getMROverApprox(graph, "parityK", 1)
+
+		assertEquals(176, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/jollyserv/parity1Paths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
 	fun `parity2 on jollyserv graph`() {
 		val graph = loadGraph("src/test/resources/correctness/jollyserv/graph.dot")
 
@@ -456,6 +507,23 @@ class TestOverApprox {
 		assertEquals(164, actual.size)
 
 		val expectedLines = File("src/test/resources/correctness/jollyserv/allPaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `parity1 on zertsecurity graph`() {
+		val graph = loadGraph("src/test/resources/correctness/zertsecurity/graph.dot")
+
+		val actual = getMROverApprox(graph, "parityK", 1)
+
+		assertEquals(1081, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/zertsecurity/parity1Paths.txt").readLines()
 		val expected = expectedLines
 			.map { it.split(" ") }
 			.map { Path(it[0].toInt(), it[1].toInt()) }
@@ -550,6 +618,23 @@ class TestOverApprox {
 	}
 
 	@Test
+	fun `parity1 on fakebanker graph`() {
+		val graph = loadGraph("src/test/resources/correctness/fakebanker/graph.dot")
+
+		val actual = getMROverApprox(graph, "parityK", 1)
+
+		assertEquals(590, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/fakebanker/parity1Paths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
 	fun `parity2 on fakebanker graph`() {
 		val graph = loadGraph("src/test/resources/correctness/fakebanker/graph.dot")
 
@@ -626,6 +711,108 @@ class TestOverApprox {
 		assertEquals(272, actual.size)
 
 		val expectedLines = File("src/test/resources/correctness/fakebanker/allPaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `parity1 on uranai graph`() {
+		val graph = loadGraph("src/test/resources/correctness/uranai/graph.dot")
+
+		val actual = getMROverApprox(graph, "parityK", 1)
+
+		assertEquals(143, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/uranai/parity1Paths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `parity2 on uranai graph`() {
+		val graph = loadGraph("src/test/resources/correctness/uranai/graph.dot")
+
+		val actual = getMROverApprox(graph, "parityK", 2)
+
+		assertEquals(143, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/uranai/parity2Paths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `se on uranai graph`() {
+		val graph = loadGraph("src/test/resources/correctness/uranai/graph.dot")
+
+		val actual = getMROverApprox(graph, "se", 2)
+
+		assertEquals(143, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/uranai/sePaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `project on uranai graph`() {
+		val graph = loadGraph("src/test/resources/correctness/uranai/graph.dot")
+
+		val actual = getMROverApprox(graph, "project", 2)
+
+		assertEquals(143, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/uranai/projectPaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `exclude on uranai graph`() {
+		val graph = loadGraph("src/test/resources/correctness/uranai/graph.dot")
+
+		val actual = getMROverApprox(graph, "exclude", 2)
+
+		assertEquals(143, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/uranai/excludePaths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `all on uranai graph`() {
+		val graph = loadGraph("src/test/resources/correctness/uranai/graph.dot")
+
+		val actual = getMROverApprox(graph, "all", 2)
+
+		assertEquals(143, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/uranai/allPaths.txt").readLines()
 		val expected = expectedLines
 			.map { it.split(" ") }
 			.map { Path(it[0].toInt(), it[1].toInt()) }
