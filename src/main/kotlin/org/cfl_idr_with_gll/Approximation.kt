@@ -62,7 +62,7 @@ fun <V, L : ILabel> getUnderApprox(
 fun <V, L : ILabel> getMROverApprox(
 	graph: InputGraph<V, L>,
 	currGrammar: String,
-	currParityK: Int,
+	currParityK: Int = 1,
 	underApprox: Set<Path<V>> = emptySet(),
 	terminalFormat: ITerminalFormat = DefaultTerminalFormat
 ): Set<Path<V>> {

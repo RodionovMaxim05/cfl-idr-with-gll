@@ -15,3 +15,10 @@ bin/
 
 # Mac OS
 .DS_Store
+
+# Benchmark
+__pycache__
+venv/
+taint-out/
+taint-out-gll-based/
+plots/
