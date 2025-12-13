@@ -1,5 +1,7 @@
 package org.cfl_idr_with_gll
 
+import org.cfl_idr_with_gll.grammar.GrammarAnalysisCache
+import org.cfl_idr_with_gll.grammar.dyckGrammar
 import org.cfl_idr_with_gll.graph.parseDyckComponent
 import org.cfl_idr_with_gll.graph.splitIntoConnectedComponents
 import org.cfl_idr_with_gll.graph.condensateFromUnderApprox
@@ -7,6 +9,7 @@ import org.cfl_idr_with_gll.graph.findPMR
 import org.cfl_idr_with_gll.graph.removeNotPath
 import org.cfl_idr_with_gll.terminal.DefaultTerminalFormat
 import org.cfl_idr_with_gll.terminal.ITerminalFormat
+import org.cfl_idr_with_gll.models.Path
 import org.ucfs.input.ILabel
 import org.ucfs.input.InputGraph
 import org.ucfs.parser.Gll

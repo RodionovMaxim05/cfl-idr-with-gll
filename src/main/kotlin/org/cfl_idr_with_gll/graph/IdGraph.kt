@@ -13,7 +13,7 @@ import org.ucfs.input.InputGraph
  * @property to the target vertex of the edge
  * @property label the label associated with the edge
  */
-data class FullEdge<V, L>(val from: V, val to: V, val label: L)
+private data class FullEdge<V, L>(val from: V, val to: V, val label: L)
 
 /**
  * Parses a graph to extract Dyck language components using bracket matching.

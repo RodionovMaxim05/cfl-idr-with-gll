@@ -1,4 +1,4 @@
-package org.cfl_idr_with_gll
+package org.cfl_idr_with_gll.grammar
 
 import org.cfl_idr_with_gll.graph.hash
 import org.cfl_idr_with_gll.graph.hashGWithId
@@ -23,7 +23,7 @@ import org.ucfs.sppf.node.RangeSppfNode
  * @param terminalFormat the terminal format parser for generating bracket labels
  * @return a [Grammar] instance configured for the specified analysis
  */
-fun getAlphaGrammar(
+private fun getAlphaGrammar(
 	parenthesesIds: List<String>,
 	bracketsIds: List<String>,
 	curGrammar: String,
@@ -55,7 +55,7 @@ fun getAlphaGrammar(
  * @param terminalFormat the terminal format parser for generating bracket labels
  * @return a [Grammar] instance configured for the specified analysis
  */
-fun getBetaGrammar(
+private fun getBetaGrammar(
 	parenthesesIds: List<String>,
 	bracketsIds: List<String>,
 	curGrammar: String,
@@ -86,7 +86,7 @@ fun getBetaGrammar(
  * @param terminalFormat the terminal format parser for generating bracket labels
  * @return a [Grammar] instance configured for exclusion analysis
  */
-fun getExcludeGrammar(
+private fun getExcludeGrammar(
 	parenthesesIds: List<String>,
 	bracketsIds: List<String>,
 	labelId: String,

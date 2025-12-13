@@ -2,7 +2,7 @@ import org.junit.jupiter.api.Test
 import org.ucfs.rsm.symbol.ITerminal
 import kotlin.test.assertEquals
 import org.cfl_idr_with_gll.extractEdgesFromSppfResults
-import org.cfl_idr_with_gll.SppfEdge
+import org.cfl_idr_with_gll.models.SppfEdge
 import utils.sppfForExtractEdges.buildSimpleSppf
 import utils.sppfForExtractEdges.buildSimplifiedDyckGrammarSppf
 import utils.sppfForExtractEdges.buildOneVertexLoopDyckGrammarSppf

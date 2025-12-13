@@ -1,6 +1,6 @@
 package org.cfl_idr_with_gll.graph
 
-import org.cfl_idr_with_gll.Path
+import org.cfl_idr_with_gll.models.Path
 import org.jgrapht.alg.TransitiveClosure
 import org.jgrapht.alg.connectivity.ConnectivityInspector
 import org.jgrapht.alg.connectivity.KosarajuStrongConnectivityInspector

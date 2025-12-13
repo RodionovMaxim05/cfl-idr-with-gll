@@ -1,26 +1,10 @@
 package org.cfl_idr_with_gll
 
+import org.cfl_idr_with_gll.models.Path
+import org.cfl_idr_with_gll.models.SppfEdge
 import org.ucfs.input.InputGraph
 import org.ucfs.input.TerminalInputLabel
-import org.ucfs.rsm.symbol.ITerminal
 import org.ucfs.sppf.node.*
-
-/**
- * Represents a directed path between two vertices in a graph.
- *
- * @property source the source vertex of the path
- * @property target the target vertex of the path
- */
-data class Path<V>(val source: V, val target: V)
-
-/**
- * Represents a directed edge extracted from an SPPF (Shared Packed Parse Forest) structure.
- *
- * @property from the source vertex of the edge
- * @property label the terminal label associated with the edge
- * @property to the target vertex of the edge
- */
-data class SppfEdge<VertexType>(val from: VertexType, val label: ITerminal, val to: VertexType)
 
 /**
  * Extracts all terminal-labeled edges from an SPPF (Shared Packed Parse Forest) structure.
