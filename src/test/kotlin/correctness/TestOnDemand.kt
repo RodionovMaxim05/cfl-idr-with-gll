@@ -26,7 +26,7 @@ class TestOnDemand {
 	fun `figure5 graph`() {
 		val graph = loadGraph("src/test/resources/correctness/figure5/graph.dot")
 		val underPaths = getUnderApprox(graph)
-		val overPaths = getMROverApprox(graph, "all", 1)
+		val overPaths = getMROverApprox(graph, "all")
 
 		val actual = getOnDemandMR(graph, underPaths, overPaths)
 
@@ -39,7 +39,7 @@ class TestOnDemand {
 	fun `figure9 graph`() {
 		val graph = loadGraph("src/test/resources/correctness/figure9/graph.dot")
 		val underPaths = getUnderApprox(graph)
-		val overPaths = getMROverApprox(graph, "all", 1)
+		val overPaths = getMROverApprox(graph, "all")
 
 		val actual = getOnDemandMR(graph, underPaths, overPaths)
 
@@ -59,7 +59,7 @@ class TestOnDemand {
 	fun `figure10 graph`() {
 		val graph = loadGraph("src/test/resources/correctness/figure10/graph.dot")
 		val underPaths = getUnderApprox(graph)
-		val overPaths = getMROverApprox(graph, "all", 1)
+		val overPaths = getMROverApprox(graph, "all")
 
 		val actual = getOnDemandMR(graph, underPaths, overPaths)
 
@@ -75,7 +75,7 @@ class TestOnDemand {
 	fun `figure11 graph`() {
 		val graph = loadGraph("src/test/resources/correctness/figure11/graph.dot")
 		val underPaths = getUnderApprox(graph)
-		val overPaths = getMROverApprox(graph, "all", 1)
+		val overPaths = getMROverApprox(graph, "all")
 
 		val actual = getOnDemandMR(graph, underPaths, overPaths)
 
@@ -95,7 +95,7 @@ class TestOnDemand {
 	fun `loozfon graph`() {
 		val graph = loadGraph("src/test/resources/correctness/loozfon/graph.dot")
 		val underPaths = getUnderApprox(graph)
-		val overPaths = getMROverApprox(graph, "all", 1)
+		val overPaths = getMROverApprox(graph, "all")
 
 		val actual = getOnDemandMR(graph, underPaths, overPaths)
 
@@ -114,7 +114,7 @@ class TestOnDemand {
 	fun `faketaobao graph`() {
 		val graph = loadGraph("src/test/resources/correctness/faketaobao/graph.dot")
 		val underPaths = getUnderApprox(graph)
-		val overPaths = getMROverApprox(graph, "all", 1)
+		val overPaths = getMROverApprox(graph, "all")
 
 		val actual = getOnDemandMR(graph, underPaths, overPaths)
 
@@ -133,7 +133,7 @@ class TestOnDemand {
 	fun `jollyserv graph`() {
 		val graph = loadGraph("src/test/resources/correctness/jollyserv/graph.dot")
 		val underPaths = getUnderApprox(graph)
-		val overPaths = getMROverApprox(graph, "all", 1)
+		val overPaths = getMROverApprox(graph, "all")
 
 		val actual = getOnDemandMR(graph, underPaths, overPaths)
 
@@ -152,7 +152,7 @@ class TestOnDemand {
 	fun `zertsecurity graph`() {
 		val graph = loadGraph("src/test/resources/correctness/zertsecurity/graph.dot")
 		val underPaths = getUnderApprox(graph)
-		val overPaths = getMROverApprox(graph, "all", 1)
+		val overPaths = getMROverApprox(graph, "all")
 
 		val actual = getOnDemandMR(graph, underPaths, overPaths)
 
@@ -171,7 +171,7 @@ class TestOnDemand {
 	fun `fakebanker graph`() {
 		val graph = loadGraph("src/test/resources/correctness/fakebanker/graph.dot")
 		val underPaths = getUnderApprox(graph)
-		val overPaths = getMROverApprox(graph, "all", 1)
+		val overPaths = getMROverApprox(graph, "all")
 
 		val actual = getOnDemandMR(graph, underPaths, overPaths)
 
@@ -190,7 +190,7 @@ class TestOnDemand {
 	fun `uranai graph`() {
 		val graph = loadGraph("src/test/resources/correctness/uranai/graph.dot")
 		val underPaths = getUnderApprox(graph)
-		val overPaths = getMROverApprox(graph, "all", 1)
+		val overPaths = getMROverApprox(graph, "all")
 
 		val actual = getOnDemandMR(graph, underPaths, overPaths)
 

@@ -32,8 +32,9 @@ fun getAlphaGrammar(
 	terminalFormat: ITerminalFormat
 ): Grammar {
 	return when (curGrammar) {
-		"parityK" -> dyckAlphaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, curParityK)
+		"parity" -> dyckAlphaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, 1)
 		"parity2" -> dyckAlphaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, 2)
+		"parityK" -> dyckAlphaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, curParityK)
 		"se" -> dyckAlphaGrammarKParitySe(terminalFormat, parenthesesIds, bracketsIds, 2)
 		"project" -> dyckAlphaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, 1)
 		"exclude" -> dyckAlphaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, 1)
@@ -50,8 +51,9 @@ fun getBetaGrammar(
 	terminalFormat: ITerminalFormat
 ): Grammar {
 	return when (curGrammar) {
-		"parityK" -> dyckBetaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, curParityK)
+		"parity" -> dyckBetaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, 1)
 		"parity2" -> dyckBetaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, 2)
+		"parityK" -> dyckBetaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, curParityK)
 		"se" -> dyckBetaGrammarKParitySe(terminalFormat, parenthesesIds, bracketsIds, 2)
 		"project" -> dyckBetaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, 1)
 		"exclude" -> dyckBetaGrammarKParity(terminalFormat, parenthesesIds, bracketsIds, 1)

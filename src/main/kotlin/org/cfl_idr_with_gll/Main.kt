@@ -7,7 +7,7 @@ object Main {
 
 	private const val DIRECTORY_OUTPUT = "src/main/resources/taint"
 	private val SUPPORTED_GRAMMARS = setOf(
-		"parityK", "parity2", "se", "project", "exclude", "all", "on-demand"
+		"parity", "parity2", "parityK", "se", "project", "exclude", "all", "on-demand"
 	)
 
 	@JvmStatic
@@ -17,6 +17,7 @@ object Main {
 		var parityK = 0
 		var outputPath: String? = null
 		var onDemand = false
+		var quiet = false
 
 		var i = 0
 		while (i < args.size) {
@@ -24,6 +25,10 @@ object Main {
 				"-o" -> {
 					if (i + 1 >= args.size) error("Missing value for -o")
 					outputPath = args[++i]
+				}
+
+				"-q" -> {
+					quiet = true
 				}
 
 				else -> {
@@ -62,7 +67,10 @@ object Main {
 		val benchmarkName = inputFile.name.substringBeforeLast(".")
 		val outputFile = if (outputPath != null) {
 			val output = File(outputPath)
-			if (output.name.contains('.')) {
+			if (outputPath == "." || (output.exists() && output.isDirectory)) {
+				output.mkdirs()
+				File(output, "$benchmarkName.out")
+			} else if (output.name.contains('.')) {
 				output.parentFile?.mkdirs()
 				output
 			} else {
@@ -89,10 +97,14 @@ object Main {
 
 		outputFile.writeText(buildString {
 			append("Under approximation paths: ${underPaths.size}\n")
-			underPaths.forEach { append("\t$it\n") }
+			if (!quiet) {
+				underPaths.forEach { append("\t$it\n") }
+			}
 
-			append("\nOver approximation paths: ${overPaths.size}\n")
-			overPaths.forEach { append("\t$it\n") }
+			append("\nOver approximation paths (${grammar}): ${overPaths.size}\n")
+			if (!quiet) {
+				overPaths.forEach { append("\t$it\n") }
+			}
 		})
 
 		if (!onDemand) {
@@ -102,7 +114,9 @@ object Main {
 		val onDemandPaths = getOnDemandMR(inputGraph, underPaths, overPaths)
 
 		outputFile.appendText("\nOn-Demand paths: ${onDemandPaths.size}\n")
-		onDemandPaths.forEach { outputFile.appendText("\t$it\n") }
+		if (!quiet) {
+			onDemandPaths.forEach { outputFile.appendText("\t$it\n") }
+		}
 
 		println("Finished. Results written to ${outputFile.absolutePath}")
 	}
