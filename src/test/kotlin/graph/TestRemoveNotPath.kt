@@ -1,6 +1,6 @@
 package graph
 
-import org.cfl_idr_with_gll.Path
+import org.cfl_idr_with_gll.models.Path
 import org.cfl_idr_with_gll.graph.computeSccs
 import org.cfl_idr_with_gll.graph.removeNotPath
 import org.junit.jupiter.api.Assertions.*

@@ -1,6 +1,6 @@
 package org.cfl_idr_with_gll.graph
 
-import org.cfl_idr_with_gll.Path
+import org.cfl_idr_with_gll.models.Path
 import org.ucfs.input.InputGraph
 import org.ucfs.input.ILabel
 import kotlin.collections.mutableMapOf

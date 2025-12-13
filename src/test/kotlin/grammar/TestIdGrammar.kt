@@ -1,10 +1,8 @@
 package grammar
 
-import org.cfl_idr_with_gll.dyckGrammar
-import org.cfl_idr_with_gll.dyckAlphaGrammar
-import org.cfl_idr_with_gll.dyckBetaGrammar
-import org.cfl_idr_with_gll.dyckAlphaGrammarKParity
-import org.cfl_idr_with_gll.dyckBetaGrammarKParity
+import org.cfl_idr_with_gll.grammar.dyckGrammar
+import org.cfl_idr_with_gll.grammar.dyckAlphaGrammar
+import org.cfl_idr_with_gll.grammar.dyckBetaGrammar
 import org.cfl_idr_with_gll.terminal.DefaultTerminalFormat
 import org.cfl_idr_with_gll.terminal.ITerminalFormat.BracketType
 import org.junit.jupiter.api.Assertions.*

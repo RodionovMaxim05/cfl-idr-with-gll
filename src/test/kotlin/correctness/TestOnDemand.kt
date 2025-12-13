@@ -1,6 +1,6 @@
 package correctness
 
-import org.cfl_idr_with_gll.Path
+import org.cfl_idr_with_gll.models.Path
 import org.cfl_idr_with_gll.convertEdgesToGraphvizText
 import org.cfl_idr_with_gll.getMROverApprox
 import org.cfl_idr_with_gll.getOnDemandMR

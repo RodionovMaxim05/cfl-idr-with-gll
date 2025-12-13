@@ -1,4 +1,4 @@
-package org.cfl_idr_with_gll
+package org.cfl_idr_with_gll.grammar
 
 import org.cfl_idr_with_gll.terminal.ITerminalFormat
 import org.ucfs.grammar.combinator.Grammar
@@ -43,7 +43,7 @@ private fun initNtReflectively(grammar: Grammar, nt: Nt, name: String) {
 	grammar.nonTerms.add(nt)
 }
 
-fun dyckGrammar(
+internal fun dyckGrammar(
 	terminalFormat: ITerminalFormat,
 	parenthesesIds: List<String>,
 	bracketsIds: List<String>
@@ -75,7 +75,7 @@ fun dyckGrammar(
 	}
 }
 
-fun dyckProjectGrammar(
+internal fun dyckProjectGrammar(
 	terminalFormat: ITerminalFormat,
 	parenthesesIds: List<String>,
 	bracketsIds: List<String>
@@ -126,7 +126,7 @@ fun dyckProjectGrammar(
 	}
 }
 
-fun dyckAlphaGrammar(
+internal fun dyckAlphaGrammar(
 	terminalFormat: ITerminalFormat,
 	parenthesesIds: List<String>,
 	bracketsIds: List<String>
@@ -207,7 +207,7 @@ fun dyckAlphaGrammar(
  * -> (_n * Sii * )_n * Spp   // 11 ^ 00 = 11
  * -> normal * Sii
  */
-fun dyckAlphaGrammarKParity(
+internal fun dyckAlphaGrammarKParity(
 	terminalFormat: ITerminalFormat,
 	parenthesesIds: List<String>,
 	bracketsIds: List<String>,
@@ -307,7 +307,7 @@ fun dyckAlphaGrammarKParity(
 	}
 }
 
-fun dyckAlphaGrammarKParityExclude(
+internal fun dyckAlphaGrammarKParityExclude(
 	terminalFormat: ITerminalFormat,
 	parenthesesIds: List<String>,
 	bracketsIds: List<String>,
@@ -399,7 +399,7 @@ fun dyckAlphaGrammarKParityExclude(
 	}
 }
 
-fun dyckAlphaGrammarKParitySe(
+internal fun dyckAlphaGrammarKParitySe(
 	terminalFormat: ITerminalFormat,
 	parenthesesIds: List<String>,
 	bracketsIds: List<String>,
@@ -507,7 +507,11 @@ fun dyckAlphaGrammarKParitySe(
 	}
 }
 
-fun dyckBetaGrammar(terminalFormat: ITerminalFormat, parentheses: List<String>, brackets: List<String>): Grammar {
+internal fun dyckBetaGrammar(
+	terminalFormat: ITerminalFormat,
+	parentheses: List<String>,
+	brackets: List<String>
+): Grammar {
 	return object : Grammar() {
 		private val S by Nt().asStart()
 
@@ -634,7 +638,7 @@ fun dyckBetaGrammarKParity(
 	}
 }
 
-fun dyckBetaGrammarKParitySe(
+internal fun dyckBetaGrammarKParitySe(
 	terminalFormat: ITerminalFormat,
 	parenthesesIds: List<String>,
 	bracketsIds: List<String>,
