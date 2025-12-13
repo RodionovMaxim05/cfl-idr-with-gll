@@ -8,9 +8,26 @@ import org.ucfs.input.InputGraph
 
 /**
  * Represents a complete edge with explicit source, target, and label.
+ *
+ * @property from the source vertex of the edge
+ * @property to the target vertex of the edge
+ * @property label the label associated with the edge
  */
 data class FullEdge<V, L>(val from: V, val to: V, val label: L)
 
+/**
+ * Parses a graph to extract Dyck language components using bracket matching.
+ *
+ * This function processes an [InputGraph] to identify and extract bracket-labeled edges
+ * that form valid Dyck language pairs (matching opening and closing brackets).
+ *
+ * @param graph the input graph to parse
+ * @param terminalFormat the format parser for bracket labels (defaults to [DefaultTerminalFormat])
+ * @return a [Triple] containing:
+ *   - [List] of parenthesis identifiers
+ *   - [List] of bracket identifiers
+ *   - Filtered [InputGraph] with valid Dyck edges
+ */
 fun <V, L : ILabel> parseDyckComponent(
 	graph: InputGraph<V, L>,
 	terminalFormat: ITerminalFormat = DefaultTerminalFormat
@@ -56,6 +73,20 @@ fun <V, L : ILabel> parseDyckComponent(
 	return Triple(parIds, braIds, parsedDyckGraph)
 }
 
+/**
+ * Parses a graph to extract Dyck language components using a naive approach.
+ *
+ * This function provides a simpler algorithm for extracting bracket pairs
+ * from a graph. Unlike [parseDyckComponent], it processes each edge independently
+ * without requiring matching pairs to exist in the graph.
+ *
+ * @param graph the input graph to parse
+ * @param terminalFormat the format parser for bracket labels
+ * @return a [Triple] containing:
+ *   - [List] of all parenthesis identifiers
+ *   - [List] of all bracket identifiers
+ *   - Filtered [InputGraph] with all labeled edges
+ */
 fun <V, L : ILabel> parseDyckComponentNaive(
 	graph: InputGraph<V, L>,
 	terminalFormat: ITerminalFormat
