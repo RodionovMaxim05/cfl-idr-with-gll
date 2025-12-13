@@ -7,24 +7,23 @@ import os
 
 GRAMMAR_LABELS = {
     "parity": "PAR",
-#     "parity2": "PAR2",
-#     "se": "PAR2E",
-#     "project": "PARUnl",
-#     "exclude": "PARErase",
-#     "all": "COM",
-#     "on-demand": "COMD"
+    "parity2": "PAR2",
+    "se": "PAR2E",
+    "project": "PARUnl",
+    "exclude": "PARErase",
+    "all": "COM",
+    "on-demand": "COMD"
 }
 
 GRAMMARS = list(GRAMMAR_LABELS.keys())
 
-# GRAPHS = sorted([f"taint/{f}" for f in os.listdir("taint") if f.endswith(".dot")])
-GRAPHS = ["taint/loozfon.dot", "taint/jollyserv.dot"]
+GRAPHS = sorted([f"taint/{f}" for f in os.listdir("taint") if f.endswith(".dot") and f != "roidsec.dot"])
 
 REPEATS = 8
 
 GO_CMD = lambda filename, grammar: ["./comparable_impl/algo_go", filename, grammar]
 
-KOTLIN_JAR = "../build/libs/cfl-idr-with-gll-1.0-SNAPSHOT-all.jar"
+KOTLIN_JAR = "../build/libs/cfl-idr-with-gll-all.jar"
 KOTLIN_CMD = lambda filename, grammar: ["java", "-jar", KOTLIN_JAR, "-q", "-o", "taint-out-gll-based", filename, grammar]
 
 
