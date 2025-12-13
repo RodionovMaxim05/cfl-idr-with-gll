@@ -1,7 +1,6 @@
 package org.cfl_idr_with_gll.graph
 
 import org.cfl_idr_with_gll.Path
-import org.cfl_idr_with_gll.adapters.InputGraphJGraphTAdapter
 import org.jgrapht.alg.TransitiveClosure
 import org.jgrapht.alg.connectivity.ConnectivityInspector
 import org.jgrapht.alg.connectivity.KosarajuStrongConnectivityInspector
@@ -10,8 +9,16 @@ import org.jgrapht.graph.SimpleDirectedGraph
 import org.ucfs.input.ILabel
 import org.ucfs.input.InputGraph
 
+/**
+ * Splits this [InputGraph] into its weakly connected components.
+ *
+ * This function partitions the graph into maximal subgraphs where each vertex
+ * is reachable from every other vertex via an undirected path (ignoring edge direction).
+ *
+ * @return a list of connected components, each represented as a separate [InputGraph].
+ */
 fun <V, L : ILabel> InputGraph<V, L>.splitIntoConnectedComponents(): List<InputGraph<V, L>> {
-	val jGraph = InputGraphJGraphTAdapter.toJGraphT(this)
+	val jGraph = toJGraphT(this)
 	val inspector = ConnectivityInspector(jGraph)
 
 	val gComponents = inspector.connectedSets()
@@ -36,6 +43,14 @@ fun <V, L : ILabel> InputGraph<V, L>.splitIntoConnectedComponents(): List<InputG
 	return resultComp
 }
 
+/**
+ * Computes the FNV-1a 64-bit hash of a byte array.
+ *
+ * @param data the byte array to hash
+ * @return the 64-bit FNV-1a hash as an unsigned long
+ *
+ * @see <a href="https://ssojet.com/hashing/fnv-1a-in-kotlin/">FNV-1a hash</a>
+ */
 private fun fnv1aHash(data: ByteArray): ULong {
 	var hash = 0xCBF29CE484222325UL // FNV offset basis (64-bit)
 	val fnvPrime = 0x100000001B3UL // FNV prime (64-bit)
@@ -48,10 +63,27 @@ private fun fnv1aHash(data: ByteArray): ULong {
 	return hash
 }
 
+/**
+ * Computes a structural hash of this [InputGraph].
+ *
+ * The hash is computed from a canonical string representation of all edges
+ * (sorted lexicographically) and is insensitive to vertex/edge ordering.
+ *
+ * @return a 64-bit hash value representing the graph structure
+ */
 fun <V, L : ILabel> InputGraph<V, L>.hash(): ULong {
 	return hashGWithId(null)
 }
 
+/**
+ * Computes a structural hash of this [InputGraph] with an optional identifier.
+ *
+ * The hash incorporates both the graph structure (string representation of all
+ * edges sorted lexicographically) and the provided identifier.
+ *
+ * @param id an optional string identifier to include in the hash computation
+ * @return a 64-bit hash value combining the graph structure and identifier
+ */
 fun <V, L : ILabel> InputGraph<V, L>.hashGWithId(id: String? = null): ULong {
 	val edgeStrings = buildList {
 		for (source in vertices) {
@@ -69,14 +101,20 @@ fun <V, L : ILabel> InputGraph<V, L>.hashGWithId(id: String? = null): ULong {
 	return fnv1aHash(key.toByteArray())
 }
 
-fun <V, L : ILabel> InputGraph<V, L>.removeNotPath(overApprox: Set<Path<V>>): InputGraph<V, L> {
-	val pairMatrix = overApprox.map { Pair(it.source, it.target) }
-
-	return removeNotPathMatrix(pairMatrix)
-}
-
+/**
+ * Computes strongly connected components (SCCs) and their reachability relations.
+ *
+ * This function performs two main operations:
+ * 1. Identifies all strongly connected components in the graph using Kosaraju's algorithm.
+ * 2. Builds the condensation DAG (where each SCC is a node) and computes its transitive closure.
+ *
+ * @return a [Pair] where:
+ *   - first: a map from each vertex to its SCC index
+ *   - second: a set of SCC index pairs representing reachability in the condensed DAG
+ *             (includes reflexive pairs `(i, i)` for each SCC)
+ */
 fun <V, L : ILabel> computeSccs(graph: InputGraph<V, L>): Pair<Map<V, Int>, Set<Pair<Int, Int>>> {
-	val jGraph = InputGraphJGraphTAdapter.toJGraphT(graph)
+	val jGraph = toJGraphT(graph)
 	val inspector = KosarajuStrongConnectivityInspector(jGraph)
 
 	val sccList: List<Set<V>> = inspector.stronglyConnectedSets()
@@ -126,15 +164,28 @@ fun <V, L : ILabel> computeSccs(graph: InputGraph<V, L>): Pair<Map<V, Int>, Set<
 	return vertexToSccMap to sccReach
 }
 
-private fun <V, L : ILabel> InputGraph<V, L>.removeNotPathMatrix(overApprox: List<Pair<V, V>>): InputGraph<V, L> {
-	if (overApprox.size == vertices.size * vertices.size) {
+/**
+ * Removes edges from this graph that cannot be part of any path in the given over-approximation.
+ *
+ * This function filters edges based on a set of allowed source-target vertex pairs.
+ * An edge `u -> v` is kept if `(u, v)` appears in the over-approximation set or
+ * if there exists a path in the SCC condensation graph that connects allowed pairs.
+ * It uses SCC condensation and transitive closure to determine which edges can be preserved.
+ *
+ * @param overApprox a set of allowed paths
+ * @return a new [InputGraph] containing only edges that can participate in allowed paths
+ */
+fun <V, L : ILabel> InputGraph<V, L>.removeNotPath(overApprox: Set<Path<V>>): InputGraph<V, L> {
+	val pairMatrix = overApprox.map { Pair(it.source, it.target) }
+
+	if (pairMatrix.size == vertices.size * vertices.size) {
 		return this
 	}
 
 	val (vertexToSccMap, sccReach) = computeSccs(this)
 
 	// Build set of allowed component-to-component transitions
-	val allowedCompTransitions = overApprox
+	val allowedCompTransitions = pairMatrix
 		.mapNotNull { (u, v) ->
 			val cu = vertexToSccMap[u] ?: return@mapNotNull null
 			val cv = vertexToSccMap[v] ?: return@mapNotNull null
@@ -186,4 +237,3 @@ private fun <V, L : ILabel> InputGraph<V, L>.removeNotPathMatrix(overApprox: Lis
 
 	return resultGraph
 }
-

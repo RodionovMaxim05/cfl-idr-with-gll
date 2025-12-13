@@ -10,29 +10,17 @@ import org.cfl_idr_with_gll.terminal.ITerminalFormat
 import org.ucfs.input.ILabel
 import org.ucfs.input.InputGraph
 import org.ucfs.parser.Gll
-import org.ucfs.sppf.node.RangeSppfNode
 
 /**
- * Represents a directed path between two vertices in a graph.
+ * Computes an under-approximation of reachable paths in a graph using Dyck language analysis.
  *
- * @property source the source vertex of the path
- * @property target the target vertex of the path
+ * This function analyzes the input graph to identify paths that are guaranteed to be
+ * present (a conservative under-approximation).
+ *
+ * @param graph the input graph to analyze
+ * @param terminalFormat the format parser for bracket labels (defaults to [DefaultTerminalFormat])
+ * @return a set of [Path] objects representing the under-approximation of reachable paths
  */
-data class Path<V>(val source: V, val target: V)
-
-private fun <V> extractNonTrivialPaths(sppf: Set<RangeSppfNode<V>>): Set<Path<V>> {
-	return buildSet {
-		for (node in sppf) {
-			node.inputRange?.let { range ->
-				val path = Path(range.from, range.to)
-				if (path.source != path.target) {
-					add(path)
-				}
-			}
-		}
-	}
-}
-
 fun <V, L : ILabel> getUnderApprox(
 	graph: InputGraph<V, L>,
 	terminalFormat: ITerminalFormat = DefaultTerminalFormat
@@ -59,6 +47,20 @@ fun <V, L : ILabel> getUnderApprox(
 	return reachablePaths
 }
 
+/**
+ * Computes a refined over-approximation of reachable paths using mutual refinement (MR) algorithm.
+ *
+ * This function implements the mutual refinement algorithm to compute a precise
+ * over-approximation of reachable paths. It combines graph condensation with
+ * iterative grammar-based analysis to refine path approximations.
+ *
+ * @param graph the input graph to analyze
+ * @param currGrammar the grammar type to use for refinement ("classic", "all", etc.)
+ * @param currParityK the parity parameter k (default: 1)
+ * @param underApprox an optional under-approximation of paths for condensation
+ * @param terminalFormat the format parser for bracket labels (defaults to [DefaultTerminalFormat])
+ * @return a set of [Path] objects representing the refined over-approximation
+ */
 fun <V, L : ILabel> getMROverApprox(
 	graph: InputGraph<V, L>,
 	currGrammar: String,
@@ -118,6 +120,18 @@ fun <V, L : ILabel> getMROverApprox(
 	return refinedOverApproxPaths
 }
 
+/**
+ * Performs on-demand mutual refinement using two-phase grammar analysis.
+ *
+ * This approach is more efficient than full mutual refinement when only
+ * incremental updates are needed.
+ *
+ * @param graph the input graph to analyze
+ * @param underApprox the current under-approximation of paths
+ * @param overApprox the current over-approximation of paths
+ * @param terminalFormat the format parser for bracket labels (defaults to [DefaultTerminalFormat])
+ * @return a refined set of [Path] objects
+ */
 fun <V, L : ILabel> getOnDemandMR(
 	graph: InputGraph<V, L>,
 	underApprox: Set<Path<V>>,
@@ -143,7 +157,24 @@ fun <V, L : ILabel> getOnDemandMR(
 	return filteredOverPaths
 }
 
-fun <V, L : ILabel> refineMRWithGrammar(
+/**
+ * Refines path approximations using grammar-based analysis and condensation.
+ *
+ * This function implements the core refinement logic that:
+ * 1. Condenses the graph based on the under-approximation
+ * 2. Identifies unknown paths (in over-approximation but not in under-approximation)
+ * 3. Processes paths in a specific order (root paths first, then derived paths)
+ * 4. Uses mutual refinement to verify individual path candidates
+ * 5. Caches results to avoid redundant computations
+ *
+ * @param graph the input graph to analyze
+ * @param underApprox the current under-approximation of paths
+ * @param overApprox the current over-approximation of paths
+ * @param curGrammar the grammar type to use for refinement
+ * @param terminalFormat the format parser for bracket labels
+ * @return a refined set of [Path] objects
+ */
+private fun <V, L : ILabel> refineMRWithGrammar(
 	graph: InputGraph<V, L>,
 	underApprox: Set<Path<V>>,
 	overApprox: Set<Path<V>>,
@@ -220,7 +251,32 @@ fun <V, L : ILabel> refineMRWithGrammar(
 	return result
 }
 
-fun <V, L : ILabel> mutualRefinement(
+/**
+ * Performs mutual refinement analysis on a graph using grammar-based reachability.
+ *
+ * This is the core mutual refinement algorithm that iteratively refines path
+ * approximations using alternating grammar analyses (Alpha, Beta, Project, Exclude).
+ * The algorithm continues until convergence (no further edge reduction) or
+ * all relevant paths have been analyzed.
+ *
+ * The algorithm proceeds as follows for each connected component:
+ * 1. **Alpha phase**: Analyze with Alpha grammar to get initial path set
+ * 2. **Beta phase**: Analyze filtered graph with Beta grammar
+ * 3. **Optional Project phase**: Apply projection grammar if specified
+ * 4. **Optional Exclude phase**: Apply exclusion grammar if specified
+ * 5. **Check convergence**: If graph unchanged, return intersection of all phases
+ * 6. **Recursive refinement**: Otherwise, recurse on the refined graph
+ *
+ * @param graph the input graph to analyze
+ * @param curGrammar the grammar type selector ("classic", "all", "project", "exclude", etc.)
+ * @param curParityK the parity parameter k
+ * @param sppfCache a cache for SPPF parsing results to improve performance
+ * @param terminalFormat the format parser for bracket labels
+ * @param checkOnePath if `true`, only check the specified `targetPath`
+ * @param targetPath an optional specific path to check (used when `checkOnePath` is `true`)
+ * @return a set of [Path] objects that satisfy all grammar constraints
+ */
+private fun <V, L : ILabel> mutualRefinement(
 	graph: InputGraph<V, L>,
 	curGrammar: String,
 	curParityK: Int,
@@ -258,7 +314,7 @@ fun <V, L : ILabel> mutualRefinement(
 		// Get alphaPaths
 
 		val alphaSppf =
-			sppfCache.getAlphaPaths(parsedComp, parenthesesList, bracketsList, curGrammar, curParityK, terminalFormat)
+			sppfCache.getAlphaSppf(parsedComp, parenthesesList, bracketsList, curGrammar, curParityK, terminalFormat)
 
 		var alphaPaths = extractNonTrivialPaths(alphaSppf)
 
@@ -277,7 +333,7 @@ fun <V, L : ILabel> mutualRefinement(
 		// Get betaPaths
 
 		val betaSppf =
-			sppfCache.getBetaPaths(alphaParsedComp, alphaParList, alphaBraList, curGrammar, curParityK, terminalFormat)
+			sppfCache.getBetaSppf(alphaParsedComp, alphaParList, alphaBraList, curGrammar, curParityK, terminalFormat)
 
 		var betaPaths = extractNonTrivialPaths(betaSppf)
 
@@ -295,7 +351,7 @@ fun <V, L : ILabel> mutualRefinement(
 		// Optional: Project phase
 		var projectPaths = betaPaths
 		if (curGrammar == "project" || curGrammar == "all") {
-			val projectSppf = sppfCache.getProjectPaths(betaParsedComp, betaParList, betaBraList, terminalFormat)
+			val projectSppf = sppfCache.getProjectSppf(betaParsedComp, betaParList, betaBraList, terminalFormat)
 
 			projectPaths = extractNonTrivialPaths(projectSppf)
 
@@ -319,7 +375,7 @@ fun <V, L : ILabel> mutualRefinement(
 		if (curGrammar == "exclude" || curGrammar == "all") {
 			for ((i, braId) in betaBraList.withIndex()) {
 				val excludeSppf =
-					sppfCache.getExcludePaths(betaParsedComp, betaParList, betaBraList, braId, terminalFormat)
+					sppfCache.getExcludeSppf(betaParsedComp, betaParList, betaBraList, braId, terminalFormat)
 
 				var curBraPaths = extractNonTrivialPaths(excludeSppf)
 

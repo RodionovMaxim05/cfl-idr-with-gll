@@ -3,15 +3,66 @@ package org.cfl_idr_with_gll
 import org.ucfs.input.DotParser
 import java.io.File
 
+/**
+ * Main entry point for the CFL reachability analysis tool.
+ *
+ * This object implements a command-line interface for analyzing graph reachability
+ * using context-free language (CFL) reachability algorithms with GLL parsing.
+ * The tool processes Graphviz DOT files and computes under/over approximations
+ * of reachable paths using various Dyck language grammars.
+ *
+ * ## Usage
+ * ```
+ * java -jar app.jar [options] <input.dot> <grammar>
+ * ```
+ *
+ * ## Arguments
+ * - `input.dot`: Path to the input Graphviz DOT file or edge list file
+ * - `grammar`: The grammar type to use for analysis (see [SUPPORTED_GRAMMARS])
+ *
+ * ## Options
+ * - `-o <path>`: Specify output file or directory (default: `src/main/resources/taint`)
+ * - `-q`: Quiet mode - suppress detailed path output in results
+ *
+ * ## Supported Grammars
+ * - `parity`: (PAR) Parity grammar with k=1 - Parity condition
+ * - `parity2`: (PAR2) Parity grammar with k=2 - Extended parity condition
+ * - `parityK`: (PARk) Parity grammar with specified k (requires additional integer argument) - Extended parity condition
+ * - `se`: (PAR2E) Structured equality grammar - Valid endpoints
+ * - `project`: (PARUnl) Projection grammar - Projection to an unlabeled Dyck grammar
+ * - `exclude`: (PARErase) Exclusion grammar - Erasing labels
+ * - `all`: (COM) Comprehensive grammar
+ * - `on-demand`: (COMD) On-demand mutual refinement
+ */
 object Main {
 
+	/** Default output directory for analysis results. */
 	private const val DIRECTORY_OUTPUT = "src/main/resources/taint"
+
+	/** Set of supported grammar types for reachability analysis. */
 	private val SUPPORTED_GRAMMARS = setOf(
 		"parity", "parity2", "parityK", "se", "project", "exclude", "all", "on-demand"
 	)
 
+	/**
+	 * Main entry point for the CFL reachability analysis tool.
+	 *
+	 * Parses command-line arguments, loads the input graph, performs reachability
+	 * analysis using the specified grammar, and writes results to an output file.
+	 *
+	 * @param args command-line arguments:
+	 *   - `input.dot`: Path to input file (required)
+	 *   - `grammar`: Grammar type (required)
+	 *   - `-o <path>`: Output path (optional)
+	 *   - `-q`: Quiet mode (optional)
+	 *   - For `parityK` grammar: additional integer parameter k
+	 *
+	 * @throws IllegalArgumentException if required arguments are missing or invalid
+	 * @throws IllegalStateException if input file is not found or cannot be read
+	 */
 	@JvmStatic
 	fun main(args: Array<String>) {
+		readLine()
 		var dotFilePath: String? = null
 		var grammar: String? = null
 		var parityK = 0
@@ -108,6 +159,7 @@ object Main {
 		})
 
 		if (!onDemand) {
+			println("Analysis completed. Results written to ${outputFile.absolutePath}")
 			return
 		}
 
@@ -118,6 +170,6 @@ object Main {
 			onDemandPaths.forEach { outputFile.appendText("\t$it\n") }
 		}
 
-		println("Finished. Results written to ${outputFile.absolutePath}")
+		println("On-demand refinement completed. Results written to ${outputFile.absolutePath}")
 	}
 }

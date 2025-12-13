@@ -6,24 +6,23 @@ import org.cfl_idr_with_gll.terminal.ITerminalFormat
 import org.ucfs.grammar.combinator.Grammar
 import org.ucfs.input.ILabel
 import org.ucfs.input.InputGraph
-import org.ucfs.input.TerminalInputLabel
 import org.ucfs.parser.Gll
 import org.ucfs.sppf.node.RangeSppfNode
 
-fun <V> createGraphFromEdges(
-	edges: Set<SppfEdge<V>>
-): InputGraph<V, TerminalInputLabel> {
-	val graph = InputGraph<V, TerminalInputLabel>()
-
-	for (edge in edges) {
-		graph.addVertex(edge.from)
-		graph.addVertex(edge.to)
-		graph.addEdge(edge.from, TerminalInputLabel(edge.label), edge.to)
-	}
-
-	return graph
-}
-
+/**
+ * Creates an Alpha grammar based on the specified grammar type and parameters.
+ *
+ * This function serves as a factory for Alpha grammars used in Dyck language analysis.
+ * It selects the appropriate grammar generator based on the `curGrammar` parameter,
+ * which determines the specific language class to analyze.
+ *
+ * @param parenthesesIds list of identifiers for parentheses-type brackets
+ * @param bracketsIds list of identifiers for bracket-type brackets
+ * @param curGrammar the grammar type selector
+ * @param curParityK the k parameter for parity grammars
+ * @param terminalFormat the terminal format parser for generating bracket labels
+ * @return a [Grammar] instance configured for the specified analysis
+ */
 fun getAlphaGrammar(
 	parenthesesIds: List<String>,
 	bracketsIds: List<String>,
@@ -43,6 +42,19 @@ fun getAlphaGrammar(
 	}
 }
 
+/**
+ * Creates a Beta grammar based on the specified grammar type and parameters.
+ *
+ * This function serves as a factory for Beta grammars used in Dyck language analysis.
+ * Beta grammars typically complement Alpha grammars in the analysis pipeline.
+ *
+ * @param parenthesesIds list of identifiers for parentheses-type brackets
+ * @param bracketsIds list of identifiers for bracket-type brackets
+ * @param curGrammar the grammar type selector (same options as [getAlphaGrammar])
+ * @param curParityK the k parameter for parity grammars
+ * @param terminalFormat the terminal format parser for generating bracket labels
+ * @return a [Grammar] instance configured for the specified analysis
+ */
 fun getBetaGrammar(
 	parenthesesIds: List<String>,
 	bracketsIds: List<String>,
@@ -62,14 +74,18 @@ fun getBetaGrammar(
 	}
 }
 
-fun getProjectGrammar(
-	parenthesesIds: List<String>,
-	bracketsIds: List<String>,
-	terminalFormat: ITerminalFormat
-): Grammar {
-	return dyckProjectGrammar(terminalFormat, parenthesesIds, bracketsIds)
-}
-
+/**
+ * Creates an exclusion grammar for Dyck language analysis.
+ *
+ * Exclusion grammars are used to analyze Dyck languages while excluding
+ * specific bracket identifiers from consideration.
+ *
+ * @param parenthesesIds list of identifiers for parentheses-type brackets
+ * @param bracketsIds list of identifiers for bracket-type brackets
+ * @param labelId the specific bracket identifier to exclude
+ * @param terminalFormat the terminal format parser for generating bracket labels
+ * @return a [Grammar] instance configured for exclusion analysis
+ */
 fun getExcludeGrammar(
 	parenthesesIds: List<String>,
 	bracketsIds: List<String>,
@@ -79,6 +95,16 @@ fun getExcludeGrammar(
 	return dyckAlphaGrammarKParityExclude(terminalFormat, parenthesesIds, bracketsIds, 2, labelId)
 }
 
+/**
+ * A caching mechanism for GLL parsing results to improve performance in grammar analysis.
+ *
+ * This class maintains separate caches for different grammar types (Alpha, Beta,
+ * Projection, Exclusion) to avoid redundant parsing of identical graphs.
+ * Each cache is keyed by the graph's hash value, computed using [InputGraph.hash] or
+ * [InputGraph.hashGWithId].
+ *
+ * @param V the vertex type of the graphs being analyzed
+ */
 class GrammarAnalysisCache<V> {
 
 	private val alphaCache = mutableMapOf<ULong, Set<RangeSppfNode<V>>>()
@@ -86,6 +112,12 @@ class GrammarAnalysisCache<V> {
 	private val projectCache = mutableMapOf<ULong, Set<RangeSppfNode<V>>>()
 	private val excludeCache = mutableMapOf<ULong, Set<RangeSppfNode<V>>>()
 
+	/**
+	 * Clears all cached parsing results.
+	 *
+	 * Use this method when the cache needs to be invalidated, such as when
+	 * grammars or analysis parameters change.
+	 */
 	fun clear() {
 		alphaCache.clear()
 		betaCache.clear()
@@ -93,7 +125,21 @@ class GrammarAnalysisCache<V> {
 		excludeCache.clear()
 	}
 
-	fun <L : ILabel> getAlphaPaths(
+	/**
+	 * Retrieves or computes Alpha grammar parse results for a graph.
+	 *
+	 * If the graph has been parsed previously with the same parameters, returns
+	 * the cached result. Otherwise, performs GLL parsing and caches the result.
+	 *
+	 * @param graph the input graph to parse
+	 * @param parenthesesLabels list of parentheses identifiers
+	 * @param bracketsLabels list of bracket identifiers
+	 * @param curGrammar the grammar type selector
+	 * @param curParityK the parity parameter k
+	 * @param terminalFormat the terminal format parser
+	 * @return a set of SPPF nodes representing parse results
+	 */
+	fun <L : ILabel> getAlphaSppf(
 		graph: InputGraph<V, L>,
 		parenthesesLabels: List<String>,
 		bracketsLabels: List<String>,
@@ -114,7 +160,21 @@ class GrammarAnalysisCache<V> {
 		}
 	}
 
-	fun <L : ILabel> getBetaPaths(
+	/**
+	 * Retrieves or computes Beta grammar parse results for a graph.
+	 *
+	 * If the graph has been parsed previously with the same parameters, returns
+	 * the cached result. Otherwise, performs GLL parsing and caches the result.
+	 *
+	 * @param graph the input graph to parse
+	 * @param parenthesesLabels list of parentheses identifiers
+	 * @param bracketsLabels list of bracket identifiers
+	 * @param curGrammar the grammar type selector
+	 * @param curParityK the parity parameter k
+	 * @param terminalFormat the terminal format parser
+	 * @return a set of SPPF nodes representing parse results
+	 */
+	fun <L : ILabel> getBetaSppf(
 		graph: InputGraph<V, L>,
 		parenthesesLabels: List<String>,
 		bracketsLabels: List<String>,
@@ -135,7 +195,19 @@ class GrammarAnalysisCache<V> {
 		}
 	}
 
-	fun <L : ILabel> getProjectPaths(
+	/**
+	 * Retrieves or computes Projection grammar parse results for a graph.
+	 *
+	 * If the graph has been parsed previously with the same parameters, returns
+	 * the cached result. Otherwise, performs GLL parsing and caches the result.
+	 *
+	 * @param graph the input graph to parse
+	 * @param parenthesesLabels list of parentheses identifiers
+	 * @param bracketsLabels list of bracket identifiers
+	 * @param terminalFormat the terminal format parser
+	 * @return a set of SPPF nodes representing parse results
+	 */
+	fun <L : ILabel> getProjectSppf(
 		graph: InputGraph<V, L>,
 		parenthesesLabels: List<String>,
 		bracketsLabels: List<String>,
@@ -144,7 +216,7 @@ class GrammarAnalysisCache<V> {
 		val h: ULong = graph.hash()
 
 		return projectCache.getOrPut(h) {
-			val grammar = getProjectGrammar(parenthesesLabels, bracketsLabels, terminalFormat)
+			val grammar = dyckProjectGrammar(terminalFormat, parenthesesLabels, bracketsLabels)
 
 			graph.vertices.forEach { graph.addStartVertex(it) }
 
@@ -154,7 +226,20 @@ class GrammarAnalysisCache<V> {
 		}
 	}
 
-	fun <L : ILabel> getExcludePaths(
+	/**
+	 * Retrieves or computes Exclusion grammar parse results for a graph.
+	 *
+	 * Exclusion grammars use [InputGraph.hashGWithId] for caching, which includes
+	 * the excluded label ID in the hash computation.
+	 *
+	 * @param graph the input graph to parse
+	 * @param parenthesesLabels list of parentheses identifiers
+	 * @param bracketsLabels list of bracket identifiers
+	 * @param braId the bracket identifier to exclude
+	 * @param terminalFormat the terminal format parser
+	 * @return a set of SPPF nodes representing parse results
+	 */
+	fun <L : ILabel> getExcludeSppf(
 		graph: InputGraph<V, L>,
 		parenthesesLabels: List<String>,
 		bracketsLabels: List<String>,
