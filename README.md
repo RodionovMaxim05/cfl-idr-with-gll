@@ -6,8 +6,8 @@ algorithm.
 ## Problem Overview
 
 Interleaved Dyck Reachability is a fundamental problem in static program analysis where path constraints are expressed
-as the shuffle of two Dyck languages - typically representing context sensitivity (parentheses) and field sensitivity (
-brackets). While this formulation enables high-precision analyses, the general problem is known to be undecidable.
+as the shuffle of two Dyck languages - typically representing context sensitivity (parentheses) and field sensitivity
+(brackets). While this formulation enables high-precision analyses, the general problem is known to be undecidable.
 
 This project implements approximation techniques based on the research paper ["CFL-based methods for approximating
 interleaved Dyck reachability" (Conrado & Pavlogiannis, 2025)](https://www.researchgate.net/publication/390804794_CFL-based_methods_for_approximating_interleaved_Dyck_reachability),
@@ -83,11 +83,9 @@ git clone https://github.com/RodionovMaxim05/cfl-idr-with-gll.git
 cd cfl-idr-with-gll
 
 # Build the project
-
 ./gradlew build
 
 # Run tests
-
 ./gradlew test
 ```
 
@@ -131,7 +129,3 @@ More details about this can be found in the [`benchmark`](benchmark/) directory.
 
 Distributed under the [MIT License](https://choosealicense.com/licenses/mit/). See [`LICENSE`](LICENSE) for more
 information.
-
-## Author
-
-* **Maxim Rodionov:** [GitHub](https://github.com/RodionovMaxim05), [Telegram](https://t.me/Maxoon22)
