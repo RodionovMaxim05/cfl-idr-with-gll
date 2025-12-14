@@ -7,15 +7,6 @@ import org.cfl_idr_with_gll.terminal.ITerminalFormat.BracketType
 import org.ucfs.input.InputGraph
 
 /**
- * Represents a complete edge with explicit source, target, and label.
- *
- * @property from the source vertex of the edge
- * @property to the target vertex of the edge
- * @property label the label associated with the edge
- */
-private data class FullEdge<V, L>(val from: V, val to: V, val label: L)
-
-/**
  * Parses a graph to extract Dyck language components using bracket matching.
  *
  * This function processes an [InputGraph] to identify and extract bracket-labeled edges
@@ -32,41 +23,48 @@ fun <V, L : ILabel> parseDyckComponent(
 	graph: InputGraph<V, L>,
 	terminalFormat: ITerminalFormat = DefaultTerminalFormat
 ): Triple<List<String>, List<String>, InputGraph<V, L>> {
-	val processedLabels = mutableSetOf<String>()
+	val processedLabels = HashSet<String>()
 	val parIds = mutableListOf<String>()
 	val braIds = mutableListOf<String>()
 
-	val allEdges = graph.vertices.flatMap { sourceV ->
-		graph.getEdges(sourceV).map { edge ->
-			FullEdge(sourceV, edge.targetVertex, edge.label)
-		}
-	}
+	for (sourceV in graph.vertices) {
+		for (edge in graph.getEdges(sourceV)) {
+			val label = edge.label.toString()
 
-	for (edge in allEdges) {
-		val label = edge.label.toString()
-		if (label.isEmpty() || label == "normal") continue
+			if (label.isEmpty() || label == "normal") continue
 
-		if (label !in processedLabels && terminalFormat.matchingLabel(label) in processedLabels) {
-			val idString = terminalFormat.extractId(label)
+			if (label !in processedLabels) {
+				if (terminalFormat.matchingLabel(label) in processedLabels) {
+					val idString = terminalFormat.extractId(label)
 
-			when (terminalFormat.getType(label)) {
-				BracketType.Parentheses -> parIds.add(idString)
-				BracketType.Brackets -> braIds.add(idString)
+					when (terminalFormat.getType(label)) {
+						BracketType.Parentheses -> parIds.add(idString)
+						BracketType.Brackets -> braIds.add(idString)
 
-				else -> {}
+						else -> {}
+					}
+				}
+				processedLabels.add(label)
 			}
 		}
-		processedLabels.add(label)
 	}
 
 	val parsedDyckGraph = InputGraph<V, L>()
-	for (edge in allEdges) {
-		val label = edge.label.toString()
 
-		if (label == "normal" || (label.isNotEmpty() && label in processedLabels && terminalFormat.matchingLabel(label) in processedLabels)) {
-			parsedDyckGraph.addVertex(edge.from)
-			parsedDyckGraph.addVertex(edge.to)
-			parsedDyckGraph.addEdge(edge.from, edge.label, edge.to)
+	for (sourceV in graph.vertices) {
+		val edges = graph.getEdges(sourceV)
+
+		for (edge in edges) {
+			val label = edge.label.toString()
+
+			if (label == "normal" || (label.isNotEmpty() && label in processedLabels && terminalFormat.matchingLabel(
+					label
+				) in processedLabels)
+			) {
+				parsedDyckGraph.addVertex(sourceV)
+				parsedDyckGraph.addVertex(edge.targetVertex)
+				parsedDyckGraph.addEdge(sourceV, edge.label, edge.targetVertex)
+			}
 		}
 	}
 
@@ -91,44 +89,43 @@ fun <V, L : ILabel> parseDyckComponentNaive(
 	graph: InputGraph<V, L>,
 	terminalFormat: ITerminalFormat
 ): Triple<List<String>, List<String>, InputGraph<V, L>> {
-	val processedLabels = mutableSetOf<String>()
+	val processedKeys = HashSet<String>()
 	val parIds = mutableListOf<String>()
 	val braIds = mutableListOf<String>()
 
-	val allEdges = graph.vertices.flatMap { from ->
-		graph.getEdges(from).map { edge ->
-			FullEdge(from, edge.targetVertex, edge.label)
-		}
-	}
+	for (sourceV in graph.vertices) {
+		for (edge in graph.getEdges(sourceV)) {
+			val label = edge.label.toString()
+			if (label == "normal" || label.isEmpty()) continue
 
-	for (edge in allEdges) {
-		val label = edge.label.toString()
-		if (label == "normal" || label.isEmpty()) continue
+			val terminalType = terminalFormat.getType(label)
+			val id = terminalFormat.extractId(label)
+			val labelKey = "${terminalType}$id"
 
-		val terminalType = terminalFormat.getType(label)
-		val id = terminalFormat.extractId(label)
-		val labelKey = "${terminalType}$id"
+			if (labelKey !in processedKeys) {
+				val idString = terminalFormat.extractId(label)
 
-		if (labelKey !in processedLabels) {
-			val idString = terminalFormat.extractId(label)
+				when (terminalType) {
+					BracketType.Parentheses -> parIds.add(idString)
+					BracketType.Brackets -> braIds.add(idString)
 
-			when (terminalType) {
-				BracketType.Parentheses -> parIds.add(idString)
-				BracketType.Brackets -> braIds.add(idString)
-
-				else -> {}
+					else -> {}
+				}
 			}
+			processedKeys.add(labelKey)
 		}
-		processedLabels.add(labelKey)
 	}
 
 	val parsedDyck = InputGraph<V, L>()
-	for (edge in allEdges) {
-		val label = edge.label.toString()
-		if (label.isNotEmpty()) {
-			parsedDyck.addVertex(edge.from)
-			parsedDyck.addVertex(edge.to)
-			parsedDyck.addEdge(edge.from, edge.label, edge.to)
+
+	for (sourceV in graph.vertices) {
+
+		for (edge in graph.getEdges(sourceV)) {
+			if (edge.label.toString().isNotEmpty()) {
+				parsedDyck.addVertex(sourceV)
+				parsedDyck.addVertex(edge.targetVertex)
+				parsedDyck.addEdge(sourceV, edge.label, edge.targetVertex)
+			}
 		}
 	}
 
