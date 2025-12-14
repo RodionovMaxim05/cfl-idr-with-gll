@@ -62,7 +62,6 @@ object Main {
 	 */
 	@JvmStatic
 	fun main(args: Array<String>) {
-		readLine()
 		var dotFilePath: String? = null
 		var grammar: String? = null
 		var parityK = 0
