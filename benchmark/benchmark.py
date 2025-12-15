@@ -12,29 +12,33 @@ GRAMMAR_LABELS = {
     "project": "PARUnl",
     "exclude": "PARErase",
     "all": "COM",
-    "on-demand": "COMD"
+    "on-demand": "COMD",
 }
 
 GRAMMARS = list(GRAMMAR_LABELS.keys())
 
-GRAPHS = sorted([f"taint/{f}" for f in os.listdir("taint") if f.endswith(".dot") and f != "roidsec.dot"])
+GRAPHS = sorted([f"taint/{f}" for f in os.listdir("taint") if f.endswith(".dot")])
 
 REPEATS = 8
 
 GO_CMD = lambda filename, grammar: ["./comparable_impl/algo_go", filename, grammar]
 
 KOTLIN_JAR = "../build/libs/cfl-idr-with-gll-all.jar"
-KOTLIN_CMD = lambda filename, grammar: ["java", "-jar", KOTLIN_JAR, "-q", "-o", "taint-out-gll-based", filename, grammar]
+KOTLIN_CMD = lambda filename, grammar: [
+    "java",
+    "-jar",
+    KOTLIN_JAR,
+    "-q",
+    "-o",
+    "taint-out-gll-based",
+    filename,
+    grammar,
+]
 
 
 def measure_time(cmd):
     start = time.perf_counter()
-    subprocess.run(
-        cmd,
-        shell=False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
+    subprocess.run(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return time.perf_counter() - start
 
 
@@ -48,7 +52,7 @@ def analyze(times):
     mean_raw = np.mean(t)
     std_raw = np.std(t, ddof=1)
 
-    ci_raw = stats.t.ppf(0.975, df=len(t)-1) * stats.sem(t)
+    ci_raw = stats.t.ppf(0.975, df=len(t) - 1) * stats.sem(t)
     error = ci_raw
 
     return {
@@ -57,7 +61,7 @@ def analyze(times):
         "mean_raw": mean_raw,
         "std_raw": std_raw,
         "ci_raw": ci_raw,
-        "normal": normal
+        "normal": normal,
     }
 
 
@@ -75,10 +79,7 @@ def run_bench_for_grammar(grammar):
         kt_times = [measure_time(KOTLIN_CMD(graph, grammar)) for _ in range(REPEATS)]
         kt_res = analyze(kt_times)
 
-        results[graph] = {
-            "go": go_res,
-            "kotlin": kt_res
-        }
+        results[graph] = {"go": go_res, "kotlin": kt_res}
 
     return results
 
@@ -96,8 +97,22 @@ def plot_for_grammar(grammar, results):
     width = 0.35
 
     plt.figure(figsize=(15, 7))
-    plt.bar(x - width/2, go_means, width, label="Original Go impl", yerr=go_err, capsize=5)
-    plt.bar(x + width/2, kt_means, width, label="GLL-based impl", yerr=kt_err, capsize=5)
+    plt.bar(
+        x - width / 2,
+        go_means,
+        width,
+        label="Original Go impl",
+        yerr=go_err,
+        capsize=5,
+    )
+    plt.bar(
+        x + width / 2,
+        kt_means,
+        width,
+        label="GLL-based impl",
+        yerr=kt_err,
+        capsize=5,
+    )
 
     plt.ylabel("Execution Time (s)")
     plt.xlabel("Graph")

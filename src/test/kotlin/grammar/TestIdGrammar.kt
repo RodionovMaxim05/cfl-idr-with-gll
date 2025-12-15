@@ -60,33 +60,29 @@ class TestIdGrammar {
 		assertTrue(alts.any { it is Epsilon }, "Missing Epsilon")
 		assertTrue(alts.any { isTerm(it, "normal") }, "Missing normal")
 
-		// S S
-		assertTrue(alts.any { alt ->
-			val p = alt.concatParts()
-			p.size == 2 && isNt(p[0], "S") && isNt(p[1], "S")
-		}, "Missing S S")
-
 		// ( S )
 		val open0 = DefaultTerminalFormat.generateLabel(BracketType.Parentheses, "01", true)
 		val close0 = DefaultTerminalFormat.generateLabel(BracketType.Parentheses, "01", false)
 		assertTrue(alts.any { alt ->
 			val p = alt.concatParts()
-			p.size == 3 &&
+			p.size == 4 &&
 					isTerm(p[0], open0) &&
 					isNt(p[1], "S") &&
-					isTerm(p[2], close0)
-		}, "Missing ( S )")
+					isTerm(p[2], close0) &&
+					isNt(p[3], "S")
+		}, "Missing ( S ) S")
 
 		// [ S ]
 		val open1 = DefaultTerminalFormat.generateLabel(BracketType.Brackets, "11", true)
 		val close1 = DefaultTerminalFormat.generateLabel(BracketType.Brackets, "11", false)
 		assertTrue(alts.any { alt ->
 			val p = alt.concatParts()
-			p.size == 3 &&
+			p.size == 4 &&
 					isTerm(p[0], open1) &&
 					isNt(p[1], "S") &&
-					isTerm(p[2], close1)
-		}, "Missing [ S ]")
+					isTerm(p[2], close1) &&
+					isNt(p[3], "S")
+		}, "Missing [ S ] S")
 	}
 
 	@Test
