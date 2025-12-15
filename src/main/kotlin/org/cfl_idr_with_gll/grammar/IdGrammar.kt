@@ -54,20 +54,19 @@ internal fun dyckGrammar(
 		init {
 			var alternatives: Regexp = Epsilon
 			alternatives = alternatives or Term("normal")
-			alternatives = alternatives or (S * S)
 
 			// Adding rules for each pair of parentheses
 			for (id in parenthesesIds) {
 				val open = terminalFormat.generateLabel(BracketType.Parentheses, id, true)
 				val close = terminalFormat.generateLabel(BracketType.Parentheses, id, false)
-				alternatives = alternatives or (Term(open) * S * Term(close))
+				alternatives = alternatives or ((Term(open) * S * Term(close)) * S)
 			}
 
 			// Adding rules for each pair of square brackets
 			for (id in bracketsIds) {
 				val open = terminalFormat.generateLabel(BracketType.Brackets, id, true)
 				val close = terminalFormat.generateLabel(BracketType.Brackets, id, false)
-				alternatives = alternatives or (Term(open) * S * Term(close))
+				alternatives = alternatives or ((Term(open) * S * Term(close)) * S)
 			}
 
 			S /= alternatives
