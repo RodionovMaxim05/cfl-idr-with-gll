@@ -31,7 +31,7 @@ internal fun dyckBetaGrammar(
 		private val S by Nt().asStart()
 
 		init {
-			var alternatives: Regexp = Epsilon or Term("normal")
+			var alternatives: Regexp = Epsilon or (Term("normal") * S)
 
 			for (brId in bracketsIds) {
 				val open = terminalFormat.generateLabel(BracketType.Brackets, brId, true)

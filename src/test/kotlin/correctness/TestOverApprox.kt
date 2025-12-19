@@ -820,4 +820,21 @@ class TestOverApprox {
 
 		assertEquals(expected, actual)
 	}
+
+	@Test
+	fun `parity2 on collection_slx graph`() {
+		val graph = loadGraph("src/test/resources/correctness/collection_slx/graph.dot")
+
+		val actual = getMROverApprox(graph, "parity2")
+
+		assertEquals(5210, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/collection_slx/paths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
 }

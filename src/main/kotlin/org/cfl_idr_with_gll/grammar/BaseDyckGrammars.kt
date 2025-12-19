@@ -30,7 +30,7 @@ internal fun dyckGrammar(
 		val S by Nt().asStart()
 
 		init {
-			var alternatives: Regexp = Epsilon or Term("normal")
+			var alternatives: Regexp = Epsilon or (Term("normal") * S)
 
 			// Adding rules for each pair of parentheses
 			for (id in parenthesesIds) {
