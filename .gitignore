@@ -19,6 +19,9 @@ bin/
 # Benchmark
 __pycache__
 venv/
+valueflow-out-gll-based/
 taint-out/
 taint-out-gll-based/
+taint_additional-out-gll-based/
+graphs_unlimited-out-gll-based/
 plots/
