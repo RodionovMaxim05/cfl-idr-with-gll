@@ -204,4 +204,23 @@ class TestOnDemand {
 
 		assertEquals(expected, actual)
 	}
+
+	@Test
+	fun `collection_slx graph`() {
+		val graph = loadGraph("src/test/resources/correctness/collection_slx/graph.dot")
+		val underPaths = getUnderApprox(graph)
+		val overPaths = getMROverApprox(graph, "all")
+
+		val actual = getOnDemandMR(graph, underPaths, overPaths)
+
+		assertEquals(5210, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/collection_slx/paths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
 }

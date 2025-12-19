@@ -31,7 +31,7 @@ internal fun dyckAlphaGrammar(
 		val S by Nt().asStart()
 
 		init {
-			var alternatives: Regexp = Epsilon or Term("normal")
+			var alternatives: Regexp = Epsilon or (Term("normal") * S)
 
 			// labeled parentheses: require exact open/close labels
 			for (parId in parenthesesIds) {
