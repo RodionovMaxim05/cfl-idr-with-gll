@@ -107,10 +107,10 @@ private fun getExcludeGrammar(
  */
 class GrammarAnalysisCache<V> {
 
-	private val alphaCache = mutableMapOf<ULong, Set<RangeSppfNode<V>>>()
-	private val betaCache = mutableMapOf<ULong, Set<RangeSppfNode<V>>>()
-	private val projectCache = mutableMapOf<ULong, Set<RangeSppfNode<V>>>()
-	private val excludeCache = mutableMapOf<ULong, Set<RangeSppfNode<V>>>()
+	private val alphaCache = HashMap<ULong, Set<RangeSppfNode<V>>>()
+	private val betaCache = HashMap<ULong, Set<RangeSppfNode<V>>>()
+	private val projectCache = HashMap<ULong, Set<RangeSppfNode<V>>>()
+	private val excludeCache = HashMap<ULong, Set<RangeSppfNode<V>>>()
 
 	/**
 	 * Clears all cached parsing results.

@@ -13,7 +13,7 @@ from utils import (
     plot_over_under_diff,
 )
 
-REPEATS = 1
+REPEATS = 10
 
 
 def make_kotlin_cmd(output_dir):
