@@ -34,17 +34,12 @@ def measure_time(cmd: list) -> float:
 def analyze(times: list[float]) -> dict:
     t = np.array(times)
 
-    normal_test = stats.normaltest(t).pvalue
-    shapiro_test = stats.shapiro(t).pvalue
-    is_normal = (normal_test > 0.05) or (shapiro_test > 0.05)
-
     mean_time = np.mean(t)
     conf_interval = stats.t.ppf(0.975, df=len(t) - 1) * stats.sem(t)
 
     return {
         "mean": mean_time,
         "error": conf_interval,
-        "is_normal": is_normal,
     }
 
 
@@ -85,6 +80,9 @@ def plot_over_under_diff(over_under_diff: dict, labels: list, filename: str):
         all_values.extend(over_under_diff[grammar])
 
     max_value = max(all_values)
+    if max_value == 0:
+        max_value = 1
+
     ax.set_xlim(0, max_value * 1.1)
 
     for i, grammar in enumerate(GRAMMARS):

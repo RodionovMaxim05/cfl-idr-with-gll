@@ -13,20 +13,27 @@ from utils import (
     plot_over_under_diff,
 )
 
-REPEATS = 10
+REPEATS = 1
 
 
-def make_kotlin_cmd(output_dir):
-    return lambda filename, grammar: [
-        "java",
-        "-jar",
-        KOTLIN_JAR,
-        "-q",
-        "-o",
-        output_dir,
-        filename,
-        grammar,
-    ]
+def make_kotlin_cmd(output_dir, valueflow: bool = False):
+    def kotlin_command(filename, grammar):
+        cmd = [
+            "java",
+            "-jar",
+            KOTLIN_JAR,
+            "-q",
+            "-o",
+            output_dir,
+        ]
+
+        if valueflow:
+            cmd.append("-valueflow")
+
+        cmd.extend([filename, grammar])
+        return cmd
+
+    return kotlin_command
 
 
 def run_bench_for_grammar(grammar: str, graphs: list, kotlin_cmd):
@@ -71,9 +78,15 @@ if __name__ == "__main__":
         "input_dir",
         help="Directory with .dot graph files",
     )
+    parser.add_argument(
+        "-valueflow",
+        action="store_true",
+        help="Enable value-flow mode for the analysis",
+    )
     args = parser.parse_args()
 
     input_dir = args.input_dir.rstrip("/")
+    valueflow = args.valueflow
 
     GRAPHS = sorted(
         [
@@ -86,14 +99,16 @@ if __name__ == "__main__":
     KOTLIN_OUTPUT_DIR = f"{input_dir}-out-gll-based"
     os.makedirs(KOTLIN_OUTPUT_DIR, exist_ok=True)
 
-    kotlin_cmd = make_kotlin_cmd(KOTLIN_OUTPUT_DIR)
+    kotlin_cmd = make_kotlin_cmd(KOTLIN_OUTPUT_DIR, valueflow)
 
     over_under_diff = {g: [] for g in GRAMMARS}
 
     for grammar in GRAMMARS:
-        print(f"\n=================================")
-        print(f"\tGrammar: {grammar} ({GRAMMAR_LABELS[grammar]})")
-        print(f"=================================\n")
+        print(f"\n============================================")
+        print(
+            f"\tGrammar: {grammar} ({GRAMMAR_LABELS[grammar]}), Value-flow: {valueflow}"
+        )
+        print(f"============================================\n")
 
         res = run_bench_for_grammar(grammar, GRAPHS, kotlin_cmd)
         plot_time(grammar, res, GRAPHS, input_dir)
