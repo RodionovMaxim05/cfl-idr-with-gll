@@ -37,27 +37,30 @@ The project is organized into two abstraction layers:
 
 ```kotlin
 // Under-approximation (guaranteed reachable)
-fun <VertexType, LabelType : ILabel> getUnderApprox(
-	graph: InputGraph<VertexType, LabelType>,
+fun <V, L : ILabel> getUnderApprox(
+	graph: InputGraph<V, L>,
+	valueflow: Boolean = false,
 	terminalFormat: ITerminalFormat = DefaultTerminalFormat
-): Set<Path<VertexType>>
+): Set<Path<V>>
 
 // Over-approximation with mutual refinement  
-fun <VertexType, LabelType : ILabel> getMROverApprox(
-	graph: InputGraph<VertexType, LabelType>,
+fun <V, L : ILabel> getMROverApprox(
+	graph: InputGraph<V, L>,
 	currGrammar: String,
 	currParityK: Int = 1,
-	underApprox: Set<Path<VertexType>> = emptySet(),
+	underApprox: Set<Path<V>> = emptySet(),
+	valueflow: Boolean = false,
 	terminalFormat: ITerminalFormat = DefaultTerminalFormat
 ): Set<Path<V>>
 
 // On-demand refinement for specific queries
-fun <VertexType, LabelType : ILabel> getOnDemandMR(
-	graph: InputGraph<VertexType, LabelType>,
-	underApprox: Set<Path<VertexType>>,
-	overApprox: Set<Path<VertexType>>,
+fun <V, L : ILabel> getOnDemandMR(
+	graph: InputGraph<V, L>,
+	underApprox: Set<Path<V>>,
+	overApprox: Set<Path<V>>,
+	valueflow: Boolean = false,
 	terminalFormat: ITerminalFormat = DefaultTerminalFormat
-): Set<Path<VertexType>>
+): Set<Path<V>>
 ```
 
 See more [_**documentation**_](src/main/kotlin/org/cfl_idr_with_gll/Approximation.kt) to learn more about it.
@@ -66,6 +69,21 @@ See more [_**documentation**_](src/main/kotlin/org/cfl_idr_with_gll/Approximatio
 
 ```bash
 java -jar cfl-idr-with-gll.jar [options] <input.dot> <grammar>
+```
+
+## Value-Flow Analysis Mode
+
+The library provides a specialized value-flow analysis mode (`-valueflow` flag) optimized for memory value-flow
+analysis.
+
+`Recommendation`: For manual preprocessing before analysis:
+
+```kotlin
+// 1. Remove vertices unreachable from store/load operations
+val filteredGraph = inputGraph.removeValueflowUnreachable(terminalFormat)
+
+// 2. Apply analysis on filtered graph
+val underPaths = getUnderApprox(filteredGraph, valueflow = true)
 ```
 
 ## Quick Start
@@ -102,6 +120,9 @@ java -jar build/libs/cfl-idr-with-gll.jar graph.dot parityK 3 -o taint-out
 
 # Quiet mode (disable path recording)
 java -jar build/libs/cfl-idr-with-gll.jar graph.dot parity -q -o result
+
+# Value-flow analysis with parity grammar
+java -jar build/libs/cfl-idr-with-gll.jar -valueflow graph.dot parity
 ```
 
 ### API Integration

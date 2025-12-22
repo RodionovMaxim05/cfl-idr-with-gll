@@ -22,6 +22,8 @@ The benchmark suite contains two independent benchmarks:
 2) A benchmark that evaluates the performance of only the GLL-based implementation
 
    Evaluates execution time and approximation accuracy on other graphs.
+3) Value-Flow Analysis Benchmark
+   Specialized benchmark for memory value-flow analysis with domain-specific optimizations.
 
 ## How to Run the Benchmarks
 
@@ -56,8 +58,9 @@ Run both benchmarks sequentially:
 Or run them individually:
 
 ```bash
-python3 comparison_go_vs_kotlin.py           # Go vs Kotlin benchmark
-python3 comparison_of_times.py <input_dir>   # Kotlin-only benchmark
+python3 comparison_go_vs_kotlin.py                    # Go vs Kotlin benchmark
+python3 comparison_of_times.py <input_dir>            # Kotlin-only benchmark
+python3 comparison_of_times.py <input_dir> -valueflow # Kotlin-Only benchmark (value-flow analysis)
 ```
 
 ## Output
