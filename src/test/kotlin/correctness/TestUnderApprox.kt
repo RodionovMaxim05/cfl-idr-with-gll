@@ -3,6 +3,7 @@ package correctness
 import org.cfl_idr_with_gll.models.Path
 import org.cfl_idr_with_gll.convertEdgesToGraphvizText
 import org.cfl_idr_with_gll.getUnderApprox
+import org.cfl_idr_with_gll.graph.removeValueflowUnreachable
 import org.junit.jupiter.api.Test
 import org.ucfs.input.DotParser
 import org.ucfs.input.InputGraph
@@ -192,6 +193,59 @@ class TestUnderApprox {
 		assertEquals(5210, actual.size)
 
 		val expectedLines = File("src/test/resources/correctness/collection_slx/paths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	// Value-flow analysis
+
+	@Test
+	fun `xz graph`() {
+		val graph = loadGraph("src/test/resources/correctness/xz/graph.dot").removeValueflowUnreachable()
+
+		val actual = getUnderApprox(graph, valueflow = true)
+
+		assertEquals(211, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/xz/paths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `nab graph`() {
+		val graph = loadGraph("src/test/resources/correctness/nab/graph.dot").removeValueflowUnreachable()
+
+		val actual = getUnderApprox(graph, valueflow = true)
+
+		assertEquals(1788, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/nab/paths.txt").readLines()
+		val expected = expectedLines
+			.map { it.split(" ") }
+			.map { Path(it[0].toInt(), it[1].toInt()) }
+			.toSet()
+
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `leela graph`() {
+		val graph = loadGraph("src/test/resources/correctness/leela/graph.dot").removeValueflowUnreachable()
+
+		val actual = getUnderApprox(graph, valueflow = true)
+
+		assertEquals(392, actual.size)
+
+		val expectedLines = File("src/test/resources/correctness/leela/paths.txt").readLines()
 		val expected = expectedLines
 			.map { it.split(" ") }
 			.map { Path(it[0].toInt(), it[1].toInt()) }

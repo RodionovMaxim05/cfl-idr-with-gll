@@ -33,6 +33,15 @@ object DefaultTerminalFormat : ITerminalFormat {
 	}
 
 	/**
+	 * Determines if a label is an opening bracket by analyzing the first character of the label.
+	 */
+	override fun isOpen(label: String): Boolean? = when (label[0]) {
+		'o' -> true
+		'c' -> false
+		else -> null
+	}
+
+	/**
 	 * Extracts the identifier from the label (substring after "--").
 	 */
 	override fun extractId(label: String): String =

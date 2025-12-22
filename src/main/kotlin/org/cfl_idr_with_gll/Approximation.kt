@@ -5,8 +5,10 @@ import org.cfl_idr_with_gll.grammar.dyckGrammar
 import org.cfl_idr_with_gll.graph.parseDyckComponent
 import org.cfl_idr_with_gll.graph.splitIntoConnectedComponents
 import org.cfl_idr_with_gll.graph.condensateFromUnderApprox
+import org.cfl_idr_with_gll.graph.filterBracketPaths
 import org.cfl_idr_with_gll.graph.findPMR
 import org.cfl_idr_with_gll.graph.removeNotPath
+import org.cfl_idr_with_gll.graph.removeValueflowUnreachable
 import org.cfl_idr_with_gll.terminal.DefaultTerminalFormat
 import org.cfl_idr_with_gll.terminal.ITerminalFormat
 import org.cfl_idr_with_gll.models.Path
@@ -26,6 +28,7 @@ import org.ucfs.parser.Gll
  */
 fun <V, L : ILabel> getUnderApprox(
 	graph: InputGraph<V, L>,
+	valueflow: Boolean = false,
 	terminalFormat: ITerminalFormat = DefaultTerminalFormat
 ): Set<Path<V>> {
 	val graphComponents = graph.splitIntoConnectedComponents()
@@ -44,7 +47,13 @@ fun <V, L : ILabel> getUnderApprox(
 
 		val componentPaths = extractNonTrivialPaths(sppf)
 
-		reachablePaths.addAll(componentPaths)
+		if (valueflow) {
+			val edges = extractEdgesFromSppfResults(sppf)
+			val updatedGraph = createGraphFromEdges(edges)
+			reachablePaths.addAll(updatedGraph.filterBracketPaths(componentPaths, terminalFormat))
+		} else {
+			reachablePaths.addAll(componentPaths)
+		}
 	}
 
 	return reachablePaths
@@ -61,6 +70,7 @@ fun <V, L : ILabel> getUnderApprox(
  * @param currGrammar the grammar type to use for refinement ("classic", "all", etc.)
  * @param currParityK the parity parameter k (default: 1)
  * @param underApprox an optional under-approximation of paths for condensation
+ * @param valueflow if `true`, applies value-flow specific optimizations and constraints (default: `false`)
  * @param terminalFormat the format parser for bracket labels (defaults to [DefaultTerminalFormat])
  * @return a set of [Path] objects representing the refined over-approximation
  */
@@ -69,6 +79,7 @@ fun <V, L : ILabel> getMROverApprox(
 	currGrammar: String,
 	currParityK: Int = 1,
 	underApprox: Set<Path<V>> = emptySet(),
+	valueflow: Boolean = false,
 	terminalFormat: ITerminalFormat = DefaultTerminalFormat
 ): Set<Path<V>> {
 	val (_, _, parsedGraph) = parseDyckComponent(graph)
@@ -84,7 +95,8 @@ fun <V, L : ILabel> getMROverApprox(
 	}
 
 	val sppfCache = GrammarAnalysisCache<V>()
-	val refinedCondensedPaths = mutualRefinement(condensedGraph, currGrammar, currParityK, sppfCache, terminalFormat)
+	val refinedCondensedPaths =
+		mutualRefinement(condensedGraph, currGrammar, currParityK, sppfCache, valueflow, terminalFormat)
 
 	// Create an inverse mapping: representative -> vertices
 	val repToVerticesMap = mutableMapOf<V, MutableList<V>>()
@@ -126,12 +138,12 @@ fun <V, L : ILabel> getMROverApprox(
 /**
  * Performs on-demand mutual refinement using two-phase grammar analysis.
  *
- * This approach is more efficient than full mutual refinement when only
- * incremental updates are needed.
+ * This approach is more efficient than full mutual refinement when only incremental updates are needed.
  *
  * @param graph the input graph to analyze
  * @param underApprox the current under-approximation of paths
  * @param overApprox the current over-approximation of paths
+ * @param valueflow if `true`, applies value-flow specific optimizations and constraints (default: `false`)
  * @param terminalFormat the format parser for bracket labels (defaults to [DefaultTerminalFormat])
  * @return a refined set of [Path] objects
  */
@@ -139,6 +151,7 @@ fun <V, L : ILabel> getOnDemandMR(
 	graph: InputGraph<V, L>,
 	underApprox: Set<Path<V>>,
 	overApprox: Set<Path<V>>,
+	valueflow: Boolean = false,
 	terminalFormat: ITerminalFormat = DefaultTerminalFormat
 ): Set<Path<V>> {
 	val (_, _, parsedGraph) = parseDyckComponent(graph)
@@ -148,14 +161,16 @@ fun <V, L : ILabel> getOnDemandMR(
 	val reducedGraph1 = parsedGraph.removeNotPath(overApprox)
 	val (_, _, graph1) = parseDyckComponent(reducedGraph1)
 
-	val filteredClassicPaths = refineMRWithGrammar(graph1, underApprox, overApprox, "classic", terminalFormat)
+	val filteredClassicPaths =
+		refineMRWithGrammar(graph1, underApprox, overApprox, "classic", valueflow, terminalFormat)
 
 	// Step 2: Apply "all" grammar refinement on the result of step 1
 
 	val reducedGraph2 = graph1.removeNotPath(filteredClassicPaths)
 	val (_, _, graph2) = parseDyckComponent(reducedGraph2)
 
-	val filteredOverPaths = refineMRWithGrammar(graph2, underApprox, filteredClassicPaths, "all", terminalFormat)
+	val filteredOverPaths =
+		refineMRWithGrammar(graph2, underApprox, filteredClassicPaths, "all", valueflow, terminalFormat)
 
 	return filteredOverPaths
 }
@@ -174,6 +189,7 @@ fun <V, L : ILabel> getOnDemandMR(
  * @param underApprox the current under-approximation of paths
  * @param overApprox the current over-approximation of paths
  * @param curGrammar the grammar type to use for refinement
+ * @param valueflow if `true`, applies value-flow specific optimizations and constraints (default: `false`)
  * @param terminalFormat the format parser for bracket labels
  * @return a refined set of [Path] objects
  */
@@ -182,6 +198,7 @@ private fun <V, L : ILabel> refineMRWithGrammar(
 	underApprox: Set<Path<V>>,
 	overApprox: Set<Path<V>>,
 	curGrammar: String,
+	valueflow: Boolean,
 	terminalFormat: ITerminalFormat
 ): Set<Path<V>> {
 	val (condensedGraph, parentMap) = condensateFromUnderApprox(graph, underApprox)
@@ -240,6 +257,7 @@ private fun <V, L : ILabel> refineMRWithGrammar(
 				curGrammar,
 				1,
 				sppfCache,
+				valueflow,
 				terminalFormat,
 				true,
 				Path(sourceRoot, targetRoot)
@@ -274,6 +292,7 @@ private fun <V, L : ILabel> refineMRWithGrammar(
  * @param curGrammar the grammar type selector ("classic", "all", "project", "exclude", etc.)
  * @param curParityK the parity parameter k
  * @param sppfCache a cache for SPPF parsing results to improve performance
+ * @param valueflow if `true`, applies value-flow specific optimizations and constraints (default: `false`)
  * @param terminalFormat the format parser for bracket labels
  * @param checkOnePath if `true`, only check the specified `targetPath`
  * @param targetPath an optional specific path to check (used when `checkOnePath` is `true`)
@@ -284,6 +303,7 @@ private fun <V, L : ILabel> mutualRefinement(
 	curGrammar: String,
 	curParityK: Int,
 	sppfCache: GrammarAnalysisCache<V>,
+	valueflow: Boolean,
 	terminalFormat: ITerminalFormat,
 	checkOnePath: Boolean = false,
 	targetPath: Path<V>? = null
@@ -406,6 +426,14 @@ private fun <V, L : ILabel> mutualRefinement(
 			excludePaths.addAll(betaPaths)
 		}
 
+		if (valueflow) {
+			betaPaths = parsedComp.filterBracketPaths(betaPaths, terminalFormat)
+			if (checkOnePath && betaPaths.size == 0) {
+				return resultPaths
+			}
+			betaParsedComp = betaParsedComp.removeValueflowUnreachable()
+		}
+
 		var finalEdgeCount = 0
 		betaParsedComp.edges.forEach { finalEdgeCount += it.value.size }
 
@@ -431,6 +459,7 @@ private fun <V, L : ILabel> mutualRefinement(
 				curGrammar,
 				curParityK,
 				sppfCache,
+				valueflow,
 				terminalFormat
 			)
 

@@ -100,7 +100,7 @@ internal fun dyckProjectGrammar(
 					anyClose = anyClose or closeTerms[i]
 				}
 
-				alternatives.add(anyOpen * S * anyClose * S)
+				alternatives.add((anyOpen * S * anyClose) * S)
 			}
 
 			alternatives.add(Term("normal") * S)
