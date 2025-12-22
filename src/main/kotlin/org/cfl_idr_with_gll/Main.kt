@@ -1,5 +1,6 @@
 package org.cfl_idr_with_gll
 
+import org.cfl_idr_with_gll.graph.removeValueflowUnreachable
 import org.ucfs.input.DotParser
 import java.io.File
 
@@ -23,6 +24,7 @@ import java.io.File
  * ## Options
  * - `-o <path>`: Specify output file or directory (default: `src/main/resources/taint`)
  * - `-q`: Quiet mode - suppress detailed path output in results
+ * - `valueflow`: Enable value-flow specific optimizations and constraints (`{s | s = [i ∗ ]i}`)
  *
  * ## Supported Grammars
  * - `parity`: (PAR) Parity grammar with k=1 - Parity condition
@@ -55,6 +57,7 @@ object Main {
 	 *   - `grammar`: Grammar type (required)
 	 *   - `-o <path>`: Output path (optional)
 	 *   - `-q`: Quiet mode (optional)
+	 *   - `-valueflow`: Value-flow filtering
 	 *   - For `parityK` grammar: additional integer parameter k
 	 *
 	 * @throws IllegalArgumentException if required arguments are missing or invalid
@@ -68,6 +71,7 @@ object Main {
 		var outputPath: String? = null
 		var onDemand = false
 		var quiet = false
+		var valueflow = false
 
 		var i = 0
 		while (i < args.size) {
@@ -79,6 +83,10 @@ object Main {
 
 				"-q" -> {
 					quiet = true
+				}
+
+				"-valueflow" -> {
+					valueflow = true
 				}
 
 				else -> {
@@ -139,11 +147,15 @@ object Main {
 			convertEdgesToGraphvizText(inputText)
 		}
 
-		val inputGraph = DotParser().parseDot(finalGraphText)
+		var inputGraph = DotParser().parseDot(finalGraphText)
 
-		val underPaths = getUnderApprox(inputGraph)
+		if (valueflow) {
+			inputGraph = inputGraph.removeValueflowUnreachable()
+		}
 
-		val overPaths = getMROverApprox(inputGraph, grammar, parityK, underPaths)
+		val underPaths = getUnderApprox(inputGraph, valueflow)
+
+		val overPaths = getMROverApprox(inputGraph, grammar, parityK, underApprox = underPaths, valueflow)
 
 		outputFile.writeText(buildString {
 			append("Under approximation paths: ${underPaths.size}\n")
@@ -162,7 +174,7 @@ object Main {
 			return
 		}
 
-		val onDemandPaths = getOnDemandMR(inputGraph, underPaths, overPaths)
+		val onDemandPaths = getOnDemandMR(inputGraph, underPaths, overPaths, valueflow)
 
 		outputFile.appendText("\nOn-Demand paths: ${onDemandPaths.size}\n")
 		if (!quiet) {

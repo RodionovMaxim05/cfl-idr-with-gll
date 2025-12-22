@@ -38,6 +38,16 @@ interface ITerminalFormat {
 	fun getType(label: String): BracketType?
 
 	/**
+	 * Determines if a label represents an opening bracket.
+	 *
+	 * @param label the terminal label to check
+	 * @return `true` if the label represents an opening bracket,
+	 *         `false` if it represents a closing bracket,
+	 *         `null` if the label format is invalid
+	 */
+	fun isOpen(label: String): Boolean?
+
+	/**
 	 * Extracts the identifier from a terminal label.
 	 *
 	 * @param label the terminal label to parse
