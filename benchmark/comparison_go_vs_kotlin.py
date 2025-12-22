@@ -12,7 +12,7 @@ from utils import (
     plot_over_under_diff,
 )
 
-REPEATS = 10
+REPEATS = 1
 
 GRAPHS = sorted([f"taint/{f}" for f in os.listdir("taint") if f.endswith(".dot")])
 
