@@ -10,6 +10,7 @@ from utils import (
     analyze,
     parse_kotlin_output,
     plot_over_under_diff,
+    print_time_out,
 )
 
 REPEATS = 1
@@ -39,13 +40,23 @@ def run_bench_for_grammar(grammar: str):
 
         # --- Go ---
         go_times = [measure_time(GO_CMD(graph, grammar)) for _ in range(REPEATS)]
-        go_res = analyze(go_times)
+        go_valid_times = [t for t in go_times if not np.isnan(t)]
+        if go_valid_times:
+            stats = analyze(go_valid_times)
+            go_result = {"mean": stats["mean"], "error": stats["error"]}
+        else:
+            go_result = {"mean": np.nan, "error": 0.0}
 
         # --- Kotlin ---
         kt_times = [measure_time(KOTLIN_CMD(graph, grammar)) for _ in range(REPEATS)]
-        kt_res = analyze(kt_times)
+        kt_valid_times = [t for t in kt_times if not np.isnan(t)]
+        if kt_valid_times:
+            stats = analyze(kt_valid_times)
+            kt_result = {"mean": stats["mean"], "error": stats["error"]}
+        else:
+            kt_result = {"mean": np.nan, "error": 0.0}
 
-        results[graph] = {"go": go_res, "kotlin": kt_res}
+        results[graph] = {"go": go_result, "kotlin": kt_result}
 
     return results
 
@@ -53,8 +64,10 @@ def run_bench_for_grammar(grammar: str):
 def plot_for_grammar(grammar: str, results: dict):
     labels = [os.path.splitext(os.path.basename(g))[0] for g in GRAPHS]
 
-    go_means = [results[g]["go"]["mean"] for g in GRAPHS]
-    kt_means = [results[g]["kotlin"]["mean"] for g in GRAPHS]
+    go_all_means = [results[g]["go"]["mean"] for g in GRAPHS]
+    go_means = [m if not np.isnan(m) else 0.0 for m in go_all_means]
+    kt_all_means = [results[g]["kotlin"]["mean"] for g in GRAPHS]
+    kt_means = [m if not np.isnan(m) else 0.0 for m in kt_all_means]
 
     go_err = [results[g]["go"]["error"] for g in GRAPHS]
     kt_err = [results[g]["kotlin"]["error"] for g in GRAPHS]
@@ -80,6 +93,9 @@ def plot_for_grammar(grammar: str, results: dict):
         capsize=5,
     )
 
+    print_time_out(x - width / 2, go_all_means)
+    print_time_out(x + width / 2, kt_all_means)
+
     plt.title(f"Comparison of algorithms for grammar {GRAMMAR_LABELS[grammar]}")
     plt.xlabel("Graph")
     plt.ylabel("Execution time (s)")
@@ -104,9 +120,11 @@ if __name__ == "__main__":
         plot_for_grammar(grammar, res)
 
         for graph in GRAPHS:
-            over_under_diff[grammar].append(
-                parse_kotlin_output(graph, grammar, KOTLIN_OUTPUT_DIR)
-            )
+            if not np.isnan(res[graph]["kotlin"]["mean"]):
+                value = parse_kotlin_output(graph, grammar, KOTLIN_OUTPUT_DIR)
+                over_under_diff[grammar].append(value)
+            else:
+                over_under_diff[grammar].append(np.nan)
 
     labels = [os.path.splitext(os.path.basename(g))[0] for g in GRAPHS]
     plot_over_under_diff(

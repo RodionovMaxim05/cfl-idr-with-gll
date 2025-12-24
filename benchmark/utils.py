@@ -4,6 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
 import os
+import subprocess
+import sys
+from typing import Any
+
+TIMEOUT_SECONDS = 7200  # 2 hours
 
 GRAMMAR_LABELS = {
     "parity": "PAR",
@@ -20,15 +25,23 @@ GRAMMARS = list(GRAMMAR_LABELS.keys())
 KOTLIN_JAR = "../build/libs/cfl-idr-with-gll-all.jar"
 
 
-def measure_time(cmd: list) -> float:
-    start = time.perf_counter()
-    subprocess.run(
-        cmd,
-        shell=False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    return time.perf_counter() - start
+def measure_time(cmd):
+    try:
+        start = time.perf_counter()
+        subprocess.run(
+            cmd,
+            shell=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=TIMEOUT_SECONDS,
+        )
+        return time.perf_counter() - start
+    except subprocess.TimeoutExpired:
+        print("Command timed out", file=sys.stderr)
+        return np.nan
+    except Exception as e:
+        print(f"Error running command: {e}", file=sys.stderr)
+        return np.nan
 
 
 def analyze(times: list[float]) -> dict:
@@ -75,34 +88,42 @@ def plot_over_under_diff(over_under_diff: dict, labels: list, filename: str):
 
     fig, ax = plt.subplots(figsize=(10, 12))
 
-    all_values = []
+    all_finite_values = []
     for grammar in GRAMMARS:
-        all_values.extend(over_under_diff[grammar])
+        arr = np.array(over_under_diff[grammar])
+        all_finite_values.extend(arr[np.isfinite(arr)])
 
-    max_value = max(all_values)
-    if max_value == 0:
-        max_value = 1
-
+    max_value = max(all_finite_values) if all_finite_values else 1.0
     ax.set_xlim(0, max_value * 1.1)
 
     for i, grammar in enumerate(GRAMMARS):
+        values = np.array(over_under_diff[grammar])
+        plot_values = np.where(np.isfinite(values), values, 0)
         bars = ax.barh(
             y + i * height,
-            over_under_diff[grammar],
+            plot_values,
             height,
             label=GRAMMAR_LABELS[grammar],
         )
+
+        labels_for_bars = []
+        for v in values:
+            if np.isfinite(v):
+                labels_for_bars.append(f"{int(v)}")
+            else:
+                labels_for_bars.append("T/O")
+
         ax.bar_label(
             bars,
-            labels=[f"{int(h)}" for h in over_under_diff[grammar]],
+            labels=labels_for_bars,
             padding=3,
             fontsize=9,
             label_type="edge",
         )
 
-    ax.set_title("|$R_{over} - R_{under}$| for all grammars")
+    ax.set_title(r"|$R_{over} - R_{under}$| for all grammars")
     ax.set_ylabel("Graph")
-    ax.set_xlabel("|$R_{over} - R_{under}$|")
+    ax.set_xlabel(r"|$R_{over} - R_{under}$|")
     ax.set_yticks(y + height * (len(GRAMMARS) - 1) / 2)
     ax.set_yticklabels(labels)
     ax.legend(ncol=2)
@@ -110,3 +131,23 @@ def plot_over_under_diff(over_under_diff: dict, labels: list, filename: str):
     fig.tight_layout()
     fig.savefig(f"plots/{filename}.png", dpi=200)
     plt.close(fig)
+
+
+def print_time_out(
+    x: np.ndarray[tuple[int], np.dtype[np.signedinteger[Any]]], all_means: list
+):
+    for i, mean in enumerate(all_means):
+        if np.isnan(mean):
+            plt.text(
+                x[i],
+                0.0,
+                "T/O",
+                ha="center",
+                va="bottom",
+                fontsize=10,
+                color="red",
+                fontweight="bold",
+                bbox=dict(
+                    boxstyle="round,pad=0.2", facecolor="white", edgecolor="red"
+                ),
+            )
