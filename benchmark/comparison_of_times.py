@@ -43,9 +43,14 @@ def run_bench_for_grammar(grammar: str, graphs: list, kotlin_cmd):
     for graph in graphs:
         print(f"=== {graph} ===")
 
-        times = [measure_time(kotlin_cmd(graph, grammar)) for _ in range(REPEATS)]
+        raw_results = [
+            measure_time(kotlin_cmd(graph, grammar)) for _ in range(REPEATS)
+        ]
 
-        valid_times = [t for t in times if not np.isnan(t)]
+        valid_times = [
+            t for t in raw_results if isinstance(t, (int, float)) and not np.isnan(t)
+        ]
+
         if valid_times:
             stats = analyze(valid_times)
             results[graph] = {
@@ -53,7 +58,15 @@ def run_bench_for_grammar(grammar: str, graphs: list, kotlin_cmd):
                 "error": stats["error"],
             }
         else:
-            results[graph] = {"mean": np.nan, "error": 0.0}
+            if "SOF" in raw_results:
+                status = "SOF"
+            elif "OOM" in raw_results:
+                status = "OOM"
+            elif "T/O" in raw_results:
+                status = "T/O"
+            else:
+                status = "ERR"
+            results[graph] = {"mean": status, "error": 0.0}
 
     return results
 
@@ -62,7 +75,10 @@ def plot_time(grammar: str, results: dict, graphs: list, input_dir: str):
     labels = [os.path.splitext(os.path.basename(g))[0] for g in graphs]
 
     all_means = [results[g]["mean"] for g in graphs]
-    means = [m if not np.isnan(m) else 0.0 for m in all_means]
+    means = [
+        m if isinstance(m, (int, float)) and not np.isnan(m) else 0.0
+        for m in all_means
+    ]
     errors = [results[g]["error"] for g in graphs]
 
     x = np.arange(len(labels))
@@ -127,11 +143,12 @@ if __name__ == "__main__":
         plot_time(grammar, res, GRAPHS, input_dir)
 
         for graph in GRAPHS:
-            if not np.isnan(res[graph]["mean"]):
+            res_val = res[graph]["mean"]
+            if isinstance(res_val, (int, float)) and not np.isnan(res_val):
                 value = parse_kotlin_output(graph, grammar, KOTLIN_OUTPUT_DIR)
                 over_under_diff[grammar].append(value)
             else:
-                over_under_diff[grammar].append(np.nan)
+                over_under_diff[grammar].append(res_val)
 
     labels = [os.path.splitext(os.path.basename(g))[0] for g in GRAPHS]
     plot_over_under_diff(

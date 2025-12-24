@@ -28,17 +28,37 @@ KOTLIN_JAR = "../build/libs/cfl-idr-with-gll-all.jar"
 def measure_time(cmd):
     try:
         start = time.perf_counter()
-        subprocess.run(
+        result = subprocess.run(
             cmd,
             shell=False,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             timeout=TIMEOUT_SECONDS,
+            text=True,
         )
-        return time.perf_counter() - start
+
+        elapsed = time.perf_counter() - start
+
+        if "java.lang.OutOfMemoryError" in result.stderr:
+            print(f"OOM detected for command: {' '.join(cmd)}", file=sys.stderr)
+            return "OOM"
+
+        if "java.lang.StackOverflowError" in result.stderr:
+            print(f"StackOverflow detected: {' '.join(cmd)}", file=sys.stderr)
+            return "SOF"
+
+        if result.returncode != 0:
+            print(
+                f"Command failed with code {result.returncode}: {result.stderr}",
+                file=sys.stderr,
+            )
+            return np.nan
+
+        return elapsed
+
     except subprocess.TimeoutExpired:
         print("Command timed out", file=sys.stderr)
-        return np.nan
+        return "T/O"
     except Exception as e:
         print(f"Error running command: {e}", file=sys.stderr)
         return np.nan
@@ -88,17 +108,23 @@ def plot_over_under_diff(over_under_diff: dict, labels: list, filename: str):
 
     fig, ax = plt.subplots(figsize=(10, 12))
 
-    all_finite_values = []
+    all_numeric_values = []
     for grammar in GRAMMARS:
-        arr = np.array(over_under_diff[grammar])
-        all_finite_values.extend(arr[np.isfinite(arr)])
+        for val in over_under_diff[grammar]:
+            if isinstance(val, (int, float)) and np.isfinite(val):
+                all_numeric_values.append(val)
 
-    max_value = max(all_finite_values) if all_finite_values else 1.0
+    max_value = max(all_numeric_values) if all_numeric_values else 1.0
     ax.set_xlim(0, max_value * 1.1)
 
     for i, grammar in enumerate(GRAMMARS):
-        values = np.array(over_under_diff[grammar])
-        plot_values = np.where(np.isfinite(values), values, 0)
+        raw_values = over_under_diff[grammar]
+
+        plot_values = [
+            v if isinstance(v, (int, float)) and np.isfinite(v) else 0
+            for v in raw_values
+        ]
+
         bars = ax.barh(
             y + i * height,
             plot_values,
@@ -107,11 +133,17 @@ def plot_over_under_diff(over_under_diff: dict, labels: list, filename: str):
         )
 
         labels_for_bars = []
-        for v in values:
-            if np.isfinite(v):
+        for v in raw_values:
+            if isinstance(v, (int, float)) and np.isfinite(v):
                 labels_for_bars.append(f"{int(v)}")
-            else:
+            elif v == "OOM":
+                labels_for_bars.append("OOM")
+            elif v == "SOF":
+                labels_for_bars.append("SOF")
+            elif v == "T/O":
                 labels_for_bars.append("T/O")
+            else:
+                labels_for_bars.append("ERR")
 
         ax.bar_label(
             bars,
@@ -137,17 +169,29 @@ def print_time_out(
     x: np.ndarray[tuple[int], np.dtype[np.signedinteger[Any]]], all_means: list
 ):
     for i, mean in enumerate(all_means):
-        if np.isnan(mean):
+        label = None
+        color = "red"
+
+        if mean == "T/O" or (isinstance(mean, float) and np.isnan(mean)):
+            label = "T/O"
+        elif mean == "OOM":
+            label = "OOM"
+            color = "purple"
+        elif mean == "SOF":
+            label = "SOF"
+            color = "orange"
+
+        if label:
             plt.text(
                 x[i],
                 0.0,
-                "T/O",
+                label,
                 ha="center",
                 va="bottom",
                 fontsize=10,
-                color="red",
+                color=color,
                 fontweight="bold",
                 bbox=dict(
-                    boxstyle="round,pad=0.2", facecolor="white", edgecolor="red"
+                    boxstyle="round,pad=0.2", facecolor="white", edgecolor=color
                 ),
             )
