@@ -3,6 +3,7 @@ plugins {
 	id("com.gradleup.shadow") version "9.2.2"
 	application
 	jacoco
+	id("org.jetbrains.dokka") version "2.1.0"
 }
 
 repositories {
