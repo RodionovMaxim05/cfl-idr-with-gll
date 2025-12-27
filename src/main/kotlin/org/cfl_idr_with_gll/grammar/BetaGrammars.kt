@@ -63,7 +63,7 @@ internal fun dyckBetaGrammar(
  * @param k the number of parity groups (1 ≤ k ≤ number of parenthesis types)
  * @return an enhanced Beta [Grammar] with parity tracking
  */
-fun dyckBetaGrammarKParity(
+internal fun dyckBetaGrammarKParity(
 	terminalFormat: ITerminalFormat,
 	parenthesesIds: List<String>,
 	bracketsIds: List<String>,

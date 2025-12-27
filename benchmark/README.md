@@ -22,8 +22,6 @@ The benchmark suite contains two independent benchmarks:
 2) A benchmark that evaluates the performance of only the GLL-based implementation
 
    Evaluates execution time and approximation accuracy on other graphs.
-3) Value-Flow Analysis Benchmark
-   Specialized benchmark for memory value-flow analysis with domain-specific optimizations.
 
 ## How to Run the Benchmarks
 
