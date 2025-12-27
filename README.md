@@ -6,15 +6,13 @@ algorithm.
 ## Problem Overview
 
 Interleaved Dyck Reachability is a fundamental problem in static program analysis where path constraints are expressed
-as the shuffle of two Dyck languages - typically representing context sensitivity (parentheses) and field sensitivity
-(brackets). While this formulation enables high-precision analyses, the general problem is known to be undecidable.
+as the shuffle of two Dyck languages - typically representing context sensitivity (parentheses) and field sensitivity (
+brackets). While this formulation enables high-precision analyses, the general problem is known to be undecidable.
 
-This project implements approximation techniques based on the research paper ["CFL-based methods for approximating
-interleaved Dyck reachability" (Conrado & Pavlogiannis, 2025)](https://www.researchgate.net/publication/390804794_CFL-based_methods_for_approximating_interleaved_Dyck_reachability),
-which transforms the undecidable problem into a series
-of
-tractable CFL reachability problems solvable via the GLL algorithm from
-the [UCFS project](https://github.com/FormalLanguageConstrainedPathQuerying/UCFS).
+This project implements approximation techniques based on the research
+paper ["CFL-based methods for approximating interleaved Dyck reachability" (Conrado & Pavlogiannis, 2025)](https://www.researchgate.net/publication/390804794_CFL-based_methods_for_approximating_interleaved_Dyck_reachability),
+which transforms the undecidable problem into a series of tractable CFL reachability problems solvable via the GLL
+algorithm from the [UCFS project](https://github.com/FormalLanguageConstrainedPathQuerying/UCFS).
 
 ### Supported Grammars
 
@@ -63,27 +61,27 @@ fun <V, L : ILabel> getOnDemandMR(
 ): Set<Path<V>>
 ```
 
-See more [_**documentation**_](src/main/kotlin/org/cfl_idr_with_gll/Approximation.kt) to learn more about it.
+See more [_**documentation
+**_](https://rodionovmaxim05.github.io/cfl-idr-with-gll/cfl-idr-with-gll/org.cfl_idr_with_gll/index.html) to learn more
+about it.
 
 2. Command-Line Interface
 
 ```bash
-java -jar cfl-idr-with-gll.jar [options] <input.dot> <grammar>
+java -jar cfl-idr-with-gll-all.jar [options] <input.dot> <grammar>
 ```
 
 ## Value-Flow Analysis Mode
 
 The library provides a specialized value-flow analysis mode (`-valueflow` flag) optimized for memory value-flow
-analysis.
+analysis: a valid path must start with `[` (similar to the `store` operation) and end with `]` (similar to the `load`
+operation) with the same id.
 
-`Recommendation`: For manual preprocessing before analysis:
+`Recommendation` For manual preprocessing before analysis:
 
 ```kotlin
-// 1. Remove vertices unreachable from store/load operations
+// Remove vertices unreachable from store/load operations
 val filteredGraph = inputGraph.removeValueflowUnreachable(terminalFormat)
-
-// 2. Apply analysis on filtered graph
-val underPaths = getUnderApprox(filteredGraph, valueflow = true)
 ```
 
 ## Quick Start
@@ -101,7 +99,7 @@ git clone https://github.com/RodionovMaxim05/cfl-idr-with-gll.git
 cd cfl-idr-with-gll
 
 # Build the project
-./gradlew build
+./gradlew shadowJar -x test
 
 # Run tests
 ./gradlew test
@@ -113,16 +111,16 @@ cd cfl-idr-with-gll
 
 ```bash
 # Basic analysis with parity grammar
-java -jar build/libs/cfl-idr-with-gll.jar graph.dot parity
+java -jar build/libs/cfl-idr-with-gll-all.jar graph.dot parity
 
 # Analysis with parity k=3 and custom output
-java -jar build/libs/cfl-idr-with-gll.jar graph.dot parityK 3 -o taint-out
+java -jar build/libs/cfl-idr-with-gll-all.jar graph.dot parityK 3 -o taint-out
 
 # Quiet mode (disable path recording)
-java -jar build/libs/cfl-idr-with-gll.jar graph.dot parity -q -o result
+java -jar build/libs/cfl-idr-with-gll-all.jar graph.dot parity -q -o result
 
 # Value-flow analysis with parity grammar
-java -jar build/libs/cfl-idr-with-gll.jar -valueflow graph.dot parity
+java -jar build/libs/cfl-idr-with-gll-all.jar -valueflow graph.dot parity
 ```
 
 ### API Integration
