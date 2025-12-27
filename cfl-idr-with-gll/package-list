@@ -1,7 +1,6 @@
 $dokka.format:html-v1
 $dokka.linkExtension:html
 $dokka.location:org.cfl_idr_with_gll.grammar////PointingToDeclaration/cfl-idr-with-gll/org.cfl_idr_with_gll.grammar/index.html
-$dokka.location:org.cfl_idr_with_gll.grammar//dyckBetaGrammarKParity/#org.cfl_idr_with_gll.terminal.ITerminalFormat#kotlin.collections.List[kotlin.String]#kotlin.collections.List[kotlin.String]#kotlin.Int/PointingToDeclaration/cfl-idr-with-gll/org.cfl_idr_with_gll.grammar/dyck-beta-grammar-k-parity.html
 $dokka.location:org.cfl_idr_with_gll.grammar/GrammarAnalysisCache///PointingToDeclaration/cfl-idr-with-gll/org.cfl_idr_with_gll.grammar/-grammar-analysis-cache/index.html
 $dokka.location:org.cfl_idr_with_gll.grammar/GrammarAnalysisCache/GrammarAnalysisCache/#/PointingToDeclaration/cfl-idr-with-gll/org.cfl_idr_with_gll.grammar/-grammar-analysis-cache/-grammar-analysis-cache.html
 $dokka.location:org.cfl_idr_with_gll.grammar/GrammarAnalysisCache/clear/#/PointingToDeclaration/cfl-idr-with-gll/org.cfl_idr_with_gll.grammar/-grammar-analysis-cache/clear.html
