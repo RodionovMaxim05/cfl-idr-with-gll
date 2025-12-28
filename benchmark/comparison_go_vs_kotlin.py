@@ -11,6 +11,7 @@ from utils import (
     parse_kotlin_output,
     plot_over_under_diff,
     print_time_out,
+    save_benchmark_results,
 )
 
 REPEATS = 1
@@ -119,6 +120,9 @@ def plot_for_grammar(grammar: str, results: dict):
 
 if __name__ == "__main__":
     over_under_diff = {g: [] for g in GRAMMARS}
+    approx_values = {g: {} for g in GRAMMARS}
+    results_dict_go = {}
+    results_dict_kotlin = {}
 
     for grammar in GRAMMARS:
         print(f"\n" + "=" * 44)
@@ -128,17 +132,40 @@ if __name__ == "__main__":
         res = run_bench_for_grammar(grammar)
         plot_for_grammar(grammar, res)
 
+        go_results = {}
+        kotlin_results = {}
+
         for graph in GRAPHS:
+            go_results[graph] = res[graph]["go"]
+            kotlin_results[graph] = res[graph]["kotlin"]
+
             kt_res = res[graph]["kotlin"]["mean"]
             if isinstance(kt_res, (int, float)) and not np.isnan(kt_res):
-                try:
-                    value = parse_kotlin_output(graph, grammar, KOTLIN_OUTPUT_DIR)
-                    over_under_diff[grammar].append(value)
-                except Exception as e:
-                    print(f"Parse error for {graph}: {e}")
-                    over_under_diff[grammar].append(np.nan)
+                diff, under, over = parse_kotlin_output(graph, KOTLIN_OUTPUT_DIR)
+                over_under_diff[grammar].append(diff)
+                approx_values[grammar][graph] = {"under": under, "over": over}
             else:
                 over_under_diff[grammar].append(kt_res)
+                approx_values[grammar][graph] = {"under": kt_res, "over": kt_res}
+
+        results_dict_go[grammar] = go_results
+        results_dict_kotlin[grammar] = kotlin_results
+
+    save_benchmark_results(
+        results_dict_go,
+        {},
+        GRAPHS,
+        "go_benchmark_results.txt",
+        approx_values=None,
+    )
+
+    save_benchmark_results(
+        results_dict_kotlin,
+        over_under_diff,
+        GRAPHS,
+        "plots/kotlin_benchmark_results.txt",
+        approx_values,
+    )
 
     labels = [os.path.splitext(os.path.basename(g))[0] for g in GRAPHS]
     plot_over_under_diff(

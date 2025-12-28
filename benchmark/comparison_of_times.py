@@ -12,6 +12,7 @@ from utils import (
     parse_kotlin_output,
     plot_over_under_diff,
     print_time_out,
+    save_benchmark_results,
 )
 
 REPEATS = 1
@@ -131,24 +132,37 @@ if __name__ == "__main__":
     kotlin_cmd = make_kotlin_cmd(KOTLIN_OUTPUT_DIR, valueflow)
 
     over_under_diff = {g: [] for g in GRAMMARS}
+    approx_values = {g: {} for g in GRAMMARS}
+    results_dict = {}
 
     for grammar in GRAMMARS:
-        print(f"\n============================================")
+        print("\n" + "=" * 44)
         print(
             f"\tGrammar: {grammar} ({GRAMMAR_LABELS[grammar]}), Value-flow: {valueflow}"
         )
-        print(f"============================================\n")
+        print("=" * 44 + "\n")
 
         res = run_bench_for_grammar(grammar, GRAPHS, kotlin_cmd)
+        results_dict[grammar] = res
         plot_time(grammar, res, GRAPHS, input_dir)
 
         for graph in GRAPHS:
             res_val = res[graph]["mean"]
             if isinstance(res_val, (int, float)) and not np.isnan(res_val):
-                value = parse_kotlin_output(graph, grammar, KOTLIN_OUTPUT_DIR)
-                over_under_diff[grammar].append(value)
+                diff, under, over = parse_kotlin_output(graph, KOTLIN_OUTPUT_DIR)
+                over_under_diff[grammar].append(diff)
+                approx_values[grammar][graph] = {"under": under, "over": over}
             else:
                 over_under_diff[grammar].append(res_val)
+                approx_values[grammar][graph] = {"under": res_val, "over": res_val}
+
+    save_benchmark_results(
+        results_dict,
+        over_under_diff,
+        GRAPHS,
+        f"plots/results_comparison_of_times_{input_dir}.txt",
+        approx_values,
+    )
 
     labels = [os.path.splitext(os.path.basename(g))[0] for g in GRAPHS]
     plot_over_under_diff(

@@ -162,19 +162,16 @@ object Main {
 
 		val overPaths = getMROverApprox(inputGraph, grammar, parityK, underApprox = underPaths, valueflow)
 
-		outputFile.writeText(buildString {
-			append("Under approximation paths: ${underPaths.size}\n")
-			if (!quiet) {
-				underPaths.forEach { append("\t$it\n") }
-			}
-
-			append("\nOver approximation paths (${grammar}): ${overPaths.size}\n")
-			if (!quiet) {
-				overPaths.forEach { append("\t$it\n") }
-			}
-		})
+		outputFile.writeText("Under approximation paths: ${underPaths.size}\n")
+		outputFile.appendText("\nOver approximation paths (${grammar}): ${overPaths.size}\n")
 
 		if (!onDemand && !parityD) {
+			outputFile.appendText(buildString {
+				if (!quiet) {
+					overPaths.forEach { append("\t$it\n") }
+				}
+			})
+
 			println("Analysis completed. Results written to ${outputFile.absolutePath}")
 			return
 		}
