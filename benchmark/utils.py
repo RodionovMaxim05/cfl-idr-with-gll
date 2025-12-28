@@ -17,6 +17,7 @@ GRAMMAR_LABELS = {
     "project": "PARUnl",
     "exclude": "PARErase",
     "all": "COM",
+    "parityD": "PARD",
     "on-demand": "COMD",
 }
 
@@ -76,13 +77,12 @@ def analyze(times: list[float]) -> dict:
     }
 
 
-def parse_kotlin_output(graph: str, grammar: str, dirname: str) -> int:
+def parse_kotlin_output(graph: str, dirname: str) -> tuple:
     name = os.path.splitext(os.path.basename(graph))[0]
     path = os.path.join(f"{dirname}", f"{name}.out")
 
     under = None
     over = None
-    on_demand = None
 
     with open(path, "r") as f:
         for line in f:
@@ -91,20 +91,20 @@ def parse_kotlin_output(graph: str, grammar: str, dirname: str) -> int:
             elif line.startswith("Over approximation paths"):
                 over = int(line.split(":")[1].strip())
             elif line.startswith("On-Demand paths:"):
-                on_demand = int(line.split(":")[1].strip())
+                over = int(line.split(":")[1].strip())
 
     if under is None:
         raise RuntimeError(f"Missing under-approx in {path}")
 
-    if grammar == "on-demand":
-        return abs(on_demand - under)
-    else:
-        return abs(over - under)
+    diff = abs(over - under) if over is not None else 0
+
+    return diff, under, over
 
 
 def plot_over_under_diff(over_under_diff: dict, labels: list, filename: str):
     y = np.arange(len(labels))
-    height = 0.8 / len(GRAMMARS)
+    n_grammars = len(GRAMMARS)
+    height = 0.8 / n_grammars
 
     fig, ax = plt.subplots(figsize=(10, 12))
 
@@ -126,7 +126,7 @@ def plot_over_under_diff(over_under_diff: dict, labels: list, filename: str):
         ]
 
         bars = ax.barh(
-            y + i * height,
+            y + (n_grammars - 1 - i) * height,
             plot_values,
             height,
             label=GRAMMAR_LABELS[grammar],
@@ -146,17 +146,13 @@ def plot_over_under_diff(over_under_diff: dict, labels: list, filename: str):
                 labels_for_bars.append("ERR")
 
         ax.bar_label(
-            bars,
-            labels=labels_for_bars,
-            padding=3,
-            fontsize=9,
-            label_type="edge",
+            bars, labels=labels_for_bars, padding=3, fontsize=7, label_type="edge"
         )
 
     ax.set_title(r"|$R_{over} - R_{under}$| for all grammars")
     ax.set_ylabel("Graph")
     ax.set_xlabel(r"|$R_{over} - R_{under}$|")
-    ax.set_yticks(y + height * (len(GRAMMARS) - 1) / 2)
+    ax.set_yticks(y + height * (n_grammars - 1) / 2)
     ax.set_yticklabels(labels)
     ax.legend(ncol=2)
 
@@ -195,3 +191,57 @@ def print_time_out(
                     boxstyle="round,pad=0.2", facecolor="white", edgecolor=color
                 ),
             )
+
+
+def save_benchmark_results(
+    results_dict: dict,
+    over_under_diff: dict[str, list],
+    graphs: list,
+    filename: str,
+    approx_values=None,
+):
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write("RESULTS (time in seconds, mean ± error):\n")
+        if approx_values:
+            f.write(
+                f"{'Grammar':8} | {'Graph':20} | {'Time':20} | {'Under':10} | {'Over':10} | {'Diff':10}\n"
+            )
+            f.write("-" * 93 + "\n")
+        else:
+            f.write(f"{'Grammar':8} | {'Graph':20} | {'Time':20}\n")
+            f.write("-" * 48 + "\n")
+
+        for grammar, graph_results in results_dict.items():
+            grammar_label = GRAMMAR_LABELS[grammar]
+            for i, graph in enumerate(graphs):
+                graph_name = os.path.splitext(os.path.basename(graph))[0]
+                result = graph_results[graph]
+
+                if isinstance(result["mean"], (int, float)):
+                    time_str = f"{result['mean']:.3f}±{result['error']:.3f}"
+                else:
+                    time_str = str(result["mean"])
+
+                if grammar in over_under_diff and i < len(over_under_diff[grammar]):
+                    diff_val = over_under_diff[grammar][i]
+                    diff_str = (
+                        f"{diff_val}"
+                        if isinstance(diff_val, (int, float))
+                        and not np.isnan(diff_val)
+                        else str(diff_val)
+                    )
+
+                if (
+                    approx_values
+                    and grammar in approx_values
+                    and graph in approx_values[grammar]
+                ):
+                    approx = approx_values[grammar][graph]
+                    under_val = approx.get("under", "N/A")
+                    over_val = approx.get("over", "N/A")
+
+                    f.write(
+                        f"{grammar_label:8} | {graph_name:20} | {time_str:20} | {under_val:10} | {over_val:10} | {diff_str:10}\n"
+                    )
+                else:
+                    f.write(f"{grammar_label:8} | {graph_name:20} | {time_str:20}\n")
