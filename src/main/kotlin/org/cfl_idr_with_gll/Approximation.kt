@@ -143,6 +143,7 @@ fun <V, L : ILabel> getMROverApprox(
  * @param graph the input graph to analyze
  * @param underApprox the current under-approximation of paths
  * @param overApprox the current over-approximation of paths
+ * @param parityD If `true`, stops after the first refinement phase. When `false`, executes two refinement phases (default: `false`)
  * @param valueflow if `true`, applies value-flow specific optimizations and constraints (default: `false`)
  * @param terminalFormat the format parser for bracket labels (defaults to [DefaultTerminalFormat])
  * @return a refined set of [Path] objects
@@ -151,6 +152,7 @@ fun <V, L : ILabel> getOnDemandMR(
 	graph: InputGraph<V, L>,
 	underApprox: Set<Path<V>>,
 	overApprox: Set<Path<V>>,
+	parityD: Boolean = false,
 	valueflow: Boolean = false,
 	terminalFormat: ITerminalFormat = DefaultTerminalFormat
 ): Set<Path<V>> {
@@ -163,6 +165,10 @@ fun <V, L : ILabel> getOnDemandMR(
 
 	val filteredClassicPaths =
 		refineMRWithGrammar(graph1, underApprox, overApprox, "classic", valueflow, terminalFormat)
+
+	if (parityD) {
+		return filteredClassicPaths
+	}
 
 	// Step 2: Apply "all" grammar refinement on the result of step 1
 
