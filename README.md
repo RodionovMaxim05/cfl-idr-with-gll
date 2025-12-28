@@ -25,7 +25,8 @@ algorithm from the [UCFS project](https://github.com/FormalLanguageConstrainedPa
 | `project`    | Projection to an unlabeled Dyck grammar | `PARUnl`                     |
 | `exclude`    | Erasing labels                          | `PARErase`                   |
 | `all`        | Comprehensive grammar                   | `COM`                        |
-| `on-demand`  | On-demand mutual refinement             | `COMD`                       |
+| `parityD`    | On-demand parity grammar                | `PARD`                       |
+| `on-demand`  | On-demand combined method               | `COMD`                       |
 
 ## Architecture
 
@@ -61,8 +62,8 @@ fun <V, L : ILabel> getOnDemandMR(
 ): Set<Path<V>>
 ```
 
-See more [_**documentation
-**_](https://rodionovmaxim05.github.io/cfl-idr-with-gll/cfl-idr-with-gll/org.cfl_idr_with_gll/index.html) to learn more
+See more _**[documentation
+](https://rodionovmaxim05.github.io/cfl-idr-with-gll/cfl-idr-with-gll/org.cfl_idr_with_gll/index.html)**_ to learn more
 about it.
 
 2. Command-Line Interface

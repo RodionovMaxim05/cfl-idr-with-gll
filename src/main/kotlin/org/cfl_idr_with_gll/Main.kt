@@ -34,7 +34,8 @@ import java.io.File
  * - `project`: (PARUnl) Projection grammar - Projection to an unlabeled Dyck grammar
  * - `exclude`: (PARErase) Exclusion grammar - Erasing labels
  * - `all`: (COM) Comprehensive grammar
- * - `on-demand`: (COMD) On-demand mutual refinement
+ * - `parityD`: (PARD) On-demand parity grammar
+ * - `on-demand`: (COMD) On-demand combined method
  */
 object Main {
 
@@ -43,7 +44,7 @@ object Main {
 
 	/** Set of supported grammar types for reachability analysis. */
 	private val SUPPORTED_GRAMMARS = setOf(
-		"parity", "parity2", "parityK", "se", "project", "exclude", "all", "on-demand"
+		"parity", "parity2", "parityK", "se", "project", "exclude", "all", "parityD", "on-demand"
 	)
 
 	/**
@@ -70,6 +71,7 @@ object Main {
 		var parityK = 0
 		var outputPath: String? = null
 		var onDemand = false
+		var parityD = false
 		var quiet = false
 		var valueflow = false
 
@@ -113,6 +115,9 @@ object Main {
 		if (grammar == "parityK") {
 			require(parityK != 0) { "Parity K is required for grammar '$grammar'" }
 			require(parityK > 0) { "Parity K must be a positive integer (got: $parityK)" }
+		} else if (grammar == "parityD") {
+			grammar = "parity"
+			parityD = true
 		} else if (grammar == "on-demand") {
 			grammar = "all"
 			onDemand = true
@@ -169,12 +174,12 @@ object Main {
 			}
 		})
 
-		if (!onDemand) {
+		if (!onDemand && !parityD) {
 			println("Analysis completed. Results written to ${outputFile.absolutePath}")
 			return
 		}
 
-		val onDemandPaths = getOnDemandMR(inputGraph, underPaths, overPaths, valueflow)
+		val onDemandPaths = getOnDemandMR(inputGraph, underPaths, overPaths, parityD, valueflow)
 
 		outputFile.appendText("\nOn-Demand paths: ${onDemandPaths.size}\n")
 		if (!quiet) {
