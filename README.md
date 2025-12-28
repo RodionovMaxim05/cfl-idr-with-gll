@@ -57,14 +57,15 @@ fun <V, L : ILabel> getOnDemandMR(
 	graph: InputGraph<V, L>,
 	underApprox: Set<Path<V>>,
 	overApprox: Set<Path<V>>,
+	parityD: Boolean = false,
 	valueflow: Boolean = false,
 	terminalFormat: ITerminalFormat = DefaultTerminalFormat
 ): Set<Path<V>>
 ```
 
-See more _**[documentation
-](https://rodionovmaxim05.github.io/cfl-idr-with-gll/cfl-idr-with-gll/org.cfl_idr_with_gll/index.html)**_ to learn more
-about it.
+See more
+**[documentation](https://rodionovmaxim05.github.io/cfl-idr-with-gll/cfl-idr-with-gll/org.cfl_idr_with_gll/index.html)**
+to learn more about it.
 
 2. Command-Line Interface
 
