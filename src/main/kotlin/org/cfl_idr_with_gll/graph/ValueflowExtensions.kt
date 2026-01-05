@@ -121,7 +121,9 @@ fun <V, L : ILabel> InputGraph<V, L>.filterBracketPaths(
 					terminalFormat.isOpen(labelStr) == true
 				) {
 					Pair(edge.targetVertex, terminalFormat.extractId(labelStr))
-				} else null
+				} else {
+					null
+				}
 			} ?: emptyList()
 
 		// Find all V such that: V --(cb)--> path.target

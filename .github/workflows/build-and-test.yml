@@ -16,6 +16,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Run Detekt
+        run: ./gradlew detekt --no-daemon
+
       - name: Build and Test with Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
@@ -32,3 +35,9 @@ jobs:
         with:
           name: JaCoCoReport
           path: build/reports/jacoco/test/html
+
+      - name: Upload Detekt Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: DetektReport
+          path: build/reports/detekt/
