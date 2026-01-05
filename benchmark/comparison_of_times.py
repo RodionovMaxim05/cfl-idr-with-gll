@@ -12,7 +12,6 @@ from utils import (
     parse_kotlin_output,
     plot_over_under_diff,
     print_time_out,
-    save_benchmark_results,
 )
 
 REPEATS = 1
@@ -38,36 +37,71 @@ def make_kotlin_cmd(output_dir, valueflow: bool = False):
     return kotlin_command
 
 
-def run_bench_for_grammar(grammar: str, graphs: list, kotlin_cmd):
+def run_bench_for_grammar(
+    grammar: str,
+    graphs: list,
+    kotlin_cmd,
+    results_file: str,
+    approx_values: dict,
+    over_under_diff: dict,
+):
     results = {}
 
-    for graph in graphs:
-        print(f"=== {graph} ===")
+    with open(results_file, "a", encoding="utf-8") as f:
+        for graph in graphs:
+            print(f"=== {graph} ===")
 
-        raw_results = [
-            measure_time(kotlin_cmd(graph, grammar)) for _ in range(REPEATS)
-        ]
+            raw_results = [
+                measure_time(kotlin_cmd(graph, grammar)) for _ in range(REPEATS)
+            ]
 
-        valid_times = [
-            t for t in raw_results if isinstance(t, (int, float)) and not np.isnan(t)
-        ]
+            valid_times = [
+                t
+                for t in raw_results
+                if isinstance(t, (int, float)) and not np.isnan(t)
+            ]
 
-        if valid_times:
-            stats = analyze(valid_times)
-            results[graph] = {
-                "mean": stats["mean"],
-                "error": stats["error"],
-            }
-        else:
-            if "SOF" in raw_results:
-                status = "SOF"
-            elif "OOM" in raw_results:
-                status = "OOM"
-            elif "T/O" in raw_results:
-                status = "T/O"
+            if valid_times:
+                stats = analyze(valid_times)
+                results[graph] = {
+                    "mean": stats["mean"],
+                    "error": stats["error"],
+                }
+
+                diff, under, over = parse_kotlin_output(graph, KOTLIN_OUTPUT_DIR)
+                over_under_diff[grammar].append(diff)
+                approx_values[grammar][graph] = {
+                    "under": under,
+                    "over": over,
+                    "diff": diff,
+                }
+
+                time_str = f"{stats['mean']:.3f}±{stats['error']:.3f}"
+                f.write(
+                    f"{grammar:8} | {os.path.basename(graph):20} | {time_str:20} | {under:10} | {over:10} | {diff:10}\n"
+                )
+
             else:
-                status = "ERR"
-            results[graph] = {"mean": status, "error": 0.0}
+                if "SOF" in raw_results:
+                    status = "SOF"
+                elif "OOM" in raw_results:
+                    status = "OOM"
+                elif "T/O" in raw_results:
+                    status = "T/O"
+                else:
+                    status = "ERR"
+                results[graph] = {"mean": status, "error": 0.0}
+                over_under_diff[grammar].append(status)
+                approx_values[grammar][graph] = {
+                    "under": status,
+                    "over": status,
+                    "diff": status,
+                }
+                f.write(
+                    f"{grammar:8} | {os.path.basename(graph):20} | {status:20} | {status:10} | {status:10} | {status:10}\n"
+                )
+
+            f.flush()
 
     return results
 
@@ -129,6 +163,14 @@ if __name__ == "__main__":
     KOTLIN_OUTPUT_DIR = f"{input_dir}-out-gll-based"
     os.makedirs(KOTLIN_OUTPUT_DIR, exist_ok=True)
 
+    results_file = f"plots/results_comparison_of_times_{input_dir}.txt"
+
+    with open(results_file, "w", encoding="utf-8") as f:
+        f.write(
+            f"{'Grammar':8} | {'Graph':20} | {'Time':20} | {'Under':10} | {'Over':10} | {'Diff':10}\n"
+        )
+        f.write("-" * 93 + "\n")
+
     kotlin_cmd = make_kotlin_cmd(KOTLIN_OUTPUT_DIR, valueflow)
 
     over_under_diff = {g: [] for g in GRAMMARS}
@@ -142,27 +184,14 @@ if __name__ == "__main__":
         )
         print("=" * 44 + "\n")
 
-        res = run_bench_for_grammar(grammar, GRAPHS, kotlin_cmd)
+        res = run_bench_for_grammar(
+            grammar, GRAPHS, kotlin_cmd, results_file, approx_values, over_under_diff
+        )
         results_dict[grammar] = res
         plot_time(grammar, res, GRAPHS, input_dir)
 
-        for graph in GRAPHS:
-            res_val = res[graph]["mean"]
-            if isinstance(res_val, (int, float)) and not np.isnan(res_val):
-                diff, under, over = parse_kotlin_output(graph, KOTLIN_OUTPUT_DIR)
-                over_under_diff[grammar].append(diff)
-                approx_values[grammar][graph] = {"under": under, "over": over}
-            else:
-                over_under_diff[grammar].append(res_val)
-                approx_values[grammar][graph] = {"under": res_val, "over": res_val}
-
-    save_benchmark_results(
-        results_dict,
-        over_under_diff,
-        GRAPHS,
-        f"plots/results_comparison_of_times_{input_dir}.txt",
-        approx_values,
-    )
+        with open(results_file, "a", encoding="utf-8") as f:
+            f.write("\n")
 
     labels = [os.path.splitext(os.path.basename(g))[0] for g in GRAPHS]
     plot_over_under_diff(
