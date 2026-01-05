@@ -1,0 +1,73 @@
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+  weights:
+  # complexity: 2
+  # LongParameterList: 1
+  # style: 1
+  # comments: 1
+
+complexity:
+  active: true
+  ComplexCondition:
+    active: true
+    threshold: 5
+  LongMethod:
+    active: true
+    threshold: 130
+  TooManyFunctions:
+    active: true
+    excludes: [ '**/test/**' ]
+
+formatting:
+  active: true
+  MultiLineIfElse:
+    active: true
+  NoBlankLineInList:
+    active: true
+  NoConsecutiveBlankLines:
+    active: false
+
+performance:
+  active: true
+  ArrayPrimitive:
+    active: true
+  CouldBeSequence:
+    active: true
+    threshold: 4
+  ForEachOnRange:
+    active: true
+  SpreadOperator:
+    active: true
+  UnnecessaryTemporaryInstantiation:
+    active: true
+
+potential-bugs:
+  active: true
+  DoubleMutabilityForCollection:
+    active: true
+  ElseCaseInsteadOfExhaustiveWhen:
+    active: true
+  MapGetWithNotNullAssertionOperator:
+    active: true
+
+style:
+  active: true
+  BracesOnIfStatements:
+    active: true
+  BracesOnWhenStatements:
+    active: true
+  LoopWithTooManyJumpStatements:
+    active: true
+    maxJumpCount: 3
+  MagicNumber:
+    active: true
+    ignoreNumbers: [ '-1', '0', '1', '2', '10', '100' ]
+    excludes: [ '**/test/**' ]
+  MandatoryBracesLoops:
+    active: true
+  MaxChainedCallsOnSameLine:
+    active: true
+  UnderscoresInNumericLiterals:
+    active: true
+    acceptableLength: 4

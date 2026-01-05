@@ -94,9 +94,7 @@ internal fun <V> extractNonTrivialPaths(sppf: Set<RangeSppfNode<V>>): Set<Path<V
  * @param edges a set of SPPF edges to convert
  * @return an [InputGraph] containing all vertices and edges from the input
  */
-internal fun <V> createGraphFromEdges(
-	edges: Set<SppfEdge<V>>
-): InputGraph<V, TerminalInputLabel> {
+internal fun <V> createGraphFromEdges(edges: Set<SppfEdge<V>>): InputGraph<V, TerminalInputLabel> {
 	val graph = InputGraph<V, TerminalInputLabel>()
 
 	for (edge in edges) {
