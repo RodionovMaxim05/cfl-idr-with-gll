@@ -1,14 +1,14 @@
 import subprocess
 import time
+import os
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
-import os
-import subprocess
-import sys
-from typing import Any
+from typing import Any, Union, List
 
 TIMEOUT_SECONDS = 7200  # 2 hours
+REPEATS = 5
 
 GRAMMAR_LABELS = {
     "parity": "PAR",
@@ -26,7 +26,21 @@ GRAMMARS = list(GRAMMAR_LABELS.keys())
 KOTLIN_JAR = "../build/libs/cfl-idr-with-gll-all.jar"
 
 
-def measure_time(cmd):
+def run_measurements(
+    cmd_func: List[str], filename: str, grammar: str
+) -> List[Union[float, str]]:
+    times = []
+
+    for i in range(REPEATS):
+        res = measure_time(cmd_func(filename, grammar))
+        times.append(res)
+        if i == 0 and not isinstance(res, (int, float)):
+            break
+
+    return times
+
+
+def measure_time(cmd: List[str]) -> Union[float, str]:
     try:
         start = time.perf_counter()
         result = subprocess.run(

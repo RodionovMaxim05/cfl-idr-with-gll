@@ -22,6 +22,7 @@ venv/
 valueflow-out-gll-based/
 taint-out/
 taint-out-gll-based/
+taint_additional-out/
 taint_additional-out-gll-based/
 graphs_unlimited-out-gll-based/
 plots/
