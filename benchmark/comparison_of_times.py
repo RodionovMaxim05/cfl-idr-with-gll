@@ -7,14 +7,12 @@ from utils import (
     GRAMMAR_LABELS,
     GRAMMARS,
     KOTLIN_JAR,
-    measure_time,
+    run_measurements,
     analyze,
     parse_kotlin_output,
     plot_over_under_diff,
     print_time_out,
 )
-
-REPEATS = 1
 
 
 def make_kotlin_cmd(output_dir, valueflow: bool = False):
@@ -39,8 +37,8 @@ def make_kotlin_cmd(output_dir, valueflow: bool = False):
 
 def run_bench_for_grammar(
     grammar: str,
-    graphs: list,
-    kotlin_cmd,
+    graphs: list[str],
+    kotlin_cmd: str,
     results_file: str,
     approx_values: dict,
     over_under_diff: dict,
@@ -51,9 +49,7 @@ def run_bench_for_grammar(
         for graph in graphs:
             print(f"=== {graph} ===")
 
-            raw_results = [
-                measure_time(kotlin_cmd(graph, grammar)) for _ in range(REPEATS)
-            ]
+            raw_results = run_measurements(kotlin_cmd, graph, grammar)
 
             valid_times = [
                 t
@@ -82,14 +78,7 @@ def run_bench_for_grammar(
                 )
 
             else:
-                if "SOF" in raw_results:
-                    status = "SOF"
-                elif "OOM" in raw_results:
-                    status = "OOM"
-                elif "T/O" in raw_results:
-                    status = "T/O"
-                else:
-                    status = "ERR"
+                status = raw_results[0]
                 results[graph] = {"mean": status, "error": 0.0}
                 over_under_diff[grammar].append(status)
                 approx_values[grammar][graph] = {
@@ -135,18 +124,9 @@ def plot_time(grammar: str, results: dict, graphs: list, input_dir: str):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Run benchmark on graphs from a given directory"
-    )
-    parser.add_argument(
-        "input_dir",
-        help="Directory with .dot graph files",
-    )
-    parser.add_argument(
-        "-valueflow",
-        action="store_true",
-        help="Enable value-flow mode for the analysis",
-    )
+    parser = argparse.ArgumentParser()
+    parser.add_argument("input_dir")
+    parser.add_argument("-valueflow", action="store_true")
     args = parser.parse_args()
 
     input_dir = args.input_dir.rstrip("/")
@@ -197,5 +177,3 @@ if __name__ == "__main__":
     plot_over_under_diff(
         over_under_diff, labels, f"over_under_diff_all_grammars_{input_dir}"
     )
-
-    print("\nDone! Benchmark finished.")

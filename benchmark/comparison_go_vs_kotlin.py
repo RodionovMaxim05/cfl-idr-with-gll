@@ -1,25 +1,28 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import sys
 
 from utils import (
     GRAMMAR_LABELS,
     GRAMMARS,
     KOTLIN_JAR,
-    measure_time,
+    run_measurements,
     analyze,
     parse_kotlin_output,
     plot_over_under_diff,
     print_time_out,
 )
 
-REPEATS = 1
+INPUT_DIR = sys.argv[1] if len(sys.argv) > 1 else "taint"
 
-GRAPHS = sorted([f"taint/{f}" for f in os.listdir("taint") if f.endswith(".dot")])
+GRAPHS = sorted(
+    [f"{INPUT_DIR}/{f}" for f in os.listdir(INPUT_DIR) if f.endswith(".dot")]
+)
 
 GO_CMD = lambda filename, grammar: ["./comparable_impl/algo_go", filename, grammar]
 
-KOTLIN_OUTPUT_DIR = "taint-out-gll-based"
+KOTLIN_OUTPUT_DIR = f"{INPUT_DIR}-out-gll-based"
 KOTLIN_CMD = lambda filename, grammar: [
     "java",
     "-jar",
@@ -32,7 +35,7 @@ KOTLIN_CMD = lambda filename, grammar: [
 ]
 
 
-def process_results(raw_times):
+def process_results(raw_times: list) -> dict:
     valid_times = [
         t for t in raw_times if isinstance(t, (int, float)) and not np.isnan(t)
     ]
@@ -41,15 +44,7 @@ def process_results(raw_times):
         stats = analyze(valid_times)
         return {"mean": stats["mean"], "error": stats["error"]}
     else:
-        if "SOF" in raw_times:
-            status = "SOF"
-        elif "OOM" in raw_times:
-            status = "OOM"
-        elif "T/O" in raw_times:
-            status = "T/O"
-        else:
-            status = np.nan
-        return {"mean": status, "error": 0.0}
+        return {"mean": raw_times[0], "error": 0.0}
 
 
 def run_bench_for_grammar(
@@ -65,6 +60,7 @@ def run_bench_for_grammar(
     kotlin_file = results_file.replace(".txt", "_kotlin.txt")
 
     if is_first_grammar:
+        os.makedirs(KOTLIN_OUTPUT_DIR, exist_ok=True)
         open(go_file, "w", encoding="utf-8").close()
         open(kotlin_file, "w", encoding="utf-8").close()
 
@@ -85,7 +81,7 @@ def run_bench_for_grammar(
         print(f"=== {graph} ===")
 
         # --- Go ---
-        go_raw = [measure_time(GO_CMD(graph, grammar)) for _ in range(REPEATS)]
+        go_raw = run_measurements(GO_CMD, graph, grammar)
         go_result = process_results(go_raw)
         results[graph] = {"go": go_result}
 
@@ -102,7 +98,7 @@ def run_bench_for_grammar(
         f_go.flush()
 
         # --- Kotlin ---
-        kt_raw = [measure_time(KOTLIN_CMD(graph, grammar)) for _ in range(REPEATS)]
+        kt_raw = run_measurements(KOTLIN_CMD, graph, grammar)
         kt_result = process_results(kt_raw)
         results[graph]["kotlin"] = kt_result
 
@@ -174,7 +170,7 @@ def plot_for_grammar(grammar: str, results: dict):
     print_time_out(x - width / 2, go_labels)
     print_time_out(x + width / 2, kt_labels)
 
-    plt.title(f"Comparison of algorithms for grammar {GRAMMAR_LABELS[grammar]}")
+    plt.title(f"Comparison ({INPUT_DIR}) for grammar {GRAMMAR_LABELS[grammar]}")
     plt.xlabel("Graph")
     plt.ylabel("Execution time (s)")
     plt.xticks(x, labels)
@@ -182,14 +178,14 @@ def plot_for_grammar(grammar: str, results: dict):
     plt.tight_layout()
 
     os.makedirs("plots", exist_ok=True)
-    plt.savefig(f"plots/{grammar}_go_vs_kotlin.png", dpi=200)
+    plt.savefig(f"plots/{grammar}_go_vs_kotlin_{INPUT_DIR}.png", dpi=200)
     plt.close()
 
 
 if __name__ == "__main__":
     over_under_diff = {g: [] for g in GRAMMARS}
     approx_values = {g: {} for g in GRAMMARS}
-    results_file = "plots/benchmark_results.txt"
+    results_file = f"plots/benchmark_results_{INPUT_DIR}.txt"
     is_first_run = True
 
     for grammar in GRAMMARS:
@@ -206,16 +202,9 @@ if __name__ == "__main__":
 
         plot_for_grammar(grammar, res)
 
-        go_results = {}
-        kotlin_results = {}
-
-        for graph in GRAPHS:
-            go_results[graph] = res[graph]["go"]
-            kotlin_results[graph] = res[graph]["kotlin"]
-
     labels = [os.path.splitext(os.path.basename(g))[0] for g in GRAPHS]
     plot_over_under_diff(
-        over_under_diff, labels, "over_under_diff_all_grammars_go_vs_kotlin"
+        over_under_diff,
+        labels,
+        f"over_under_diff_all_grammars_go_vs_kotlin_{INPUT_DIR}",
     )
-
-    print("\nDone! Comparison benchmark finished.")
