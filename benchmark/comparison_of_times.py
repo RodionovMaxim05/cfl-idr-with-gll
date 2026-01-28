@@ -9,7 +9,7 @@ from utils import (
     KOTLIN_JAR,
     run_measurements,
     analyze,
-    parse_kotlin_output,
+    parse_output,
     plot_over_under_diff,
     print_time_out,
 )
@@ -64,7 +64,7 @@ def run_bench_for_grammar(
                     "error": stats["error"],
                 }
 
-                diff, under, over = parse_kotlin_output(graph, KOTLIN_OUTPUT_DIR)
+                diff, under, over = parse_output(graph, KOTLIN_OUTPUT_DIR)
                 over_under_diff[grammar].append(diff)
                 approx_values[grammar][graph] = {
                     "under": under,

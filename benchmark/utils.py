@@ -16,8 +16,8 @@ GRAMMAR_LABELS = {
     "se": "PAR2E",
     "project": "PARUnl",
     "exclude": "PARErase",
-    "all": "COM",
     "parityD": "PARD",
+    "all": "COM",
     "on-demand": "COMD",
 }
 
@@ -33,6 +33,7 @@ def run_measurements(
 
     for i in range(REPEATS):
         res = measure_time(cmd_func(filename, grammar))
+        print(res)
         times.append(res)
         if i == 0 and not isinstance(res, (int, float)):
             break
@@ -91,7 +92,7 @@ def analyze(times: list[float]) -> dict:
     }
 
 
-def parse_kotlin_output(graph: str, dirname: str) -> tuple:
+def parse_output(graph: str, dirname: str) -> tuple:
     name = os.path.splitext(os.path.basename(graph))[0]
     path = os.path.join(f"{dirname}", f"{name}.out")
 
@@ -100,11 +101,17 @@ def parse_kotlin_output(graph: str, dirname: str) -> tuple:
 
     with open(path, "r") as f:
         for line in f:
-            if line.startswith("Under approximation paths:"):
+            if line.startswith("Underapproximation:") or line.startswith(
+                "Under approximation paths:"
+            ):
                 under = int(line.split(":")[1].strip())
-            elif line.startswith("Over approximation paths"):
+            elif line.startswith("Refinement loop") or line.startswith(
+                "Over approximation paths"
+            ):
                 over = int(line.split(":")[1].strip())
-            elif line.startswith("On-Demand paths:"):
+            elif line.startswith("On-Demand:") or line.startswith(
+                "On-Demand paths:"
+            ):
                 over = int(line.split(":")[1].strip())
 
     if under is None:

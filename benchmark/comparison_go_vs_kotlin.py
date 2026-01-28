@@ -9,7 +9,7 @@ from utils import (
     KOTLIN_JAR,
     run_measurements,
     analyze,
-    parse_kotlin_output,
+    parse_output,
     plot_over_under_diff,
     print_time_out,
 )
@@ -20,6 +20,7 @@ GRAPHS = sorted(
     [f"{INPUT_DIR}/{f}" for f in os.listdir(INPUT_DIR) if f.endswith(".dot")]
 )
 
+GO_OUTPUT_DIR = f"{INPUT_DIR}-out"
 GO_CMD = lambda filename, grammar: ["./comparable_impl/algo_go", filename, grammar]
 
 KOTLIN_OUTPUT_DIR = f"{INPUT_DIR}-out-gll-based"
@@ -68,8 +69,10 @@ def run_bench_for_grammar(
     f_kotlin = open(kotlin_file, "a", encoding="utf-8")
 
     if os.path.getsize(go_file) == 0:
-        f_go.write(f"{'Grammar':8} | {'Graph':20} | {'Time':20}\n")
-        f_go.write("-" * 48 + "\n")
+        f_go.write(
+            f"{'Grammar':8} | {'Graph':20} | {'Time':20} | {'Under':10} | {'Over':10} | {'Diff':10}\n"
+        )
+        f_go.write("-" * 93 + "\n")
 
     if os.path.getsize(kotlin_file) == 0:
         f_kotlin.write(
@@ -87,9 +90,10 @@ def run_bench_for_grammar(
 
         graph_name = os.path.splitext(os.path.basename(graph))[0]
         if isinstance(go_result["mean"], (int, float)):
+            diff, under, over = parse_output(graph, GO_OUTPUT_DIR)
             time_str = f"{go_result['mean']:.3f}±{go_result['error']:.3f}"
             f_go.write(
-                f"{GRAMMAR_LABELS[grammar]:8} | {graph_name:20} | {time_str:20}\n"
+                f"{GRAMMAR_LABELS[grammar]:8} | {graph_name:20} | {time_str:20} | {under:10} | {over:10} | {diff:10}\n"
             )
         else:
             f_go.write(
@@ -105,7 +109,7 @@ def run_bench_for_grammar(
         if isinstance(kt_result["mean"], (int, float)) and not np.isnan(
             kt_result["mean"]
         ):
-            diff, under, over = parse_kotlin_output(graph, KOTLIN_OUTPUT_DIR)
+            diff, under, over = parse_output(graph, KOTLIN_OUTPUT_DIR)
 
             over_under_diff[grammar].append(diff)
             approx_values[grammar][graph] = {
@@ -123,7 +127,7 @@ def run_bench_for_grammar(
             approx_values[grammar][graph] = {"under": status, "over": status}
 
             f_kotlin.write(
-                f"{GRAMMAR_LABELS[grammar]:8} | {graph_name:20} | {status:20} | {status:10} | {status:10} | {status:10}\n"
+                f"{GRAMMAR_LABELS[grammar]:8} | {graph_name:20} | {status:20}\n"
             )
 
         f_kotlin.flush()
