@@ -1,0 +1,18 @@
+Grammar  | Graph                | Time                 | Under      | Over       | Diff      
+---------------------------------------------------------------------------------------------
+parity   | basic.dot            | 0.209±nan            |        410 |        412 | 2         
+parity   | basic_slx.dot        | 0.502±nan            |      31920 |      31920 | 0         
+parity   | collection.dot       | 0.163±nan            |        232 |        232 | 0         
+parity   | collection_slx.dot   | 0.209±nan            |       5210 |       5210 | 0         
+parity   | com_fasterxml_jackson.dot | SOF                  | SOF        | SOF        | SOF       
+parity   | com_fasterxml_jackson_slx.dot | OOM                  | OOM        | OOM        | OOM
+parity   | cornerCases.dot      | 0.935±nan            |        431 |        433 | 2         
+parity   | cornerCases_slx.dot  | 0.916±nan            |      43683 |      43683 | 0         
+parity   | generalJava.dot      | 0.171±nan            |        316 |        316 | 0         
+parity   | generalJava_slx.dot  | 0.424±nan            |      15778 |      15778 | 0         
+parity   | org_apache_jackrabbit.dot | SOF                  | SOF        | SOF        | SOF       
+parity   | org_apache_jackrabbit_slx.dot | T/O                  | T/O        | T/O        | T/O       
+parity   | org_jivesoftware_openfire.dot | SOF                  | SOF        | SOF        | SOF       
+parity   | org_jivesoftware_openfire_slx.dot | T/O                  | T/O        | T/O        | T/O       
+parity   | reactor.dot          | T/O                  | T/O        | T/O        | T/O       
+parity   | reactor_slx.dot      | T/O                  | T/O        | T/O        | T/O       
