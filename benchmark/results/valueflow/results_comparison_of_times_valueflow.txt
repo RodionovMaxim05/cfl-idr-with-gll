@@ -1,0 +1,89 @@
+Grammar  | Graph                | Time                 | Under      | Over       | Diff
+---------------------------------------------------------------------------------------------
+parity   | cactus.dot           | 371.893±3.318        |      46421 |      46421 |          0
+parity   | imagick.dot          | T/O                  | T/O        | T/O        | T/O
+parity   | leela.dot            | 2.697±0.451          |        392 |        392 |          0
+parity   | nab.dot              | 1.605±0.049          |       1788 |       1788 |          0
+parity   | omnetpp.dot          | 259.527±27.923       |      48641 |      48641 |          0
+parity   | parest.dot           | 40.958±8.952         |       4571 |       4571 |          0
+parity   | perlbench.dot        | T/O                  | T/O        | T/O        | T/O
+parity   | povray.dot           | 27.299±4.712         |       7230 |       7230 |          0
+parity   | x264.dot             | 110.055±14.042       |      60792 |      60792 |          0
+parity   | xz.dot               | 0.990±0.085          |        211 |        211 |          0
+
+parity2  | cactus.dot           | 373.423±3.318        |      46421 |      46421 |          0
+parity2  | imagick.dot          | T/O                  | T/O        | T/O        | T/O
+parity2  | leela.dot            | 2.588±0.042          |        392 |        392 |          0
+parity2  | nab.dot              | 1.539±0.102          |       1788 |       1788 |          0
+parity2  | omnetpp.dot          | 256.649±15.824       |      48641 |      48641 |          0
+parity2  | parest.dot           | 38.555±1.127         |       4571 |       4571 |          0
+parity2  | perlbench.dot        | T/O                  | T/O        | T/O        | T/O
+parity2  | povray.dot           | 27.533±0.910         |       7230 |       7230 |          0
+parity2  | x264.dot             | 110.906±13.840       |      60792 |      60792 |          0
+parity2  | xz.dot               | 0.969±0.060          |        211 |        211 |          0
+
+se       | cactus.dot           | 380.288±9.616        |      46421 |      46421 |          0
+se       | imagick.dot          | T/O                  | T/O        | T/O        | T/O
+se       | leela.dot            | 2.788±0.278          |        392 |        392 |          0
+se       | nab.dot              | 1.585±0.041          |       1788 |       1788 |          0
+se       | omnetpp.dot          | 252.707±13.224       |      48641 |      48641 |          0
+se       | parest.dot           | 37.992±3.052         |       4571 |       4571 |          0
+se       | perlbench.dot        | T/O                  | T/O        | T/O        | T/O
+se       | povray.dot           | 29.642±1.035         |       7230 |       7230 |          0
+se       | x264.dot             | 109.841±20.468       |      60792 |      60792 |          0
+se       | xz.dot               | 1.156±0.100          |        211 |        211 |          0
+
+project  | cactus.dot           | 380.853±15.629       |      46421 |      46421 |          0
+project  | imagick.dot          | T/O                  | T/O        | T/O        | T/O
+project  | leela.dot            | 2.562±0.242          |        392 |        392 |          0
+project  | nab.dot              | 1.585±0.055          |       1788 |       1788 |          0
+project  | omnetpp.dot          | 260.033±10.939       |      48641 |      48641 |          0
+project  | parest.dot           | 39.143±3.498         |       4571 |       4571 |          0
+project  | perlbench.dot        | T/O                  | T/O        | T/O        | T/O
+project  | povray.dot           | 27.960±0.781         |       7230 |       7230 |          0
+project  | x264.dot             | 161.143±8.629        |      60792 |      60792 |          0
+project  | xz.dot               | 1.011±0.036          |        211 |        211 |          0
+
+exclude  | cactus.dot           | 372.764±9.668        |      46421 |      46421 |          0
+exclude  | imagick.dot          | T/O                  | T/O        | T/O        | T/O
+exclude  | leela.dot            | 2.608±0.208          |        392 |        392 |          0
+exclude  | nab.dot              | 1.552±0.033          |       1788 |       1788 |          0
+exclude  | omnetpp.dot          | 268.102±7.217        |      48641 |      48641 |          0
+exclude  | parest.dot           | 38.169±2.595         |       4571 |       4571 |          0
+exclude  | perlbench.dot        | T/O                  | T/O        | T/O        | T/O
+exclude  | povray.dot           | 28.083±5.634         |       7230 |       7230 |          0
+exclude  | x264.dot             | 108.362±1.459        |      60792 |      60792 |          0
+exclude  | xz.dot               | 1.016±0.070          |        211 |        211 |          0
+
+parityD  | cactus.dot           | 395.458±6.917        |      46421 |      46421 |          0
+parityD  | imagick.dot          | T/O                  | T/O        | T/O        | T/O
+parityD  | leela.dot            | 2.580±0.108          |        392 |        392 |          0
+parityD  | nab.dot              | 1.764±0.281          |       1788 |       1788 |          0
+parityD  | omnetpp.dot          | 260.627±4.409        |      48641 |      48641 |          0
+parityD  | parest.dot           | 38.431±1.595         |       4571 |       4571 |          0
+parityD  | perlbench.dot        | T/O                  | T/O        | T/O        | T/O
+parityD  | povray.dot           | 29.276±5.441         |       7230 |       7230 |          0
+parityD  | x264.dot             | 105.318±1.590        |      60792 |      60792 |          0
+parityD  | xz.dot               | 1.007±0.055          |        211 |        211 |          0
+
+all      | cactus.dot           | 395.093±5.961        |      46421 |      46421 |          0
+all      | imagick.dot          | T/O                  | T/O        | T/O        | T/O
+all      | leela.dot            | 2.767±0.250          |        392 |        392 |          0
+all      | nab.dot              | 1.682±0.034          |       1788 |       1788 |          0
+all      | omnetpp.dot          | 266.760±5.891        |      48641 |      48641 |          0
+all      | parest.dot           | 39.716±3.445         |       4571 |       4571 |          0
+all      | perlbench.dot        | T/O                  | T/O        | T/O        | T/O
+all      | povray.dot           | 30.123±3.437         |       7230 |       7230 |          0
+all      | x264.dot             | 179.981±30.607       |      60792 |      60792 |          0
+all      | xz.dot               | 1.302±0.218          |        211 |        211 |          0
+
+on-demand| cactus.dot           | 432.552±8.094        |      46421 |      46421 |          0
+on-demand| imagick.dot          | T/O                  | T/O        | T/O        | T/O
+on-demand| leela.dot            | 2.811±0.125          |        392 |        392 |          0
+on-demand| nab.dot              | 1.866±0.105          |       1788 |       1788 |          0
+on-demand| omnetpp.dot          | 283.867±8.036        |      48641 |      48641 |          0
+on-demand| parest.dot           | 39.698±1.563         |       4571 |       4571 |          0
+on-demand| perlbench.dot        | T/O                  | T/O        | T/O        | T/O
+on-demand| povray.dot           | 33.007±3.923         |       7230 |       7230 |          0
+on-demand| x264.dot             | 170.641±9.534        |      60792 |      60792 |          0
+on-demand| xz.dot               | 1.320±0.119          |        211 |        211 |          0

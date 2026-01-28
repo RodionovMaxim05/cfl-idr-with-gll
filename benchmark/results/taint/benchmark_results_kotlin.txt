@@ -1,0 +1,97 @@
+Grammar  | Graph                | Time                 | Under      | Over       | Diff
+---------------------------------------------------------------------------------------------
+parity   | backflash.dot        | 1.060±0.012          |       2625 |       2754 |        129
+parity   | batterydoc.dot       | 0.969±0.013          |       2804 |       4661 |       1857
+parity   | droidkongfu.dot      | 0.956±0.018          |       2906 |       5273 |       2367
+parity   | fakebanker.dot       | 0.307±0.002          |        249 |        590 |        341
+parity   | fakedaum.dot         | 0.655±0.007          |       1132 |       2826 |       1694
+parity   | faketaobao.dot       | 0.201±0.008          |         57 |        151 |         94
+parity   | jollyserv.dot        | 0.311±0.008          |        155 |        176 |         21
+parity   | loozfon.dot          | 0.210±0.007          |         76 |        212 |        136
+parity   | roidsec.dot          | 0.864±0.019          |      12284 |      16362 |       4078
+parity   | uranai.dot           | 0.246±0.005          |        143 |        143 |          0
+parity   | zertsecurity.dot     | 0.339±0.013          |        779 |       1081 |        302
+
+parity2  | backflash.dot        | 1.254±0.057          |       2625 |       2754 |        129
+parity2  | batterydoc.dot       | 1.948±0.018          |       2804 |       4658 |       1854
+parity2  | droidkongfu.dot      | 2.379±0.050          |       2906 |       5240 |       2334
+parity2  | fakebanker.dot       | 0.391±0.011          |        249 |        590 |        341
+parity2  | fakedaum.dot         | 1.453±0.058          |       1132 |       2805 |       1673
+parity2  | faketaobao.dot       | 0.220±0.002          |         57 |        151 |         94
+parity2  | jollyserv.dot        | 0.387±0.005          |        155 |        175 |         20
+parity2  | loozfon.dot          | 0.260±0.004          |         76 |        211 |        135
+parity2  | roidsec.dot          | 1.607±0.077          |      12284 |      16361 |       4077
+parity2  | uranai.dot           | 0.346±0.026          |        143 |        143 |          0
+parity2  | zertsecurity.dot     | 0.504±0.062          |        779 |       1045 |        266
+
+se       | backflash.dot        | 4.247±0.089          |       2625 |       2625 |          0
+se       | batterydoc.dot       | 11.774±0.089         |       2804 |       3666 |        862
+se       | droidkongfu.dot      | 20.756±0.103         |       2906 |       4983 |       2077
+se       | fakebanker.dot       | 1.616±0.039          |        249 |        279 |         30
+se       | fakedaum.dot         | 12.216±0.308         |       1132 |       2545 |       1413
+se       | faketaobao.dot       | 0.433±0.013          |         57 |         64 |          7
+se       | jollyserv.dot        | 1.021±0.013          |        155 |        164 |          9
+se       | loozfon.dot          | 0.665±0.021          |         76 |         93 |         17
+se       | roidsec.dot          | 9.477±0.139          |      12284 |      13586 |       1302
+se       | uranai.dot           | 0.479±0.007          |        143 |        143 |          0
+se       | zertsecurity.dot     | 0.879±0.035          |        779 |        883 |        104
+
+project  | backflash.dot        | 1.175±0.048          |       2625 |       2736 |        111
+project  | batterydoc.dot       | 65.555±6.348         |       2804 |       4500 |       1696
+project  | droidkongfu.dot      | 100.901±2.052        |       2906 |       5242 |       2336
+project  | fakebanker.dot       | 0.327±0.003          |        249 |        354 |        105
+project  | fakedaum.dot         | 2.232±0.039          |       1132 |       2700 |       1568
+project  | faketaobao.dot       | 0.207±0.005          |         57 |         59 |          2
+project  | jollyserv.dot        | 0.351±0.008          |        155 |        174 |         19
+project  | loozfon.dot          | 0.236±0.009          |         76 |        153 |         77
+project  | roidsec.dot          | 7.964±0.086          |      12284 |      15283 |       2999
+project  | uranai.dot           | 0.273±0.010          |        143 |        143 |          0
+project  | zertsecurity.dot     | 0.410±0.008          |        779 |       1081 |        302
+
+exclude  | backflash.dot        | 1.375±0.018          |       2625 |       2754 |        129
+exclude  | batterydoc.dot       | 3.988±0.116          |       2804 |       4661 |       1857
+exclude  | droidkongfu.dot      | 5.669±0.299          |       2906 |       5273 |       2367
+exclude  | fakebanker.dot       | 0.758±0.037          |        249 |        590 |        341
+exclude  | fakedaum.dot         | 1.803±0.051          |       1132 |       2826 |       1694
+exclude  | faketaobao.dot       | 0.301±0.068          |         57 |        151 |         94
+exclude  | jollyserv.dot        | 0.410±0.007          |        155 |        176 |         21
+exclude  | loozfon.dot          | 0.292±0.022          |         76 |        212 |        136
+exclude  | roidsec.dot          | 3.172±0.040          |      12284 |      16362 |       4078
+exclude  | uranai.dot           | 0.299±0.023          |        143 |        143 |          0
+exclude  | zertsecurity.dot     | 0.493±0.093          |        779 |       1080 |        301
+
+parityD  | backflash.dot        | 1.990±0.091          |       2625 |       2625 |          0
+parityD  | batterydoc.dot       | 4.649±0.052          |       2804 |       3447 |        643
+parityD  | droidkongfu.dot      | 18.070±0.174         |       2906 |       3938 |       1032
+parityD  | fakebanker.dot       | 1.071±0.018          |        249 |        254 |          5
+parityD  | fakedaum.dot         | 5.967±0.496          |       1132 |       2362 |       1230
+parityD  | faketaobao.dot       | 0.363±0.063          |         57 |         61 |          4
+parityD  | jollyserv.dot        | 0.442±0.070          |        155 |        164 |          9
+parityD  | loozfon.dot          | 0.610±0.063          |         76 |         93 |         17
+parityD  | roidsec.dot          | 8.971±0.103          |      12284 |      14214 |       1930
+parityD  | uranai.dot           | 0.255±0.003          |        143 |        143 |          0
+parityD  | zertsecurity.dot     | 0.842±0.043          |        779 |        808 |         29
+
+all      | backflash.dot        | 4.430±0.178          |       2625 |       2625 |          0
+all      | batterydoc.dot       | 59.600±2.733         |       2804 |       3666 |        862
+all      | droidkongfu.dot      | 1249.167±20.140      |       2906 |       4983 |       2077
+all      | fakebanker.dot       | 1.877±0.023          |        249 |        272 |         23
+all      | fakedaum.dot         | 13.998±0.122         |       1132 |       2545 |       1413
+all      | faketaobao.dot       | 0.459±0.020          |         57 |         59 |          2
+all      | jollyserv.dot        | 0.989±0.006          |        155 |        164 |          9
+all      | loozfon.dot          | 0.703±0.027          |         76 |         93 |         17
+all      | roidsec.dot          | 32.942±0.793         |      12284 |      13586 |       1302
+all      | uranai.dot           | 0.562±0.075          |        143 |        143 |          0
+all      | zertsecurity.dot     | 1.031±0.058          |        779 |        883 |        104
+
+on-demand| backflash.dot        | 4.616±0.087          |       2625 |       2625 |          0
+on-demand| batterydoc.dot       | 92.440±1.502         |       2804 |       3340 |        536
+on-demand| droidkongfu.dot      | 2803.642±37.079      |       2906 |       3393 |        487
+on-demand| fakebanker.dot       | 2.238±0.090          |        249 |        251 |          2
+on-demand| fakedaum.dot         | 602.801±2.436        |       1132 |       2280 |       1148
+on-demand| faketaobao.dot       | 0.537±0.026          |         57 |         59 |          2
+on-demand| jollyserv.dot        | 1.493±0.038          |        155 |        164 |          9
+on-demand| loozfon.dot          | 1.759±0.075          |         76 |         93 |         17
+on-demand| roidsec.dot          | 232.053±4.020        |      12284 |      13052 |        768
+on-demand| uranai.dot           | 0.519±0.009          |        143 |        143 |          0
+on-demand| zertsecurity.dot     | 2.247±0.113          |        779 |        794 |         15

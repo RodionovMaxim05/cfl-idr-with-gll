@@ -1,0 +1,36 @@
+Grammar  | Graph                | Time                 | Under      | Over       | Diff
+---------------------------------------------------------------------------------------------
+parity   | phospy.dot           | T/O
+parity   | scipiex.dot          | 2256.245±63.894      |       1699 |       8879 |       7180
+parity   | simhosy.dot          | 1257.264±17.199      |       6722 |      39577 |      32855
+parity   | skullkey.dot         | T/O
+
+parity2  | phospy.dot           | T/O
+parity2  | scipiex.dot          | T/O
+parity2  | simhosy.dot          | T/O
+parity2  | skullkey.dot         | T/O
+
+se       | phospy.dot           | T/O
+se       | scipiex.dot          | T/O
+se       | simhosy.dot          | T/O
+se       | skullkey.dot         | T/O
+
+project  | phospy.dot           | T/O
+project  | scipiex.dot          | 4843.234±42.320      |       1699 |       8498 |       6799
+project  | simhosy.dot          | 1741.219±2.596       |       6722 |      38403 |      31681
+project  | skullkey.dot         | T/O
+
+exclude  | phospy.dot           | T/O
+exclude  | scipiex.dot          | T/O
+exclude  | simhosy.dot          | T/O
+exclude  | skullkey.dot         | T/O
+
+parityD  | phospy.dot           | T/O
+parityD  | scipiex.dot          | T/O
+parityD  | simhosy.dot          | T/O
+parityD  | skullkey.dot         | T/O
+
+all      | phospy.dot           | T/O
+all      | scipiex.dot          | T/O
+all      | simhosy.dot          | T/O
+all      | skullkey.dot         | T/O
