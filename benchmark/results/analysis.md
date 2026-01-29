@@ -5,7 +5,7 @@
 This report presents a performance analysis of the implementation of Interleaved Dyck Reachability approximation
 algorithms. The comparison was made between the reference implementation in Go and a new implementation in Kotlin (using
 a GLL solver), as well as a comparison of various approximation strategies within the Kotlin version.  
-Full plots are available in current directory.
+All results and graphs are available in the current directory.
 
 ## System Configuration
 
@@ -17,9 +17,17 @@ Full plots are available in current directory.
 
 - **Timeout:** 2 hours (7200 seconds) per benchmark execution.
 
+## Notation and Conventions
+
+The following conventions are used:
+
+1. **`T/O`** (Time out) - a response was not received within the allotted 7200 seconds (2 hours);
+2. **`OOM`** (Out of Memory) - the tool ran out of 128 GiB of RAM;
+3. **`SOF`** (Stack Overflow Error) - the tool ran out of 12 MiB of stack space.
+
 ## Dataset Characteristics
 
-$|V|$ and $|E|$ represent the number of nodes and edges, respectively; $n_α$ and $n_β$ represent the number of parenthesis and bracket labels present in the graph
+$|V|$ and $|E|$ represent the number of nodes and edges, respectively; $n_α$ and $n_β$ represent the number of parenthesis and bracket labels present in the graph.
 
 ### taint
 
@@ -238,6 +246,10 @@ Similar to profiling the `PARUnl` grammar for simpler graphs, a problem with the
 
 ### Value-flow
 
+The comparison was conducted on the [`valueflow dataset`](../valueflow/).
+
+#### Per-Graph Trade-off Analysis (Time vs. Precision)
+
 |                                                                                  |                                                                                    |
 |----------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
 | **Graph `cactus`:**                                                              | **Graph `leela`:**                                                                 |
@@ -255,17 +267,18 @@ All grammars exhibit almost identical runtime behavior. At the same time, the `i
 
 This suggests that in the meaning value-flow mode, all grammars work approximately the same way, regardless of their complexity.
 
-This happens because in value-flow mode, the analysis is limited to only those paths that start with `[` and end with `]`. For these graphs, this significantly narrows the search area (for example, only when preprocessing the `x264` graph, the number of vertices decreases from **49 806** to **13 044**, and the number of edges from **56 376** to **14 351**). Therefore, the difference between grammars becomes insignificant.
+This happens because in value-flow mode, the analysis is limited to only those paths that start with `[` and end with `]`. For these graphs, this significantly narrows the search area (for example, only when preprocessing ([function removeValueflowUnreachable](../../src/main/kotlin/org/cfl_idr_with_gll/graph/ValueflowExtensions.kt#L24)) the `x264` graph, the number of vertices decreases from **49 806** to **13 044**, and the number of edges from **56 376** to **14 351**). Therefore, the difference between grammars becomes insignificant.
 
 However, the approximation yielded an accurate result (as confirmed by the results of the paper). This means that this test suite is not particularly challenging.
 
 ### Graphs Unlimited
 
+The comparison was conducted on the [`graphs_unlimited dataset`](../graphs_unlimited/).  
 The `graphs_unlimited` dataset represents the most demanding benchmarks for Interleaved Dyck Reachability. Due to their scale, measurements were limited to a single run per graph using only the simplest grammar (`PAR`) to establish a feasibility baseline.
 
-<figure style="text-align: center;"> <img alt="graphs_unlimited parity perfomance" src="graphs_unlimited/parity_comparison_of_times_graphs_unlimited.png"/> <figcaption>Performance of <code>PAR</code> grammar for graphs_unlimited</figcaption></figure>
+<figure style="text-align: center;"> <img alt="graphs_unlimited parity perfomance" src="graphs_unlimited/parity_comparison_of_times_graphs_unlimited.png"/> <figcaption>Performance of <code>PAR</code> grammar for <code>graphs_unlimited</code></figcaption></figure>
 
-- For all larger graphs in this dataset - including com_fasterxml_jackson, org_apache_jackrabbit, org_jivesoftware_openfire, and reactor - the basic `PAR` grammar failed to complete due to StackOverflowError (`SOF`), Out of Memory (`OOM`), or Timeout (`T/O`).
+- For all larger graphs in this dataset the basic `PAR` grammar failed to complete due to StackOverflowError (`SOF`), Out of Memory (`OOM`), or Timeout (`T/O`).
 
 #### Stack Overflow in GLL Traversal
 
@@ -278,7 +291,7 @@ Exception in thread "main" java.lang.StackOverflowError
   ...
 ```
 
-The error originates in the GLL engine's recursive traversal of the grammar combinator structure during parse forest construction—a limitation of the current recursive implementation when handling extremely deep derivation trees.
+The error occurs due to the recursive traversal of the grammar combinator structure in the GLL engine during the construction of the rsm (Recursive State Machine) - this is a limitation of the current recursive implementation when processing large grammars.
 
 #### Precision for Successful Subsets
 

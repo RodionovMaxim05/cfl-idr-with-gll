@@ -21,7 +21,7 @@ The benchmark suite contains two independent benchmarks:
 
 2) A benchmark that evaluates the performance of only the GLL-based implementation
 
-   Evaluates execution time and approximation accuracy on other graphs.
+   Evaluates the execution time and approximation accuracy on selected graphs.
 
 ## How to Run the Benchmarks
 
@@ -47,7 +47,7 @@ The benchmark suite contains two independent benchmarks:
 
 4. Run the benchmarks:
 
-    Run both benchmarks sequentially:
+    Run all benchmarks sequentially:
 
     ```bash
     ./run_all.sh
@@ -56,14 +56,14 @@ The benchmark suite contains two independent benchmarks:
     Or run them individually:
 
     ```bash
-    python3 comparison_go_vs_kotlin.py                    # Go vs Kotlin benchmark
+    python3 comparison_go_vs_kotlin.py <input_dir>        # Go vs Kotlin benchmark
     python3 comparison_of_times.py <input_dir>            # Kotlin-only benchmark
     python3 comparison_of_times.py <input_dir> -valueflow # Kotlin-Only benchmark (value-flow analysis)
     ```
 
 ## Output
 
-All plots are saved automatically in the `plots/` directory.
+All results and plots are saved automatically in the `plots/` directory.
 
 ## Directory structure
 
@@ -76,11 +76,8 @@ All plots are saved automatically in the `plots/` directory.
 │   ├── algo_go             # Compiled binary of the original Go implementation
 │   └── mcfg/               # Python files for algo_go
 ├── plots/                  # Performance plots (created automatically)
-├── taint/                  # Graph collection for comparison_go_vs_kotlin
-│   ├── backflash.dot
-│   ├── batterydoc.dot
-│   └── ...
-├── taint_additional/       # Graph collections for comparison_of_times
+├── taint/                  # Graph collections
+├── taint_additional/
 ├── valueflow/
 └── graphs_unlimited/
 ```
