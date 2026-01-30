@@ -39,9 +39,6 @@ import java.io.File
  */
 object Main {
 
-	/** Default output directory for analysis results. */
-	private const val DIRECTORY_OUTPUT = "src/main/resources/taint"
-
 	/** Set of supported grammar types for reachability analysis. */
 	private val SUPPORTED_GRAMMARS = setOf(
 		"parity", "parity2", "parityK", "se", "project", "exclude", "all", "parityD", "on-demand"
@@ -62,7 +59,6 @@ object Main {
 	 *   - For `parityK` grammar: additional integer parameter k
 	 *
 	 * @throws IllegalArgumentException if required arguments are missing or invalid
-	 * @throws IllegalStateException if input file is not found or cannot be read
 	 */
 	@JvmStatic
 	fun main(args: Array<String>) {
@@ -79,7 +75,7 @@ object Main {
 		while (i < args.size) {
 			when (args[i]) {
 				"-o" -> {
-					if (i + 1 >= args.size) error("Missing value for -o")
+					require(i + 1 < args.size) { "Missing value for -o" }
 					outputPath = args[++i]
 				}
 
@@ -97,9 +93,11 @@ object Main {
 					} else if (grammar == null) {
 						grammar = args[i]
 					} else if (parityK == 0 && grammar == "parityK") {
-						parityK = args[i].toIntOrNull() ?: error("Parity K must be an integer")
+						val kValue = args[i].toIntOrNull()
+						require(kValue != null) { "Parity K must be an integer" }
+						parityK = kValue
 					} else {
-						error("Unexpected extra argument: ${args[i]}")
+						require(false) { "Unexpected extra argument: ${args[i]}" }
 					}
 				}
 			}
@@ -141,8 +139,7 @@ object Main {
 				File(output, "$benchmarkName.out")
 			}
 		} else {
-			val outputDir = File(DIRECTORY_OUTPUT).apply { mkdirs() }
-			File(outputDir, "$benchmarkName.out")
+			File("$benchmarkName.out")
 		}
 
 		val inputText = inputFile.readText()
