@@ -234,7 +234,7 @@ Similar to profiling the `PARUnl` grammar for simpler graphs, a problem with the
 
 ### Summary and Conclusions
 
-1. **Performance gains:** The Kotlin GLL-based implementation delivers substantial speedups (5×–80×) over the reference Go solver for most grammars and graph sizes, particularly on lightweight approximations (`PAR`, `PAR2`).
+1. **Performance Improvement:** The Kotlin GLL-based implementation provides a significant average speedup (12.3x) compared to the Go benchmark solver in benchmarks where both implementations succeed.
 
 2. **Correctness preserved:** Identical approximation results across implementations validate the semantic fidelity of the GLL approach.
 
