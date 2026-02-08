@@ -10,8 +10,8 @@ Two implementations are considered:
 - [Original Go Implementation](https://github.com/kobusgiovanna/cfl-idr/tree/main) - reference implementation from
   the [research paper](https://www.researchgate.net/publication/390804794_CFL-based_methods_for_approximating_interleaved_Dyck_reachability)
 
-- GLL-based Kotlin Implementation - new implementation using
-  the [UCFS GLL solver](https://github.com/FormalLanguageConstrainedPathQuerying/UCFS)
+- Kotlin implementation with a GLL-based algorithm - new implementation using
+  the [UCFS](https://github.com/FormalLanguageConstrainedPathQuerying/UCFS)
 
 The benchmark suite contains two independent benchmarks:
 
@@ -19,7 +19,7 @@ The benchmark suite contains two independent benchmarks:
 
    Compares execution time of the Go and Kotlin implementations.
 
-2) A benchmark that evaluates the performance of only the GLL-based implementation
+2) A benchmark that evaluates the performance of only the implementation using the GLL-based algorithm
 
    Evaluates the execution time and approximation accuracy on selected graphs.
 

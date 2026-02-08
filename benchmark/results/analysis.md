@@ -3,8 +3,7 @@
 ## Introduction
 
 This report presents a performance analysis of the implementation of Interleaved Dyck Reachability approximation
-algorithms. The comparison was made between the reference implementation in Go and a new implementation in Kotlin (using
-a GLL solver), as well as a comparison of various approximation strategies within the Kotlin version.  
+algorithms. The comparison was made between the reference implementation in Go and a new implementation in Kotlin (using [UCFS](https://github.com/FormalLanguageConstrainedPathQuerying/UCFS), a context-free reachability solver based on the GLL algorithm), as well as a comparison of various approximation strategies within the Kotlin version.  
 All results and graphs are available in the current directory.
 
 ## System Configuration
@@ -122,9 +121,7 @@ The following charts compare the execution times between the Go and Kotlin imple
 | **Grammar `COM`:**                                              | **Grammar `COMD`:**                                           |
 | <img alt="COM" src="taint/all_go_vs_kotlin_taint.png">          | <img alt="COMD" src="taint/on-demand_go_vs_kotlin_taint.png"> |
 
-There is a consistent pattern: the Kotlin (GLL) implementation is faster than the original Go implementation for almost
-all grammars and graphs. The exceptions are limited to
-3 graphs when using the `PARUnl` grammar and 1 graph when using the `COM` grammar.
+There is a consistent pattern: the Kotlin (using GLL-based algorithm) implementation is faster than the original Go implementation for almost all grammars and graphs. The exceptions are limited to 3 graphs when using the `PARUnl` grammar and 1 graph when using the `COM` grammar.
 
 #### Performance Hierarchy Analysis
 
@@ -152,7 +149,7 @@ The `COM` method calculates the intersection of the results of several grammars,
 Only thanks to other components (`PAR2E`, `PARErase`), the overall execution time is not as bad as with the `PARUnl`
 method.
 
-The situation is similar with the `COMD` grammar, in which GLL is repeatedly invoked with the `PARUnl` grammar.
+The situation is similar with the `COMD` grammar, in which UCFS is repeatedly invoked with the `PARUnl` grammar.
 
 #### Accuracy of approximations
 
@@ -209,9 +206,7 @@ On the larger `taint_additional` dataset, both implementations experience timeou
 In the smaller `taint` dataset, `PARErase` was faster than `PARD`. However, in `taint_additional`, this relationship flips
 due to the multi-pass execution bottleneck.
 
-This can be explained by the fact that as the graph size and the number of unique bracket identifiers ($n_b$) increase,
-`PARErase's` performance significantly decreases: the algorithm performs an exhaustive GLL search in a loop for each
-unique bracket identifier ([code](../../src/main/kotlin/org/cfl_idr_with_gll/Approximation.kt#L405)).
+This can be explained by the fact that as the graph size and the number of unique bracket identifiers ($n_b$) increase, `PARErase's` performance significantly decreases: the algorithm performs an exhaustive path search in a loop for each unique bracket identifier ([code](../../src/main/kotlin/org/cfl_idr_with_gll/Approximation.kt#L405)).
 
 ### Profiling problem graph
 
@@ -234,11 +229,11 @@ Similar to profiling the `PARUnl` grammar for simpler graphs, a problem with the
 
 ### Summary and Conclusions
 
-1. **Performance Improvement:** The Kotlin GLL-based implementation provides a significant average speedup (12.3x) compared to the Go benchmark solver in benchmarks where both implementations succeed.
+1. **Performance Improvement:** The Kotlin implementation using the GLL-based algorithm provides a significant average speedup (12.3x) compared to the Go benchmark solver in benchmarks where both implementations succeed.
 
-2. **Correctness preserved:** Identical approximation results across implementations validate the semantic fidelity of the GLL approach.
+2. **Correctness preserved:** Identical approximation results across implementations validate the semantic fidelity of the UCFS-based approach.
 
-3. **Systemic equals bottleneck:** The primary performance limitation stems from inefficient equality comparisons within the GLL engine. During parse forest construction and traversal, the solver frequently compares complex derivation structures. This issue manifests most severely in grammars producing large intermediate structures (`PARUnl`, multi-pass variants) but affects all grammars on sufficiently large inputs.
+3. **Systemic equals bottleneck:** The primary performance limitation stems from inefficient equality comparisons within UCFS. During parse forest construction and traversal, the solver frequently compares complex derivation structures. This issue manifests most severely in grammars producing large intermediate structures (`PARUnl`, multi-pass variants) but affects all grammars on sufficiently large inputs.
 
 4. **Scalability trade-offs:** While Kotlin handles moderate-scale graphs more efficiently, both implementations face fundamental scalability barriers on the largest inputs.
 
@@ -280,7 +275,7 @@ The `graphs_unlimited` dataset represents the most demanding benchmarks for Inte
 
 - For all larger graphs in this dataset the basic `PAR` grammar failed to complete due to StackOverflowError (`SOF`), Out of Memory (`OOM`), or Timeout (`T/O`).
 
-#### Stack Overflow in GLL Traversal
+#### Stack Overflow in UCFS
 
 Three graphs triggered java.lang.StackOverflowError despite increasing the JVM stack size to 12 MB (12× default):
 
@@ -291,7 +286,7 @@ Exception in thread "main" java.lang.StackOverflowError
   ...
 ```
 
-The error occurs due to the recursive traversal of the grammar combinator structure in the GLL engine during the construction of the rsm (Recursive State Machine) - this is a limitation of the current recursive implementation when processing large grammars.
+The error occurs due to the recursive traversal of the grammar combinator structure in UCFS during the construction of the rsm (Recursive State Machine) - this is a limitation of the current recursive implementation when processing large grammars.
 
 #### Precision for Successful Subsets
 

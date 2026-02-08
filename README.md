@@ -1,12 +1,12 @@
 # cfl-idr-with-gll
 
-A Kotlin implementation of CFL-based approximation methods for interleaved Dyck reachability using the GLL algorithm.
+A Kotlin implementation of CFL-based approximation methods for interleaved Dyck reachability using the GLL-based algorithm.
 
 ## Problem Overview
 
 Interleaved Dyck Reachability is a fundamental problem in static program analysis where path constraints are expressed as the shuffle of two Dyck languages - typically representing context sensitivity (parentheses) and field sensitivity (brackets). While this formulation enables high-precision analyses, the problem is known to be undecidable in general, and thus existing approaches resort to clever overapproximations.
 
-This project implements approximation techniques based on the research paper ["CFL-based methods for approximating interleaved Dyck reachability" (Conrado & Pavlogiannis, 2025)](https://www.researchgate.net/publication/390804794_CFL-based_methods_for_approximating_interleaved_Dyck_reachability), which transforms the undecidable problem into a series of tractable CFL reachability problems solvable via the GLL algorithm from the [UCFS project](https://github.com/FormalLanguageConstrainedPathQuerying/UCFS).
+This project implements approximation techniques based on the research paper ["CFL-based methods for approximating interleaved Dyck reachability" (Conrado & Pavlogiannis, 2025)](https://www.researchgate.net/publication/390804794_CFL-based_methods_for_approximating_interleaved_Dyck_reachability), which transforms the undecidable problem into a series of tractable CFL reachability problems solvable via the GLL-based algorithm from the [UCFS project](https://github.com/FormalLanguageConstrainedPathQuerying/UCFS).
 
 ### Supported Grammars
 
