@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-echo "Running comparison_go_vs_kotlin benchmark..."
-python3 comparison_go_vs_kotlin.py
+echo "Running comparison_go_vs_kotlin benchmark for taint/..."
+python3 comparison_go_vs_kotlin.py external-repos/cfl-idr/src/main/taint
 
 echo "Running comparison_go_vs_kotlin benchmark for taint_additional/..."
 python3 comparison_go_vs_kotlin.py taint_additional
