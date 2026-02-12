@@ -45,7 +45,17 @@ The benchmark suite contains two independent benchmarks:
     (cd .. && ./gradlew shadowJar -x test)
     ```
 
-4. Run the benchmarks:
+4. Build the Go executable file:
+
+    ```bash
+    # Initialize submodules (if not already done)
+    git submodule update --init
+
+    # Build the executable file
+    (cd external-repos/cfl-idr/src/main/ && go build -o algo_go .)
+    ```
+
+5. Run the benchmarks:
 
     Run all benchmarks sequentially:
 
@@ -71,13 +81,10 @@ All results and plots are saved automatically in the `plots/` directory.
 .
 ├── comparison_go_vs_kotlin.py
 ├── comparison_of_times.py
-├── utils.py                # Shared benchmarking utilities
-├── comparable_impl/        # Reference implementation for comparison
-│   ├── algo_go             # Compiled binary of the original Go implementation
-│   └── mcfg/               # Python files for algo_go
-├── plots/                  # Performance plots (created automatically)
-├── taint/                  # Graph collections
-├── taint_additional/
+├── utils.py                   # Shared benchmarking utilities
+├── external-rapos/cfl-idr/    # Reference implementation for comparison
+├── plots/                     # Performance plots (created automatically)
+├── taint_additional/          # Graph collections
 ├── valueflow/
 └── graphs_unlimited/
 ```

@@ -104,7 +104,7 @@ For the `taint_additional` dataset, each benchmark execution was repeated 3 time
 
 ### Results: `taint` Dataset
 
-The comparison was conducted on the [`taint dataset`](../taint/).
+The comparison was conducted on the [`taint dataset`](../external-repos/cfl-idr/src/main/taint/).
 
 #### Implementation Comparison (Go vs. Kotlin per Grammar)
 

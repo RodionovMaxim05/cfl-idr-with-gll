@@ -14,16 +14,21 @@ from utils import (
     print_time_out,
 )
 
-INPUT_DIR = sys.argv[1] if len(sys.argv) > 1 else "taint"
+INPUT_DIR = sys.argv[1]
+BASE_NAME = os.path.basename(os.path.normpath(INPUT_DIR))
 
 GRAPHS = sorted(
     [f"{INPUT_DIR}/{f}" for f in os.listdir(INPUT_DIR) if f.endswith(".dot")]
 )
 
 GO_OUTPUT_DIR = f"{INPUT_DIR}-out"
-GO_CMD = lambda filename, grammar: ["./comparable_impl/algo_go", filename, grammar]
+GO_CMD = lambda filename, grammar: [
+    "./external-repos/cfl-idr/src/main/algo_go",
+    filename,
+    grammar,
+]
 
-KOTLIN_OUTPUT_DIR = f"{INPUT_DIR}-out-gll-based"
+KOTLIN_OUTPUT_DIR = f"{BASE_NAME}-out-gll-based"
 KOTLIN_CMD = lambda filename, grammar: [
     "java",
     "-jar",
@@ -174,7 +179,7 @@ def plot_for_grammar(grammar: str, results: dict):
     print_time_out(x - width / 2, go_labels)
     print_time_out(x + width / 2, kt_labels)
 
-    plt.title(f"Comparison ({INPUT_DIR}) for grammar {GRAMMAR_LABELS[grammar]}")
+    plt.title(f"Comparison ({BASE_NAME}) for grammar {GRAMMAR_LABELS[grammar]}")
     plt.xlabel("Graph")
     plt.ylabel("Execution time (s)")
     plt.xticks(x, labels)
@@ -182,14 +187,14 @@ def plot_for_grammar(grammar: str, results: dict):
     plt.tight_layout()
 
     os.makedirs("plots", exist_ok=True)
-    plt.savefig(f"plots/{grammar}_go_vs_kotlin_{INPUT_DIR}.png", dpi=200)
+    plt.savefig(f"plots/{grammar}_go_vs_kotlin_{BASE_NAME}.png", dpi=200)
     plt.close()
 
 
 if __name__ == "__main__":
     over_under_diff = {g: [] for g in GRAMMARS}
     approx_values = {g: {} for g in GRAMMARS}
-    results_file = f"plots/benchmark_results_{INPUT_DIR}.txt"
+    results_file = f"plots/benchmark_results_{BASE_NAME}.txt"
     is_first_run = True
 
     for grammar in GRAMMARS:
@@ -210,5 +215,5 @@ if __name__ == "__main__":
     plot_over_under_diff(
         over_under_diff,
         labels,
-        f"over_under_diff_all_grammars_go_vs_kotlin_{INPUT_DIR}",
+        f"over_under_diff_all_grammars_go_vs_kotlin_{BASE_NAME}",
     )

@@ -93,6 +93,9 @@ cd cfl-idr-with-gll
 # Build the project
 ./gradlew shadowJar -x test
 
+# Initialize submodules (for tests)
+git submodule update --init
+
 # Run tests
 ./gradlew test
 ```
