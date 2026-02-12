@@ -37,7 +37,6 @@ def make_kotlin_cmd(output_dir, valueflow: bool = False):
 
 def run_bench_for_grammar(
     grammar: str,
-    graphs: list[str],
     kotlin_cmd: str,
     results_file: str,
     approx_values: dict,
@@ -46,7 +45,7 @@ def run_bench_for_grammar(
     results = {}
 
     with open(results_file, "a", encoding="utf-8") as f:
-        for graph in graphs:
+        for graph in GRAPHS:
             print(f"=== {graph} ===")
 
             raw_results = run_measurements(kotlin_cmd, graph, grammar)
@@ -95,15 +94,15 @@ def run_bench_for_grammar(
     return results
 
 
-def plot_time(grammar: str, results: dict, graphs: list, input_dir: str):
-    labels = [os.path.splitext(os.path.basename(g))[0] for g in graphs]
+def plot_time(grammar: str, results: dict):
+    labels = [os.path.splitext(os.path.basename(g))[0] for g in GRAPHS]
 
-    all_means = [results[g]["mean"] for g in graphs]
+    all_means = [results[g]["mean"] for g in GRAPHS]
     means = [
         m if isinstance(m, (int, float)) and not np.isnan(m) else 0.0
         for m in all_means
     ]
-    errors = [results[g]["error"] for g in graphs]
+    errors = [results[g]["error"] for g in GRAPHS]
 
     x = np.arange(len(labels))
 
@@ -119,7 +118,7 @@ def plot_time(grammar: str, results: dict, graphs: list, input_dir: str):
     plt.tight_layout()
 
     os.makedirs("plots", exist_ok=True)
-    plt.savefig(f"plots/{grammar}_comparison_of_times_{input_dir}.png", dpi=200)
+    plt.savefig(f"plots/{grammar}_comparison_of_times_{BASE_NAME}.png", dpi=200)
     plt.close()
 
 
@@ -130,6 +129,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     input_dir = args.input_dir.rstrip("/")
+    BASE_NAME = os.path.basename(os.path.normpath(input_dir))
     valueflow = args.valueflow
 
     GRAPHS = sorted(
@@ -140,10 +140,10 @@ if __name__ == "__main__":
         ]
     )
 
-    KOTLIN_OUTPUT_DIR = f"{input_dir}-out-gll-based"
+    KOTLIN_OUTPUT_DIR = f"{BASE_NAME}-out-gll-based"
     os.makedirs(KOTLIN_OUTPUT_DIR, exist_ok=True)
 
-    results_file = f"plots/results_comparison_of_times_{input_dir}.txt"
+    results_file = f"plots/results_comparison_of_times_{BASE_NAME}.txt"
 
     with open(results_file, "w", encoding="utf-8") as f:
         f.write(
@@ -165,15 +165,15 @@ if __name__ == "__main__":
         print("=" * 44 + "\n")
 
         res = run_bench_for_grammar(
-            grammar, GRAPHS, kotlin_cmd, results_file, approx_values, over_under_diff
+            grammar, kotlin_cmd, results_file, approx_values, over_under_diff
         )
         results_dict[grammar] = res
-        plot_time(grammar, res, GRAPHS, input_dir)
+        plot_time(grammar, res)
 
         with open(results_file, "a", encoding="utf-8") as f:
             f.write("\n")
 
     labels = [os.path.splitext(os.path.basename(g))[0] for g in GRAPHS]
     plot_over_under_diff(
-        over_under_diff, labels, f"over_under_diff_all_grammars_{input_dir}"
+        over_under_diff, labels, f"over_under_diff_all_grammars_{BASE_NAME}"
     )
