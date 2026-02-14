@@ -26,7 +26,20 @@ The following conventions are used:
 
 ## Dataset Characteristics
 
-$|V|$ and $|E|$ represent the number of nodes and edges, respectively; $n_α$ and $n_β$ represent the number of parenthesis and bracket labels present in the graph.
+All graphs were obtained from publicly available sources:
+
+- `taint` - graphs from the [taint analysis for Android](https://dl.acm.org/doi/10.1145/2771783.2771803), taken from [this repository](https://github.com/sdingcn/mutual-refinement/tree/main/exp). This data exactly matches the data analyzed in the underlying paper.
+- `taint_additional` - graphs from the same source. They relate to the same area of taint analysis but were not included in the evaluation of the underlying paper; the suffix _additional denotes this distinction.
+- `valueflow` - graphs from [value-flow analysis for LLVM](https://dl.acm.org/doi/10.1145/2892208.2892235), also sourced from the same repository above.
+- `graphs_unlimited` - Java program-analysis graphs from [this repository](https://github.com/verbinna22/graphs_unlimited/tree/main). In the source repository, each project includes two files:
+  - `<name>.g` - original graph extracted from source code;
+  - `<name>_slx.g` - context-reduced variant.  
+    Labels were uniformly mapped to Dyck symbols:
+    - Store / Load → Open/Close Brackets
+    - Assign Open / Assign Close → Open/Close Parentheses
+    - Everything else → Normal label
+
+Below are the key properties of each graph. $|V|$ and $|E|$ represent the number of nodes and edges, respectively; $n_α$ and $n_β$ represent the number of parenthesis and bracket labels present in the graph.
 
 ### taint
 
