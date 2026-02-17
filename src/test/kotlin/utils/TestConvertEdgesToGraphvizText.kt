@@ -4,6 +4,7 @@ import java.io.File
 import kotlin.test.assertEquals
 
 class TestConvertEdgesToGraphvizText {
+	private val basePath = "utils/convertEdgesToGraphviz"
 
 	private fun resourceFile(name: String): File {
 		val url = this::class.java.classLoader.getResource(name)
@@ -13,8 +14,8 @@ class TestConvertEdgesToGraphvizText {
 
 	@Test
 	fun `convertEdgesToGraphvizText handles empty input`() {
-		val input = resourceFile("utils/convertEdgesToGraphviz/empty/input.txt").readText()
-		val expectedOutput = resourceFile("utils/convertEdgesToGraphviz/empty/output.txt").readText().trim()
+		val input = resourceFile("$basePath/empty/input.txt").readText()
+		val expectedOutput = resourceFile("$basePath/empty/output.txt").readText().trim()
 
 		val actualOutput = convertEdgesToGraphvizText(input).trim()
 		assertEquals(expectedOutput, actualOutput)
@@ -22,8 +23,8 @@ class TestConvertEdgesToGraphvizText {
 
 	@Test
 	fun `convertEdgesToGraphvizText creates valid DOT`() {
-		val input = resourceFile("utils/convertEdgesToGraphviz/default/input.txt").readText()
-		val expectedOutput = resourceFile("utils/convertEdgesToGraphviz/default/output.txt").readText().trim()
+		val input = resourceFile("$basePath/default/input.txt").readText()
+		val expectedOutput = resourceFile("$basePath/default/output.txt").readText().trim()
 
 		val actualOutput = convertEdgesToGraphvizText(input).trim()
 		assertEquals(expectedOutput, actualOutput)
@@ -31,8 +32,8 @@ class TestConvertEdgesToGraphvizText {
 
 	@Test
 	fun `convertEdgesToGraphvizText ignores blank lines`() {
-		val input = resourceFile("utils/convertEdgesToGraphviz/blankLines/input.txt").readText()
-		val expectedOutput = resourceFile("utils/convertEdgesToGraphviz/blankLines/output.txt").readText().trim()
+		val input = resourceFile("$basePath/blankLines/input.txt").readText()
+		val expectedOutput = resourceFile("$basePath/blankLines/output.txt").readText().trim()
 
 		val actualOutput = convertEdgesToGraphvizText(input).trim()
 		assertEquals(expectedOutput, actualOutput)
