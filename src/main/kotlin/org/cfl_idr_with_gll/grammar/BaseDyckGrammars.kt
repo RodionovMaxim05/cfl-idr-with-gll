@@ -54,6 +54,9 @@ internal fun dyckGrammar(
 /**
  * Creates a projection grammar that abstracts away specific bracket labels.
  *
+ * Corresponds to the unlabeled Dyck grammar `D(Σ_u)` from the article (Sect. 4.2),
+ * used in the **PARUnl** method.
+ *
  * This grammar projects all opening symbols to a single abstract '(' and all closing symbols
  * to a single abstract ')', then accepts properly nested sequences. It's used for
  * unlabeled Dyck language analysis.

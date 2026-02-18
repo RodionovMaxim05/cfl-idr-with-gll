@@ -10,17 +10,17 @@ This project implements approximation techniques based on the research paper ["C
 
 ### Supported Grammars
 
-| Grammar Type | Description                             | Designation from the article |
-|--------------|-----------------------------------------|------------------------------|
-| `parity`     | Parity condition (k=1)                  | `PAR`                        |
-| `parity2`    | Extended parity condition (k=2)         | `PAR2`                       |
-| `parityK`    | Extended parity condition (parameter k) | `PARk`                       |
-| `se`         | Valid endpoints                         | `PAR2E`                      |
-| `project`    | Projection to an unlabeled Dyck grammar | `PARUnl`                     |
-| `exclude`    | Erasing labels                          | `PARErase`                   |
-| `all`        | Comprehensive grammar                   | `COM`                        |
-| `parityD`    | On-demand parity grammar                | `PARD`                       |
-| `on-demand`  | On-demand combined method               | `COMD`                       |
+| Grammar Type | Description                                                                                                                                                                       | Article designation |
+|--------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| `parity`     | Mutual refinement with k=1 parity condition on parentheses/brackets: requires the total count of parentheses/bracket symbols to be even                                           | `PAR`               |
+| `parity2`    | Mutual refinement with k=2 parity condition: parentheses/brackets are split into 2 groups, count in each group must be even                                                       | `PAR2`              |
+| `parityK`    | Mutual refinement with parameterized k-parity condition: parentheses/brackets are split into k groups                                                                             | `PARk`              |
+| `se`         | Extends `PAR2` with a "valid endpoints" (structured equality) condition: parentheses/bracket substrings must start with `(`/`[` and end with `)`/`]`                              | `PAR2E`             |
+| `project`    | Extends `PAR` with unlabeled projection: additionally runs reachability on the graph with all labels stripped, catching unreachable pairs where total nesting depth is unbalanced | `PARUnl`            |
+| `exclude`    | Extends `PAR` with label erasure: iterates over each bracket label, erases it from the graph, and reruns `PAR` - exposing unreachable pairs that were hidden by that label        | `PARErase`          |
+| `all`        | Combines `PAR2E` grammar with both the unlabeled projection phase and the label-erasure phase in the mutual refinement loop                                                       | `COM`               |
+| `parityD`    | Same grammar as `PAR`, but run in on-demand mode: mutual refinement is performed independently for each queried node pair, filtering out irrelevant graph parts                   | `PARD`              |
+| `on-demand`  | Same grammar as `COM`, but run in on-demand mode: combines all stronger grammars and graph simplifications with per-pair refinement                                               | `COMD`              |
 
 ## Architecture
 

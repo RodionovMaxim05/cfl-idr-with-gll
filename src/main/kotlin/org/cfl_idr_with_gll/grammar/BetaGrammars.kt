@@ -13,6 +13,9 @@ import org.ucfs.rsm.symbol.Term
 /**
  * Creates a Beta grammar that precisely tracks brackets but approximates parentheses.
  *
+ * Corresponds to the base grammar `D'(Σ_β, Σ_α)` from the article,
+ * used as the Beta grammar in the baseline mutual refinement method.
+ *
  * Beta grammars are used in the mutual refinement algorithm to:
  * 1. Precisely match brackets (require exact open/close pairs)
  * 2. Approximate parentheses (accept any parenthesis symbol individually)
@@ -53,6 +56,12 @@ internal fun dyckBetaGrammar(
 
 /**
  * Creates a Beta grammar with k-parity conditions for enhanced precision.
+ *
+ * Corresponds to the grammar `D_parᵏ(Σ_β, Σ_α)` from the article (Sect. 4.1).
+ * Special cases by k:
+ * - k=1 → `D_par(Σ_β, Σ_α)`, used in method **PAR**
+ * - k=2 → `D_par²(Σ_β, Σ_α)`, used in method **PAR2**
+ * - k=n → `D_parⁿ(Σ_β, Σ_α)`, used in method **PARk** (parameterized)
  *
  * This grammar extends the basic Beta grammar by tracking parity of parenthesis counts
  * across k groups.
@@ -165,6 +174,12 @@ internal fun dyckBetaGrammarKParity(
 
 /**
  * Creates a Beta grammar with k-parity conditions and structured equality (valid endpoints).
+ *
+ * Corresponds to the grammar `D⁺_parᵏ(Σ_β, Σ_α)` from the article (Sect. 4.1),
+ * defined as `D_parᵏ(Σ_β, Σ_α) ∩ R'(Σ_α)`, where `R'(Σ_α)` is the regular language
+ * accepting only strings that start with an opening parenthesis and end with a closing parenthesis.
+ * Special cases by k:
+ * - k=2 → `D⁺_par²(Σ_β, Σ_α)`, used in methods **PAR2E** (`se`) and **COM** (`all`)
  *
  * This is the Beta counterpart to [dyckAlphaGrammarKParitySe], combining parity tracking
  * with the "valid endpoints" condition for parentheses.
