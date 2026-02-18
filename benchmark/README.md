@@ -79,6 +79,7 @@ All results and plots are saved automatically in the `plots/` directory.
 
 ```text
 .
+├── results/                   # All raw results and charts
 ├── comparison_go_vs_kotlin.py
 ├── comparison_of_times.py
 ├── utils.py                   # Shared benchmarking utilities
