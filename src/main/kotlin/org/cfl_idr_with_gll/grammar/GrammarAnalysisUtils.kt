@@ -16,6 +16,23 @@ import org.ucfs.sppf.node.RangeSppfNode
  * It selects the appropriate grammar generator based on the `curGrammar` parameter,
  * which determines the specific language class to analyze.
  *
+ * The grammar type keys correspond to the article designations as follows:
+ * - `parity`    → PAR (`D_par(Σ_α, Σ_β)`, k=1)
+ * - `parity2`   → PAR2 (`D_par²(Σ_α, Σ_β)`, k=2)
+ * - `parityK`   → PARk (`D_parᵏ(Σ_α, Σ_β)`, parameterized)
+ * - `se`        → PAR2E (`D⁺_par²(Σ_α, Σ_β)`, k=2 + valid endpoints)
+ * - `project`   → PARUnl — uses PAR grammar; the unlabeled-graph transformation
+ *                 is applied externally in [mutualRefinement] via [getProjectSppf]
+ * - `exclude`   → PARErase — uses PAR grammar; label-erasing iteration
+ *                 is applied externally in [mutualRefinement] via [getExcludeSppf]
+ * - `all`       → COM (PAR2E grammar)
+ * - `parityD`   → PARD (PAR grammar, on-demand mode controlled externally)
+ * - `on-demand` → COMD (COM grammar, on-demand mode controlled externally)
+ *
+ * Note: for `project`, `exclude`, `parityD`, `all`, and `on-demand`, the grammar itself
+ * is the same as a simpler variant — the additional algorithmic logic that defines
+ * these methods is handled in [mutualRefinement], not here.
+ *
  * @param parenthesesIds list of identifiers for parentheses-type brackets
  * @param bracketsIds list of identifiers for bracket-type brackets
  * @param curGrammar the grammar type selector
@@ -47,6 +64,23 @@ private fun getAlphaGrammar(
  *
  * This function serves as a factory for Beta grammars used in Dyck language analysis.
  * Beta grammars typically complement Alpha grammars in the analysis pipeline.
+ *
+ * The grammar type keys correspond to the article designations as follows:
+ * - `parity`    → PAR (`D_par(Σ_β, Σ_α)`, k=1)
+ * - `parity2`   → PAR2 (`D_par²(Σ_β, Σ_α)`, k=2)
+ * - `parityK`   → PARk (`D_parᵏ(Σ_β, Σ_α)`, parameterized)
+ * - `se`        → PAR2E (`D⁺_par²(Σ_β, Σ_α)`, k=2 + valid endpoints)
+ * - `project`   → PARUnl — uses PAR grammar; the unlabeled-graph transformation
+ *                 is applied externally in [mutualRefinement] via [getProjectSppf]
+ * - `exclude`   → PARErase — uses PAR grammar; label-erasing iteration
+ *                 is applied externally in [mutualRefinement] via [getExcludeSppf]
+ * - `all`       → COM (PAR2E grammar)
+ * - `parityD`   → PARD (PAR grammar, on-demand mode controlled externally)
+ * - `on-demand` → COMD (COM grammar, on-demand mode controlled externally)
+ *
+ * Note: for `project`, `exclude`, `parityD`, `all`, and `on-demand`, the grammar itself
+ * is the same as a simpler variant — the additional algorithmic logic that defines
+ * these methods is handled in [mutualRefinement], not here.
  *
  * @param parenthesesIds list of identifiers for parentheses-type brackets
  * @param bracketsIds list of identifiers for bracket-type brackets

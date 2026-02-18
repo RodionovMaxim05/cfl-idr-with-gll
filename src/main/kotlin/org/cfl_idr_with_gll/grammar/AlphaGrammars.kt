@@ -13,6 +13,9 @@ import org.ucfs.rsm.symbol.Term
 /**
  * Creates an Alpha grammar that precisely tracks parentheses but approximates brackets.
  *
+ * Corresponds to the base grammar `D'(Σ_α, Σ_β)` from the article,
+ * used as the Alpha grammar in the baseline mutual refinement method.
+ *
  * Alpha grammars are used in the mutual refinement algorithm to:
  * 1. Precisely match parentheses (require exact open/close pairs)
  * 2. Approximate brackets (accept any bracket symbol individually)
@@ -54,6 +57,12 @@ internal fun dyckAlphaGrammar(
 
 /**
  * Creates an Alpha grammar with k-parity conditions for enhanced precision.
+ *
+ * Corresponds to the grammar `D_parᵏ(Σ_α, Σ_β)` from the article (Sect. 4.1).
+ * Special cases by k:
+ * - k=1 → `D_par(Σ_α, Σ_β)`, used in method **PAR**
+ * - k=2 → `D_par²(Σ_α, Σ_β)`, used in method **PAR2**
+ * - k=n → `D_parⁿ(Σ_α, Σ_β)`, used in method **PARk** (parameterized)
  *
  * This grammar extends the basic Alpha grammar by tracking parity of bracket counts
  * across k groups.
@@ -167,6 +176,8 @@ internal fun dyckAlphaGrammarKParity(
 /**
  * Creates an Alpha grammar with k-parity conditions and label exclusion.
  *
+ * Corresponds to the grammar used in the **PARErase** method (Sect. 4.2).
+ *
  * This grammar extends [dyckAlphaGrammarKParity] by excluding a specific bracket label
  * from parity tracking. The excluded label does not affect parity states.
  *
@@ -271,6 +282,12 @@ internal fun dyckAlphaGrammarKParityExclude(
 
 /**
  * Creates an Alpha grammar with k-parity conditions and structured equality (valid endpoints).
+ *
+ * Corresponds to the grammar `D⁺_parᵏ(Σ_α, Σ_β)` from the article (Sect. 4.1),
+ * defined as `D_parᵏ(Σ_α, Σ_β) ∩ R'(Σ_β)`, where `R'(Σ_β)` is the regular language
+ * accepting only strings that start with an opening bracket and end with a closing bracket.
+ * Special cases by k:
+ * - k=2 → `D⁺_par²(Σ_α, Σ_β)`, used in methods **PAR2E** (`se`) and **COM** (`all`)
  *
  * This grammar combines parity tracking with the "valid endpoints" condition.
  * It ensures strings start in state QE and end in either QE or QC, improving precision
