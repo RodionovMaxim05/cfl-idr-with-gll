@@ -1,3 +1,5 @@
+<a name="readme-top"></a>
+
 # cfl-idr-with-gll
 
 A Kotlin implementation of CFL-based approximation methods for interleaved Dyck reachability using the GLL-based algorithm.
