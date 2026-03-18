@@ -1,0 +1,36 @@
+Grammar  | Graph                | Time                 | Peak RSS MB         | Under      | Over       | Diff
+-----------------------------------------------------------------------------------------------------------------
+parity   | phospy.dot           | 827.423±21.575       | 60030.3±3121.0      |       8839 |      78735 |      69896
+parity   | scipiex.dot          | 25.778±0.337         | 11846.5±737.2       |       1699 |       8879 |       7180
+parity   | simhosy.dot          | 15.542±0.464         | 8012.4±488.3        |       6722 |      39577 |      32855
+parity   | skullkey.dot         | T/O                  | T/O                 |
+
+parity2  | phospy.dot           | 4837.850±225.953     | 120992.8±123.6      |       8839 |      78481 |      69642
+parity2  | scipiex.dot          | 102.084±2.482        | 31239.7±1347.9      |       1699 |       8650 |       6951
+parity2  | simhosy.dot          | 55.030±1.864         | 23991.2±722.2       |       6722 |      39489 |      32767
+parity2  | skullkey.dot         | T/O                  | T/O                 |
+
+se       | phospy.dot           | T/O                  | T/O                 |
+se       | scipiex.dot          | 975.347±33.181       | 88643.7±6333.5      |       1699 |       6912 |       5213
+se       | simhosy.dot          | 407.245±11.261       | 68035.4±5592.1      |       6722 |      37488 |      30766
+se       | skullkey.dot         | T/O                  | T/O                 |
+
+project  | phospy.dot           | T/O                  | T/O                 |
+project  | scipiex.dot          | T/O                  | T/O                 |
+project  | simhosy.dot          | T/O                  | T/O                 |
+project  | skullkey.dot         | T/O                  | T/O                 |
+
+exclude  | phospy.dot           | OOM                  | OOM                 |
+exclude  | scipiex.dot          | 1062.991±9.445       | 113966.8±998.6      |       1699 |       8711 |       7012
+exclude  | simhosy.dot          | 1021.199±11.874      | 105251.1±1531.9     |       6722 |      39448 |      32726
+exclude  | skullkey.dot         | T/O                  | T/O                 |
+
+parityD  | phospy.dot           | T/O                  | T/O                 |
+parityD  | scipiex.dot          | 365.958±12.385       | 29629.4±1258.9      |       1699 |       3505 |       1806
+parityD  | simhosy.dot          | 2688.150±44.637      | 26308.8±1316.7      |       6722 |      27041 |      20319
+parityD  | skullkey.dot         | T/O                  | T/O                 |
+
+all      | phospy.dot           | T/O                  | T/O                 |
+all      | scipiex.dot          | T/O                  | T/O                 |
+all      | simhosy.dot          | T/O                  | T/O                 |
+all      | skullkey.dot         | T/O                  | T/O                 |
