@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-	implementation(files("libs/solver.jar"))
+	implementation(files("libs/solver-new.jar"))
 	implementation("org.antlr:antlr4:4.13.1") // for solver
 	implementation("org.jgrapht:jgrapht-core:1.5.2")
 	testImplementation(kotlin("test"))

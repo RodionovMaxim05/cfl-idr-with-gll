@@ -245,12 +245,19 @@ Below are the key properties of each graph. $|V|$ and $|E|$ represent the number
 | reactor                       | 26 999  | 84 197    | 1 567  | 414   |
 | reactor_slx                   | 26 999  | 84 197    | 0      | 414   |
 
+> [!IMPORTANT]
+> **Important warning about the measurement conditions**
+>
+> Performance measurements for the `taint` and `taint_additional` datasets were performed on an [optimized version of UCFS](libs/solver-new.jar) - the optimization code is available in [PR](https://github.com/FormalLanguageConstrainedPathQuerying/UCFS/pull/50).
+>
+> All other measurements (for the `valueflow` and `graphs_unlimited` sets) were performed on the [original UCFS version](libs/solver-original.jar) without optimizations - - the original code is available [here](https://github.com/FormalLanguageConstrainedPathQuerying/UCFS/tree/e9c92ba1a85e95e941d04163cd4b55f50686c1f7).
+
 ## Implementation Comparison: Go vs Kotlin
 
 ### Methodology and Statistical Reliability
 
 For the `taint` dataset, each benchmark execution was repeated 5 times. The results presented in the charts below are the average values ​​of these measurements.  
-The sample standard deviation for all measured execution times does not exceed 18% (only 7 of 176 measurements exceed 8%, and all of these measurements were obtained using the Kotlin implementation, with an average time of less than 0.7 seconds, which can be explained by natural error). This variance is low enough to allow meaningful conclusions, as the performance differences between the Go and Kotlin implementations significantly exceed this statistical limit.
+The sample standard deviation for all measured execution times does not exceed 10% (only 3 of 176 measurements exceed 7%, and all of these measurements were obtained using the Kotlin implementation, with an average time of less than 0.5 seconds, which can be explained by natural error). This variance is low enough to allow meaningful conclusions, as the performance differences between the Go and Kotlin implementations significantly exceed this statistical limit.
 
 For the `taint_additional` dataset, each benchmark execution was repeated 3 times. The sample standard deviation for all measured execution times does not exceed 2%. This variance is also low enough to draw meaningful conclusions.
 
@@ -277,7 +284,7 @@ The following charts compare the execution times between the Go and Kotlin imple
 | **Grammar `COM`:**                                              | **Grammar `COMD`:**                                           |
 | <img alt="COM" src="benchmark/results/taint/all_go_vs_kotlin_taint.png">          | <img alt="COMD" src="benchmark/results/taint/on-demand_go_vs_kotlin_taint.png"> |
 
-There is a consistent pattern: the Kotlin (using GLL-based algorithm) implementation is faster than the original Go implementation for almost all grammars and graphs. The exceptions are limited to 3 graphs when using the `PARUnl` grammar and 1 graph when using the `COM` grammar.
+There is a consistent pattern: the Kotlin (using GLL-based algorithm) implementation is faster than the original Go implementation for almost all grammars and graphs. The exceptions are limited to 1 graphs when using the `PARUnl` grammar.
 
 #### Performance Hierarchy Analysis
 
@@ -289,23 +296,6 @@ grammar. The total execution time follows these sequences (from fastest to slowe
 |-------------------|----------------------------------------------------------------------------|
 | **Kotlin (GLL)**  | `PAR` → `PAR2` → `PARErase` → `PARD` → `PAR2E` → `PARUnl` → `COM` → `COMD` |
 | **Go (Original)** | `PAR` → `PARUnl` → `PAR2` → `PARD` → `COM` → `PAR2E` → `PARErase` → `COMD` |
-
-### Problem area: `PARUnl` Grammar (Projected/Unlabeled Dyck)
-
-An analysis of the results and profiling data revealed a critical bottleneck in the grammar `PARUnl` - the `equals`
-operation:
-
-<figure style="text-align: center;"> <img alt="profiling grammar `project`" src="benchmark/results/figures/profiling_project.jpg"/> <figcaption>The results of profiling the <code>taint/batterydoc.dot</code> graph using the grammar <code>PARUnl</code></figcaption></figure>
-
-### Influence on combined methods (`COM`, `COMD`)
-
-The problem with `PARUnl` has a cascading effect on more accurate approximation methods - `COM` and `COMD`.
-
-The `COM` method calculates the intersection of the results of several grammars, including `PARUnl`.  
-Only thanks to other components (`PAR2E`, `PARErase`), the overall execution time is not as bad as with the `PARUnl`
-method.
-
-The situation is similar with the `COMD` grammar, in which UCFS is repeatedly invoked with the `PARUnl` grammar.
 
 #### Accuracy of approximations
 
@@ -347,14 +337,14 @@ The comparison was conducted on the [`taint_additional dataset`](benchmark/taint
 | **Grammar `COM`:**                                                                    | **Grammar `COMD`:**                                                                 |
 | <img alt="COM" src="benchmark/results/taint_additional/all_go_vs_kotlin_taint_additional.png">          | <img alt="COMD" src="benchmark/results/taint_additional/on-demand_go_vs_kotlin_taint_additional.png"> |
 
-On the larger `taint_additional` dataset, both implementations experience timeout issues (`T/O`), and the GLL-based implementation also experiences out-of-memory issues (`OOM`) for many grammar-graph combinations. Overall, however, the GLL-based implementation provided the answer in more cases. However, where comparisons are possible:
+On the larger `taint_additional` dataset, both implementations experience timeout issues (`T/O`), and the GLL-based implementation also experiences out-of-memory issues (`OOM`) for some grammar-graph combinations. Overall, however, the GLL-based implementation provided the answer in more cases. However, where comparisons are possible:
 
 1. Successful completions:
-	- On `scipiex` (`PAR`): Kotlin 28.5s vs. Go 2256s (79× speedup)
-	- On `simhosy` (`PAR`): Kotlin 17.2s vs. Go 1257s (73× speedup)
+	- On `scipiex` (`PAR`): Kotlin 25.8s vs. Go 2256s (87× speedup)
+	- On `simhosy` (`PAR`): Kotlin 15.5s vs. Go 1257s (81× speedup)
 
 2. Challenges:
-	- Kotlin encounters `OOM` with `PAR2`, `PARErase`, and `PARD` grammars on `phospy`
+	- Kotlin encounters `OOM` with `PARErase` grammar on `phospy`
 	- Go experiences timeouts more frequently across grammars
 
 #### Performance Shift: `PARErase` vs. `PARD`
@@ -363,12 +353,6 @@ In the smaller `taint` dataset, `PARErase` was faster than `PARD`. However, in `
 due to the multi-pass execution bottleneck.
 
 This can be explained by the fact that as the graph size and the number of unique bracket identifiers ($n_b$) increase, `PARErase's` performance significantly decreases: the algorithm performs an exhaustive path search in a loop for each unique bracket identifier ([code](src/main/kotlin/org/cfl_idr_with_gll/Approximation.kt#L405)).
-
-### Profiling problem graph
-
-Similar to profiling the `PARUnl` grammar for simpler graphs, a problem with the `equals` function is visible here:
-
-<figure style="text-align: center;"> <img alt="profiling grammar `parity2`" src="benchmark/results/figures/profiling_parity2.jpg"/> <figcaption>The results of profiling the <code>taint_additional/skullkey.dot</code> graph using the grammar <code>PAR</code></figcaption></figure>
 
 #### Accuracy of approximations
 
@@ -385,7 +369,7 @@ Similar to profiling the `PARUnl` grammar for simpler graphs, a problem with the
 
 ### Summary and Conclusions
 
-1. **Performance Improvement:** The Kotlin implementation using the GLL-based algorithm provides a significant average speedup (12.3x) compared to the Go benchmark solver in benchmarks where both implementations succeed.
+1. **Performance Improvement:** The Kotlin implementation using the GLL-based algorithm provides a significant average speedup (13.6x) compared to the Go benchmark solver in benchmarks where both implementations succeed.
 
 2. **Correctness preserved:** Identical approximation results across implementations validate the semantic fidelity of the UCFS-based approach.
 
