@@ -50,14 +50,10 @@ def run_bench_for_grammar(
 
             raw_results = run_measurements(kotlin_cmd, graph, grammar)
 
-            valid_times = [
-                t
-                for t in raw_results
-                if isinstance(t, (int, float)) and not np.isnan(t)
-            ]
+            valid_mes = [r for r in raw_results if isinstance(r, tuple)]
 
-            if valid_times:
-                stats = analyze(valid_times)
+            if valid_mes:
+                stats = analyze(valid_mes)
                 results[graph] = {
                     "mean": stats["mean"],
                     "error": stats["error"],
@@ -72,8 +68,16 @@ def run_bench_for_grammar(
                 }
 
                 time_str = f"{stats['mean']:.3f}±{stats['error']:.3f}"
+
+                rss_str = (
+                    f"{stats['peak_rss_mb']:.1f}±{stats['rss_error']:.1f}"
+                    if not np.isnan(stats["peak_rss_mb"])
+                    else "N/A"
+                )
+
                 f.write(
-                    f"{grammar:8} | {os.path.basename(graph):20} | {time_str:20} | {under:10} | {over:10} | {diff:10}\n"
+                    f"{grammar:8} | {os.path.basename(graph):20} | {time_str:20} | "
+                    f"{rss_str:17} | {under:10} | {over:10} | {diff:10}\n"
                 )
 
             else:
@@ -86,7 +90,8 @@ def run_bench_for_grammar(
                     "diff": status,
                 }
                 f.write(
-                    f"{grammar:8} | {os.path.basename(graph):20} | {status:20} | {status:10} | {status:10} | {status:10}\n"
+                    f"{grammar:8} | {os.path.basename(graph):20} | {status:20} | "
+                    f"{'N/A':17} | {'N/A':17}\n"
                 )
 
             f.flush()
@@ -147,9 +152,9 @@ if __name__ == "__main__":
 
     with open(results_file, "w", encoding="utf-8") as f:
         f.write(
-            f"{'Grammar':8} | {'Graph':20} | {'Time':20} | {'Under':10} | {'Over':10} | {'Diff':10}\n"
+            f"{'Grammar':8} | {'Graph':20} | {'Time':20} | {'Peak RSS MB':17} | {'Under':10} | {'Over':10} | {'Diff':10}\n"
         )
-        f.write("-" * 93 + "\n")
+        f.write("-" * 113 + "\n")
 
     kotlin_cmd = make_kotlin_cmd(KOTLIN_OUTPUT_DIR, valueflow)
 

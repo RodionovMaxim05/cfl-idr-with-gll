@@ -29,23 +29,26 @@ KOTLIN_JAR = "../build/libs/cfl-idr-with-gll-all.jar"
 def run_measurements(
     cmd_func: List[str], filename: str, grammar: str
 ) -> List[Union[float, str]]:
-    times = []
+    results = []
 
     for i in range(REPEATS):
-        res = measure_time(cmd_func(filename, grammar))
+        res = measure_time_and_memory(cmd_func(filename, grammar))
         print(res)
-        times.append(res)
-        if i == 0 and not isinstance(res, (int, float)):
+        results.append(res)
+        if i == 0 and not isinstance(res, tuple):
             break
 
-    return times
+    return results
 
 
-def measure_time(cmd: List[str]) -> Union[float, str]:
+def measure_time_and_memory(cmd: List[str]) -> Union[tuple, str]:
     try:
+        flags = []
+        full_cmd = ["/usr/bin/time", "-f", "%M"] + [cmd[0]] + flags + cmd[1:]
+
         start = time.perf_counter()
         result = subprocess.run(
-            cmd,
+            full_cmd,
             shell=False,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -70,7 +73,10 @@ def measure_time(cmd: List[str]) -> Union[float, str]:
             )
             return np.nan
 
-        return elapsed
+        peak_rss_kb = int(result.stderr.strip().splitlines()[-1])
+        peak_rss_mb = peak_rss_kb / 1024
+
+        return elapsed, peak_rss_mb
 
     except subprocess.TimeoutExpired:
         print("Command timed out", file=sys.stderr)
@@ -80,15 +86,29 @@ def measure_time(cmd: List[str]) -> Union[float, str]:
         return np.nan
 
 
-def analyze(times: list[float]) -> dict:
-    t = np.array(times)
+def analyze(raw_results: list) -> dict:
+    valid = [r for r in raw_results if isinstance(r, tuple)]
 
-    mean_time = np.mean(t)
-    conf_interval = stats.t.ppf(0.975, df=len(t) - 1) * stats.sem(t)
+    times = np.array([r[0] for r in valid])
+    rss = np.array([r[1] for r in valid if not np.isnan(r[1])])
+
+    mean_time = np.mean(times)
+    conf_interval = (
+        stats.t.ppf(0.975, df=len(times) - 1) * stats.sem(times)
+        if len(times) > 1
+        else 0.0
+    )
+
+    mean_rss = np.mean(rss) if len(rss) > 0 else float("nan")
+    rss_error = (
+        stats.t.ppf(0.975, df=len(rss) - 1) * stats.sem(rss) if len(rss) > 1 else 0.0
+    )
 
     return {
         "mean": mean_time,
         "error": conf_interval,
+        "peak_rss_mb": mean_rss,
+        "rss_error": rss_error,
     }
 
 
