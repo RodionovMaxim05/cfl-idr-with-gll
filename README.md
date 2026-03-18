@@ -250,7 +250,7 @@ Below are the key properties of each graph. $|V|$ and $|E|$ represent the number
 >
 > Performance measurements for the `taint` and `taint_additional` datasets were performed on an [optimized version of UCFS](libs/solver-new.jar) - the optimization code is available in [PR](https://github.com/FormalLanguageConstrainedPathQuerying/UCFS/pull/50).
 >
-> All other measurements (for the `valueflow` and `graphs_unlimited` sets) were performed on the [original UCFS version](libs/solver-original.jar) without optimizations - - the original code is available [here](https://github.com/FormalLanguageConstrainedPathQuerying/UCFS/tree/e9c92ba1a85e95e941d04163cd4b55f50686c1f7).
+> All other measurements (for the `valueflow` and `graphs_unlimited` sets) were performed on the [original UCFS version](libs/solver-original.jar) without optimizations - the original code is available [here](https://github.com/FormalLanguageConstrainedPathQuerying/UCFS/tree/e9c92ba1a85e95e941d04163cd4b55f50686c1f7).
 
 ## Implementation Comparison: Go vs Kotlin
 
