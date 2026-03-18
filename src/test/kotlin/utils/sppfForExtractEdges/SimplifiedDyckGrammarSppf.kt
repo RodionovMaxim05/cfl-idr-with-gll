@@ -18,123 +18,123 @@ fun buildSimplifiedDyckGrammarSppf(): Set<RangeSppfNode<Int>> {
 	// Branch 1: [0;0] -> Nonterminal -> Range -> Epsilon
 	// -------------------
 
-	val epsilon00 = RangeSppfNode(
+	val epsilon00 = LeafSppfNode(
 		inputRange = InputRange(0, 0),
 		rsmRange = RsmRange(s0, s0),
 		type = EpsilonNonterminalType(s0)
 	)
 
-	val innerRange00 = RangeSppfNode(
+	val innerRange00 = VariadicSppfNode(
 		inputRange = InputRange(0, 0),
 		rsmRange = RsmRange(s0, s0),
 		type = Range
-	).apply { children.add(epsilon00) }
+	).apply { addChild(epsilon00) }
 
-	val nonterm00 = RangeSppfNode(
+	val nonterm00 = VariadicSppfNode(
 		inputRange = InputRange(0, 0),
 		rsmRange = RsmRange(s0, s1),
 		type = NonterminalType(s0)
-	).apply { children.add(innerRange00) }
+	).apply { addChild(innerRange00) }
 
-	val rangeTop00 = RangeSppfNode(
+	val rangeTop00 = VariadicSppfNode(
 		inputRange = InputRange(0, 0),
 		rsmRange = RsmRange(s0, s1),
 		type = Range
-	).apply { children.add(nonterm00) }
+	).apply { addChild(nonterm00) }
 
 	// -------------------
 	// Branch 2: [0;2]
 	// -------------------
 
-	val epsilon11 = RangeSppfNode(
+	val epsilon11 = LeafSppfNode(
 		inputRange = InputRange(1, 1),
 		rsmRange = RsmRange(s0, s0),
 		type = EpsilonNonterminalType(s0)
 	)
 
-	val innerRange11 = RangeSppfNode(
+	val innerRange11 = VariadicSppfNode(
 		inputRange = InputRange(1, 1),
 		rsmRange = RsmRange(s0, s0),
 		type = Range
-	).apply { children.add(epsilon11) }
+	).apply { addChild(epsilon11) }
 
-	val nonterm11 = RangeSppfNode(
+	val nonterm11 = VariadicSppfNode(
 		inputRange = InputRange(1, 1),
 		rsmRange = RsmRange(s1, s2),
 		type = NonterminalType(s0)
-	).apply { children.add(innerRange11) }
+	).apply { addChild(innerRange11) }
 
-	val range01ForNonterm11 = RangeSppfNode(
+	val range01ForNonterm11 = VariadicSppfNode(
 		inputRange = InputRange(1, 1),
 		rsmRange = RsmRange(s1, s2),
 		type = Range
-	).apply { children.add(nonterm11) }
+	).apply { addChild(nonterm11) }
 
-	val terminalOpen = RangeSppfNode(
+	val terminalOpen = LeafSppfNode(
 		inputRange = InputRange(0, 1),
 		rsmRange = null,
 		type = TerminalType(MockTerminal("("))
 	)
 
-	val range01InnerForTerminal = RangeSppfNode(
+	val range01InnerForTerminal = VariadicSppfNode(
 		inputRange = InputRange(0, 1),
 		rsmRange = RsmRange(s0, s1),
 		type = Range
-	).apply { children.add(terminalOpen) }
+	).apply { addChild(terminalOpen) }
 
-	val intermediateInner01 = RangeSppfNode(
+	val intermediateInner01 = BinarySppfNode(
 		inputRange = InputRange(0, 1),
 		rsmRange = RsmRange(s0, s2),
 		type = IntermediateType(s1, 1)
 	).apply {
-		children.add(range01InnerForTerminal)
-		children.add(range01ForNonterm11)
+		addChild(range01InnerForTerminal)
+		addChild(range01ForNonterm11)
 	}
 
-	val range01 = RangeSppfNode(
+	val range01 = VariadicSppfNode(
 		inputRange = InputRange(0, 1),
 		rsmRange = RsmRange(s0, s2),
 		type = Range
-	).apply { children.add(intermediateInner01) }
+	).apply { addChild(intermediateInner01) }
 
-	val terminalClose = RangeSppfNode(
+	val terminalClose = LeafSppfNode(
 		inputRange = InputRange(1, 2),
 		rsmRange = null,
 		type = TerminalType(MockTerminal(")"))
 	)
 
-	val range12 = RangeSppfNode(
+	val range12 = VariadicSppfNode(
 		inputRange = InputRange(1, 2),
 		rsmRange = RsmRange(s2, s3),
 		type = Range
-	).apply { children.add(terminalClose) }
+	).apply { addChild(terminalClose) }
 
-	val intermediateTop = RangeSppfNode(
+	val intermediateTop = BinarySppfNode(
 		inputRange = InputRange(0, 2),
 		rsmRange = RsmRange(s0, s3),
 		type = IntermediateType(s2, 1)
 	).apply {
-		children.add(range01)
-		children.add(range12)
+		addChild(range01)
+		addChild(range12)
 	}
 
-	val innerRange02 = RangeSppfNode(
+	val innerRange02 = VariadicSppfNode(
 		inputRange = InputRange(0, 2),
 		rsmRange = RsmRange(s0, s3),
 		type = Range
-	).apply { children.add(intermediateTop) }
+	).apply { addChild(intermediateTop) }
 
-	val nonterm02 = RangeSppfNode(
+	val nonterm02 = VariadicSppfNode(
 		inputRange = InputRange(0, 2),
 		rsmRange = RsmRange(s0, s1),
 		type = NonterminalType(s0)
-	).apply { children.add(innerRange02) }
+	).apply { addChild(innerRange02) }
 
-	val rangeTop02 = RangeSppfNode(
+	val rangeTop02 = VariadicSppfNode(
 		inputRange = InputRange(0, 2),
 		rsmRange = RsmRange(s0, s1),
 		type = Range
-	).apply { children.add(nonterm02) }
+	).apply { addChild(nonterm02) }
 
 	return setOf(rangeTop00, rangeTop02)
 }

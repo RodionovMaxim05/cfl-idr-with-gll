@@ -13,45 +13,44 @@ fun buildCyclicSppf(): Set<RangeSppfNode<Int>> {
 	val s00 = RsmState(S, isStart = true, isFinal = true, numId = 0)
 	val s1 = RsmState(S, isStart = false, isFinal = true, numId = 1)
 
-
-	val range01 = RangeSppfNode(
+	val range01 = VariadicSppfNode(
 		inputRange = InputRange(0, 1),
 		rsmRange = RsmRange(s0, s1),
 		type = Range
 	)
 
-	val innerNonterm = RangeSppfNode(
+	val innerNonterm = VariadicSppfNode(
 		inputRange = InputRange(0, 1),
 		rsmRange = RsmRange(s0, s1),
 		type = NonterminalType(s00)
 	).apply {
-		children.add(range01)
+		addChild(range01)
 	}
 
-	val terminalA = RangeSppfNode(
+	val terminalA = LeafSppfNode(
 		inputRange = InputRange(0, 1),
 		rsmRange = null,
 		type = TerminalType(MockTerminal("a"))
 	)
 
 	// Make a cycle
-	range01.children.add(terminalA)
-	range01.children.add(innerNonterm)
+	range01.addChild(terminalA)
+	range01.addChild(innerNonterm)
 
-	val outerNonterm = RangeSppfNode(
+	val outerNonterm = VariadicSppfNode(
 		inputRange = InputRange(0, 1),
 		rsmRange = RsmRange(s0, s1),
 		type = NonterminalType(s0)
 	).apply {
-		children.add(range01)
+		addChild(range01)
 	}
 
-	val rootRange = RangeSppfNode(
+	val rootRange = VariadicSppfNode(
 		inputRange = InputRange(0, 1),
 		rsmRange = RsmRange(s00, s1),
 		type = Range
 	).apply {
-		children.add(outerNonterm)
+		addChild(outerNonterm)
 	}
 
 	return setOf(rootRange)
