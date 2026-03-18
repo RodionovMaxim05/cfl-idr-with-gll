@@ -42,15 +42,9 @@ KOTLIN_CMD = lambda filename, grammar: [
 
 
 def process_results(raw_times: list) -> dict:
-    valid_times = [
-        t for t in raw_times if isinstance(t, (int, float)) and not np.isnan(t)
-    ]
+    valid = [t for t in raw_times if isinstance(t, tuple)]
 
-    if valid_times:
-        stats = analyze(valid_times)
-        return {"mean": stats["mean"], "error": stats["error"]}
-    else:
-        return {"mean": raw_times[0], "error": 0.0}
+    return analyze(valid)
 
 
 def run_bench_for_grammar(
@@ -75,15 +69,15 @@ def run_bench_for_grammar(
 
     if os.path.getsize(go_file) == 0:
         f_go.write(
-            f"{'Grammar':8} | {'Graph':20} | {'Time':20} | {'Under':10} | {'Over':10} | {'Diff':10}\n"
+            f"{'Grammar':8} | {'Graph':20} | {'Time':20} | {'Peak RSS MB':17} | {'Under':10} | {'Over':10} | {'Diff':10}\n"
         )
-        f_go.write("-" * 93 + "\n")
+        f_go.write("-" * 113 + "\n")
 
     if os.path.getsize(kotlin_file) == 0:
         f_kotlin.write(
-            f"{'Grammar':8} | {'Graph':20} | {'Time':20} | {'Under':10} | {'Over':10} | {'Diff':10}\n"
+            f"{'Grammar':8} | {'Graph':20} | {'Time':20} | {'Peak RSS MB':17} | {'Under':10} | {'Over':10} | {'Diff':10}\n"
         )
-        f_kotlin.write("-" * 93 + "\n")
+        f_kotlin.write("-" * 113 + "\n")
 
     for graph in GRAPHS:
         print(f"=== {graph} ===")
@@ -97,13 +91,18 @@ def run_bench_for_grammar(
         if isinstance(go_result["mean"], (int, float)):
             diff, under, over = parse_output(graph, GO_OUTPUT_DIR)
             time_str = f"{go_result['mean']:.3f}±{go_result['error']:.3f}"
+            rss_str = (
+                f"{go_result['peak_rss_mb']:.1f}±{go_result['rss_error']:.1f}"
+                if not np.isnan(go_result["peak_rss_mb"])
+                else "N/A"
+            )
+
             f_go.write(
-                f"{GRAMMAR_LABELS[grammar]:8} | {graph_name:20} | {time_str:20} | {under:10} | {over:10} | {diff:10}\n"
+                f"{grammar:8} | {graph_name:20} | {time_str:20} | "
+                f"{rss_str:17} | {under:10} | {over:10} | {diff:10}\n"
             )
         else:
-            f_go.write(
-                f"{GRAMMAR_LABELS[grammar]:8} | {graph_name:20} | {go_result['mean']:20}\n"
-            )
+            f_go.write(f"{grammar:8} | {graph_name:20} | {go_result['mean']:20}\n")
         f_go.flush()
 
         # --- Kotlin ---
@@ -123,8 +122,15 @@ def run_bench_for_grammar(
             }
 
             time_str = f"{kt_result['mean']:.3f}±{kt_result['error']:.3f}"
+            rss_str = (
+                f"{kt_result['peak_rss_mb']:.1f}±{kt_result['rss_error']:.1f}"
+                if not np.isnan(kt_result["peak_rss_mb"])
+                else "N/A"
+            )
+
             f_kotlin.write(
-                f"{GRAMMAR_LABELS[grammar]:8} | {graph_name:20} | {time_str:20} | {under:10} | {over:10} | {diff:10}\n"
+                f"{grammar:8} | {graph_name:20} | {time_str:20} | "
+                f"{rss_str:17} | {under:10} | {over:10} | {diff:10}\n"
             )
         else:
             status = kt_result["mean"]
