@@ -466,7 +466,9 @@ private fun <V, L : ILabel> mutualRefinement(
 				curParityK,
 				sppfCache,
 				valueflow,
-				terminalFormat
+				terminalFormat,
+				checkOnePath,
+				targetPath
 			)
 
 			if (checkOnePath) {

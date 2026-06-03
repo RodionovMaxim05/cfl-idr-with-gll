@@ -26,8 +26,8 @@ exclude  | simhosy.dot          | 1021.199±11.874      | 105251.1±1531.9     |
 exclude  | skullkey.dot         | T/O                  | T/O                 |
 
 parityD  | phospy.dot           | T/O                  | T/O                 |
-parityD  | scipiex.dot          | 365.958±12.385       | 29629.4±1258.9      |       1699 |       3505 |       1806
-parityD  | simhosy.dot          | 2688.150±44.637      | 26308.8±1316.7      |       6722 |      27041 |      20319
+parityD  | scipiex.dot          | 323.839±2.456        | 27783.2±331.5       |       1699 |       3002 |       1303
+parityD  | simhosy.dot          | 2434.204±44.985      | 24651.6±260.4       |       6722 |      24719 |      17997
 parityD  | skullkey.dot         | T/O                  | T/O                 |
 
 all      | phospy.dot           | T/O                  | T/O                 |
