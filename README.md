@@ -259,7 +259,7 @@ Below are the key properties of each graph. $|V|$ and $|E|$ represent the number
 For the `taint` dataset, each benchmark execution was repeated 5 times. The results presented in the charts below are the average values ​​of these measurements.  
 The sample standard deviation for all measured execution times does not exceed 10% (only 3 of 176 measurements exceed 7%, and all of these measurements were obtained using the Kotlin implementation, with an average time of less than 0.5 seconds, which can be explained by natural error). This variance is low enough to allow meaningful conclusions, as the performance differences between the Go and Kotlin implementations significantly exceed this statistical limit.
 
-For the `taint_additional` dataset, each benchmark execution was repeated 3 times. The sample standard deviation for all measured execution times does not exceed 2%. This variance is also low enough to draw meaningful conclusions.
+For the `taint_additional` dataset, each benchmark execution was repeated 5 times. The sample standard deviation for all measured execution times does not exceed 2%. This variance is also low enough to draw meaningful conclusions.
 
 95% confidence intervals were also calculated for all average execution times.
 
