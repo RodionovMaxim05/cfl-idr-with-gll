@@ -163,11 +163,11 @@ object Main {
 		outputFile.appendText("\nOver approximation paths (${grammar}): ${overPaths.size}\n")
 
 		if (!onDemand && !parityD) {
-			outputFile.appendText(buildString {
-				if (!quiet) {
-					overPaths.forEach { append("\t$it\n") }
-				}
-			})
+			if (!quiet) {
+				outputFile.appendText(buildString {
+					overPaths.forEach { append("\t${it.source} ${it.target}\n") }
+				})
+			}
 
 			println("Analysis completed. Results written to ${outputFile.absolutePath}")
 			return
@@ -176,8 +176,11 @@ object Main {
 		val onDemandPaths = getOnDemandMR(inputGraph, underPaths, overPaths, parityD, valueflow)
 
 		outputFile.appendText("\nOn-Demand paths: ${onDemandPaths.size}\n")
+
 		if (!quiet) {
-			onDemandPaths.forEach { outputFile.appendText("\t$it\n") }
+			outputFile.appendText(buildString {
+				onDemandPaths.forEach { append("\t${it.source} ${it.target}\n") }
+			})
 		}
 
 		println("On-demand refinement completed. Results written to ${outputFile.absolutePath}")
