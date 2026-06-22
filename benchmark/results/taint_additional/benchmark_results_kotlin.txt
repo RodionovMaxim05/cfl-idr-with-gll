@@ -34,3 +34,8 @@ all      | phospy.dot           | T/O                  | T/O                 |
 all      | scipiex.dot          | T/O                  | T/O                 |
 all      | simhosy.dot          | T/O                  | T/O                 |
 all      | skullkey.dot         | T/O                  | T/O                 |
+
+on-demand| phospy.dot           | T/O                  | T/O                 |
+on-demand| scipiex.dot          | T/O                  | T/O                 |
+on-demand| simhosy.dot          | T/O                  | T/O                 |
+on-demand| skullkey.dot         | T/O                  | T/O                 |

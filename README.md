@@ -173,14 +173,14 @@ All graphs were obtained from publicly available sources:
 
 - `taint` - graphs from the [taint analysis for Android](https://dl.acm.org/doi/10.1145/2771783.2771803), taken from [this repository](https://github.com/sdingcn/mutual-refinement/tree/main/exp). This data exactly matches the data analyzed in the underlying paper.
 - `taint_additional` - graphs from the same source. They relate to the same area of taint analysis but were not included in the evaluation of the underlying paper; the suffix _additional denotes this distinction.
-- `valueflow` - graphs from [value-flow analysis for LLVM](https://dl.acm.org/doi/10.1145/2892208.2892235), also sourced from the same repository above.
+<!-- - `valueflow` - graphs from [value-flow analysis for LLVM](https://dl.acm.org/doi/10.1145/2892208.2892235), also sourced from the same repository above.
 - `graphs_unlimited` - Java program-analysis graphs from [this repository](https://github.com/verbinna22/graphs_unlimited/tree/main). In the source repository, each project includes two files:
   - `<name>.g` - original graph extracted from source code;
   - `<name>_slx.g` - context-reduced variant.  
 	Labels were uniformly mapped to Dyck symbols:
    	- Store / Load → Open/Close Brackets
    	- Assign Open / Assign Close → Open/Close Parentheses
-   	- Everything else → Normal label
+   	- Everything else → Normal label -->
 
 Below are the key properties of each graph. $|V|$ and $|E|$ represent the number of nodes and edges, respectively; $n_α$ and $n_β$ represent the number of parenthesis and bracket labels present in the graph.
 
@@ -209,7 +209,7 @@ Below are the key properties of each graph. $|V|$ and $|E|$ represent the number
 | simhosy   | 4 253   | 13 768  | 2 894  | 330   |
 | skullkey  | 18 862  | 69 599  | 12 316 | 1 340 |
 
-### valueflow
+<!-- ### valueflow
 
 | Benchmark | $\|V\|$ | $\|E\|$ | $n_a$  | $n_b$ |
 |-----------|---------|---------|--------|-------|
@@ -243,14 +243,14 @@ Below are the key properties of each graph. $|V|$ and $|E|$ represent the number
 | org_jivesoftware_openfire     | 298 555 | 1 006 577 | 14 159 | 5 270 |
 | org_jivesoftware_openfire_slx | 298 555 | 1 006 577 | 0      | 5 270 |
 | reactor                       | 26 999  | 84 197    | 1 567  | 414   |
-| reactor_slx                   | 26 999  | 84 197    | 0      | 414   |
+| reactor_slx                   | 26 999  | 84 197    | 0      | 414   | -->
 
 > [!IMPORTANT]
 > **Important warning about the measurement conditions**
 >
 > Performance measurements for the `taint` and `taint_additional` datasets were performed on an [optimized version of UCFS](libs/solver-new.jar) - the optimization code is available in [PR](https://github.com/FormalLanguageConstrainedPathQuerying/UCFS/pull/50).
->
-> All other measurements (for the `valueflow` and `graphs_unlimited` sets) were performed on the [original UCFS version](libs/solver-original.jar) without optimizations - the original code is available [here](https://github.com/FormalLanguageConstrainedPathQuerying/UCFS/tree/e9c92ba1a85e95e941d04163cd4b55f50686c1f7).
+<!-- >
+> All other measurements (for the `valueflow` and `graphs_unlimited` sets) were performed on the [original UCFS version](libs/solver-original.jar) without optimizations - the original code is available [here](https://github.com/FormalLanguageConstrainedPathQuerying/UCFS/tree/e9c92ba1a85e95e941d04163cd4b55f50686c1f7). -->
 
 ## Implementation Comparison: Go vs Kotlin
 
@@ -276,13 +276,13 @@ The following charts compare the execution times between the Go and Kotlin imple
 |                                                                 |                                                               |
 |-----------------------------------------------------------------|---------------------------------------------------------------|
 | **Grammar `PAR`:**                                              | **Grammar `PAR2`:**                                           |
-| <img alt="PAR" src="benchmark/results/taint/parity_go_vs_kotlin_taint.png">       | <img alt="PAR2" src="benchmark/results/taint/parity2_go_vs_kotlin_taint.png">   |
+| <img alt="PAR" src="benchmark/results/taint/parity_time_comparison.png">       | <img alt="PAR2" src="benchmark/results/taint/parity2_time_comparison.png">   |
 | **Grammar `PAR2E`:**                                            | **Grammar `PARUnl`:**                                         |
-| <img alt="PAR2E" src="benchmark/results/taint/se_go_vs_kotlin_taint.png">         | <img alt="PARUnl" src="benchmark/results/taint/project_go_vs_kotlin_taint.png"> |
+| <img alt="PAR2E" src="benchmark/results/taint/se_time_comparison.png">         | <img alt="PARUnl" src="benchmark/results/taint/project_time_comparison.png"> |
 | **Grammar `PARErase`:**                                         | **Grammar `PARD`:**                                           |
-| <img alt="PARErase" src="benchmark/results/taint/exclude_go_vs_kotlin_taint.png"> | <img alt="PARD" src="benchmark/results/taint/parityD_go_vs_kotlin_taint.png">   |
+| <img alt="PARErase" src="benchmark/results/taint/exclude_time_comparison.png"> | <img alt="PARD" src="benchmark/results/taint/parityD_time_comparison.png">   |
 | **Grammar `COM`:**                                              | **Grammar `COMD`:**                                           |
-| <img alt="COM" src="benchmark/results/taint/all_go_vs_kotlin_taint.png">          | <img alt="COMD" src="benchmark/results/taint/on-demand_go_vs_kotlin_taint.png"> |
+| <img alt="COM" src="benchmark/results/taint/all_time_comparison.png">          | <img alt="COMD" src="benchmark/results/taint/on-demand_time_comparison.png"> |
 
 There is a consistent pattern: the Kotlin (using GLL-based algorithm) implementation is faster than the original Go implementation for almost all grammars and graphs. The exceptions are limited to 1 graphs when using the `PARUnl` grammar.
 
@@ -303,22 +303,22 @@ grammar. The total execution time follows these sequences (from fastest to slowe
 
 #### Per-Graph Trade-off Analysis (Time vs. Precision)
 
-The following charts illustrate the relationship between execution time and approximation accuracy (measured as $R_{over} - R_{under}$) for individual graphs:
+The following charts illustrate the relationship between execution time and approximation accuracy (measured as $R_{over}$) for individual graphs:
 
 |                                                                                      |                                                                                  |
 |--------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
 | **Graph `backflash`:**                                                               | **Graph `batterydoc`:**                                                          |
-| <img alt="backflash" src="benchmark/results/taint/application/backflash_time_vs_diff_taint.png">       | <img alt="batterydoc" src="benchmark/results/taint/application/batterydoc_time_vs_diff_taint.png"> |
+| <img alt="backflash" src="benchmark/results/taint/application/graph_backflash_time_comparison.png">       | <img alt="batterydoc" src="benchmark/results/taint/application/graph_batterydoc_time_comparison.png"> |
 | **Graph `droidkongfu`:**                                                             | **Graph `fakebanker`:**                                                          |
-| <img alt="droidkongfu" src="benchmark/results/taint/application/droidkongfu_time_vs_diff_taint.png">   | <img alt="fakebanker" src="benchmark/results/taint/application/fakebanker_time_vs_diff_taint.png"> |
+| <img alt="droidkongfu" src="benchmark/results/taint/application/graph_droidkongfu_time_comparison.png">   | <img alt="fakebanker" src="benchmark/results/taint/application/graph_fakebanker_time_comparison.png"> |
 | **Graph `fakedaum`:**                                                                | **Graph `faketaobao`:**                                                          |
-| <img alt="fakedaum" src="benchmark/results/taint/application/fakedaum_time_vs_diff_taint.png">         | <img alt="faketaobao" src="benchmark/results/taint/application/faketaobao_time_vs_diff_taint.png"> |
+| <img alt="fakedaum" src="benchmark/results/taint/application/graph_fakedaum_time_comparison.png">         | <img alt="faketaobao" src="benchmark/results/taint/application/graph_faketaobao_time_comparison.png"> |
 | **Graph `jollyserv`:**                                                               | **Graph `loozfon`:**                                                             |
-| <img alt="jollyserv" src="benchmark/results/taint/application/jollyserv_time_vs_diff_taint.png">       | <img alt="loozfon" src="benchmark/results/taint/application/loozfon_time_vs_diff_taint.png">       |
+| <img alt="jollyserv" src="benchmark/results/taint/application/graph_jollyserv_time_comparison.png">       | <img alt="loozfon" src="benchmark/results/taint/application/graph_loozfon_time_comparison.png">       |
 | **Graph `roidsec`:**                                                                 | **Graph `uranai`:**                                                              |
-| <img alt="roidsec" src="benchmark/results/taint/application/roidsec_time_vs_diff_taint.png">           | <img alt="uranai" src="benchmark/results/taint/application/uranai_time_vs_diff_taint.png">         |
+| <img alt="roidsec" src="benchmark/results/taint/application/graph_roidsec_time_comparison.png">           | <img alt="uranai" src="benchmark/results/taint/application/graph_uranai_time_comparison.png">         |
 | **Graph `zertsecurity`:**                                                            |                                                                                  |
-| <img alt="zertsecurity" src="benchmark/results/taint/application/zertsecurity_time_vs_diff_taint.png"> |                                                                                  |
+| <img alt="zertsecurity" src="benchmark/results/taint/application/graph_zertsecurity_time_comparison.png"> |                                                                                  |
 
 ### Results: `taint_additional` Dataset
 
@@ -329,13 +329,13 @@ The comparison was conducted on the [`taint_additional dataset`](benchmark/taint
 |                                                                                       |                                                                                     |
 |---------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
 | **Grammar `PAR`:**                                                                    | **Grammar `PAR2`:**                                                                 |
-| <img alt="PAR" src="benchmark/results/taint_additional/parity_go_vs_kotlin_taint_additional.png">       | <img alt="PAR2" src="benchmark/results/taint_additional/parity2_go_vs_kotlin_taint_additional.png">   |
+| <img alt="PAR" src="benchmark/results/taint_additional/parity_time_comparison.png">       | <img alt="PAR2" src="benchmark/results/taint_additional/parity2_time_comparison.png">   |
 | **Grammar `PAR2E`:**                                                                  | **Grammar `PARUnl`:**                                                               |
-| <img alt="PAR2E" src="benchmark/results/taint_additional/se_go_vs_kotlin_taint_additional.png">         | <img alt="PARUnl" src="benchmark/results/taint_additional/project_go_vs_kotlin_taint_additional.png"> |
+| <img alt="PAR2E" src="benchmark/results/taint_additional/se_time_comparison.png">         | <img alt="PARUnl" src="benchmark/results/taint_additional/project_time_comparison.png"> |
 | **Grammar `PARErase`:**                                                               | **Grammar `PARD`:**                                                                 |
-| <img alt="PARErase" src="benchmark/results/taint_additional/exclude_go_vs_kotlin_taint_additional.png"> | <img alt="PARD" src="benchmark/results/taint_additional/parityD_go_vs_kotlin_taint_additional.png">   |
+| <img alt="PARErase" src="benchmark/results/taint_additional/exclude_time_comparison.png"> | <img alt="PARD" src="benchmark/results/taint_additional/parityD_time_comparison.png">   |
 | **Grammar `COM`:**                                                                    | **Grammar `COMD`:**                                                                 |
-| <img alt="COM" src="benchmark/results/taint_additional/all_go_vs_kotlin_taint_additional.png">          | <img alt="COMD" src="benchmark/results/taint_additional/on-demand_go_vs_kotlin_taint_additional.png"> |
+| <img alt="COM" src="benchmark/results/taint_additional/all_time_comparison.png">          | <img alt="COMD" src="benchmark/results/taint_additional/on-demand_time_comparison.png"> |
 
 On the larger `taint_additional` dataset, both implementations experience timeout issues (`T/O`), and the GLL-based implementation also experiences out-of-memory issues (`OOM`) for some grammar-graph combinations. Overall, however, the GLL-based implementation provided the answer in more cases. However, where comparisons are possible:
 
@@ -363,9 +363,9 @@ This can be explained by the fact that as the graph size and the number of uniqu
 |                                                                                                  |                                                                                                  |
 |--------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
 | **Graph `phospy`:**                                                                              | **Graph `scipiex`:**                                                                             |
-| <img alt="phospy" src="benchmark/results/taint_additional/application/phospy_time_vs_diff_taint_additional.png">   | <img alt="scipiex" src="benchmark/results/taint_additional/application/scipiex_time_vs_diff_taint_additional.png"> |
+| <img alt="phospy" src="benchmark/results/taint_additional/application/graph_phospy_time_comparison.png">   | <img alt="scipiex" src="benchmark/results/taint_additional/application/graph_scipiex_time_comparison.png"> |
 | **Graph `simhosy`:**                                                                             |                                                                                                  |
-| <img alt="simhosy" src="benchmark/results/taint_additional/application/simhosy_time_vs_diff_taint_additional.png"> |                                                                                                  |
+| <img alt="simhosy" src="benchmark/results/taint_additional/application/graph_simhosy_time_comparison.png"> |                                                                                                  |
 
 ### Summary and Conclusions
 
@@ -377,7 +377,7 @@ This can be explained by the fact that as the graph size and the number of uniqu
 
 4. **Scalability trade-offs:** While Kotlin handles moderate-scale graphs more efficiently, both implementations face fundamental scalability barriers on the largest inputs.
 
-## Data set analysis
+<!-- ## Data set analysis
 
 ### Value-flow
 
@@ -435,7 +435,7 @@ The error occurs due to the recursive traversal of the grammar combinator struct
 For the subset of graphs that did complete (e.g., basic, collection, generalJava), the precision was high.
 
 - In most completed cases like collection_slx and generalJava_slx, the precision gap $|R_{over} - R_{under}|$ was 0, indicating that the approximation reached the exact solution.
-- Even in cases with a gap, such as basic or cornerCases, the difference remained constant at 2 across almost all grammar types.
+- Even in cases with a gap, such as basic or cornerCases, the difference remained constant at 2 across almost all grammar types. -->
 
 ## License
 
